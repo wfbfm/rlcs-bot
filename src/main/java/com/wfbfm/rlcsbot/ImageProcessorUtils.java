@@ -14,6 +14,8 @@ import java.nio.file.Paths;
 
 public class ImageProcessorUtils
 {
+    private static final int BUFFER = 30;
+
     public static void processImages(String imagePath, String csvFilePath) throws CsvValidationException
     {
         try
@@ -57,10 +59,12 @@ public class ImageProcessorUtils
             if (isWhiteOnBlue)
             {
                 processWhiteOnBlue(processedImage);
+                processedImage = addWhiteBorder(processedImage, 200);
             }
             else if (isWhiteOnOrange)
             {
                 processWhiteOnOrange(processedImage);
+                processedImage = addWhiteBorder(processedImage, 200);
             }
             else
             {
@@ -82,6 +86,21 @@ public class ImageProcessorUtils
         }
     }
 
+    private static BufferedImage addWhiteBorder(BufferedImage image, int borderSize) {
+        int width = image.getWidth() + 2 * borderSize;
+        int height = image.getHeight() + 2 * borderSize;
+
+        BufferedImage imageWithBorder = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D g2d = imageWithBorder.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, width, height);
+        g2d.drawImage(image, borderSize, borderSize, null);
+        g2d.dispose();
+
+        return imageWithBorder;
+    }
+
     private static void processWhiteOnBlue(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -95,7 +114,7 @@ public class ImageProcessorUtils
                 Color color = new Color(image.getRGB(x, y));
 
                 // Check if the pixel is within the blue channel
-                if (color.getBlue() > color.getRed() && color.getBlue() > color.getGreen())
+                if (color.getBlue() > (color.getRed() + BUFFER))
                 {
                     // Set everything in the Blue channel to White
                     image.setRGB(x, y, Color.WHITE.getRGB());
@@ -121,9 +140,9 @@ public class ImageProcessorUtils
                 Color color = new Color(image.getRGB(x, y));
 
                 // Check if the pixel is within the orange channel
-                if (color.getRed() > color.getBlue() && color.getGreen() > color.getBlue())
+                if (color.getRed() > (color.getBlue() + BUFFER))
                 {
-                    // Set everything in the Red and Green channels to White
+                    // Set everything in the Red
                     image.setRGB(x, y, Color.WHITE.getRGB());
                 } else
                 {
