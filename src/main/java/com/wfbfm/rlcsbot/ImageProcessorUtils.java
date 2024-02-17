@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
@@ -29,9 +30,11 @@ public class ImageProcessorUtils
                     int endX = Integer.parseInt(row[3]);
                     int endY = Integer.parseInt(row[4]);
                     boolean invert = Boolean.parseBoolean(row[5]);
+                    boolean isWhiteOnBlue = Boolean.parseBoolean(row[6]);
+                    boolean isWhiteOnOrange = Boolean.parseBoolean(row[7]);
 
                     // Crop, convert to greyscale, and save the image
-                    processAndSaveImage(imagePath, name, startX, startY, endX, endY, invert);
+                    processAndSaveImage(imagePath, name, startX, startY, endX, endY, invert, isWhiteOnBlue, isWhiteOnOrange);
                 }
             }
         } catch (IOException e)
@@ -40,7 +43,7 @@ public class ImageProcessorUtils
         }
     }
 
-    private static void processAndSaveImage(String imagePath, String name, int startX, int startY, int endX, int endY, boolean invert)
+    private static void processAndSaveImage(String imagePath, String name, int startX, int startY, int endX, int endY, boolean invert, boolean isWhiteOnBlue, boolean isWhiteOnOrange)
     {
         try
         {
@@ -50,20 +53,84 @@ public class ImageProcessorUtils
             // Crop the image
             BufferedImage croppedImage = cropImage(originalImage, startX, startY, endX, endY);
 
-            // Convert to greyscale
-            BufferedImage greyscaleImage = convertToGreyscale(croppedImage);
-
-            // Invert greyscale if needed
-            if (invert)
+            BufferedImage processedImage = croppedImage;
+            if (isWhiteOnBlue)
             {
-                invertGreyscale(greyscaleImage);
+                processWhiteOnBlue(processedImage);
+            }
+            else if (isWhiteOnOrange)
+            {
+                processWhiteOnOrange(processedImage);
+            }
+            else
+            {
+                // Convert to greyscale
+                processedImage = convertToGreyscale(croppedImage);
+
+                // Invert greyscale if needed
+                if (invert)
+                {
+                    invertGreyscale(processedImage);
+                }
             }
 
             // Save the processed image
-            saveImage(greyscaleImage, name);
+            saveImage(processedImage, name);
         } catch (IOException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private static void processWhiteOnBlue(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        // Iterate through each pixel
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // Get the color of the current pixel
+                Color color = new Color(image.getRGB(x, y));
+
+                // Check if the pixel is within the blue channel
+                if (color.getBlue() > color.getRed() && color.getBlue() > color.getGreen())
+                {
+                    // Set everything in the Blue channel to White
+                    image.setRGB(x, y, Color.WHITE.getRGB());
+                } else
+                {
+                    // Set everything else to Black
+                    image.setRGB(x, y, Color.BLACK.getRGB());
+                }
+            }
+        }
+    }
+
+    private static void processWhiteOnOrange(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        // Iterate through each pixel
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // Get the color of the current pixel
+                Color color = new Color(image.getRGB(x, y));
+
+                // Check if the pixel is within the orange channel
+                if (color.getRed() > color.getBlue() && color.getGreen() > color.getBlue())
+                {
+                    // Set everything in the Red and Green channels to White
+                    image.setRGB(x, y, Color.WHITE.getRGB());
+                } else
+                {
+                    // Set everything else to Black
+                    image.setRGB(x, y, Color.BLACK.getRGB());
+                }
+            }
         }
     }
 
