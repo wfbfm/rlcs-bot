@@ -7,10 +7,10 @@ public class RlcsBotApplication
 {
     public static void main(String[] args)
     {
-        final ExecutorService executorService = Executors.newFixedThreadPool(2);
+        final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-        final HeadlessTwitchWatcher twitchWatcher = new HeadlessTwitchWatcher();
-        executorService.submit(twitchWatcher::run);
+//        final HeadlessTwitchWatcher twitchWatcher = new HeadlessTwitchWatcher();
+//        executorService.submit(twitchWatcher::run);
 
         final GameScreenshotProcessor snapshotParser = new GameScreenshotProcessor();
         executorService.submit(snapshotParser::run);

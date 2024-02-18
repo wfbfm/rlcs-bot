@@ -120,7 +120,7 @@ public class GameScreenshotProcessor
             for (final SubImageStrategy subImageStrategy : this.subImageStrategies)
             {
                 final BufferedImage subImage = GameScreenshotProcessorUtils.createSubImageFromStrategy(originalImage, subImageStrategy);
-                final String outputPath = PROCESSING_DIRECTORY +
+                final String outputPath = PROCESSING_DIRECTORY + File.separator +
                         incomingFile.getName().replace(".png", "") + "-" + subImageStrategy.getName() + ".png";
                 GameScreenshotProcessorUtils.saveImage(subImage, outputPath);
             }

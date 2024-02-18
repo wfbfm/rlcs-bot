@@ -11,7 +11,7 @@ public class GameScreenshotProcessorUtils
 {
     public static BufferedImage createSubImageFromStrategy(final BufferedImage originalImage, final SubImageStrategy strategy)
     {
-        final BufferedImage subImage = cropImage(originalImage, strategy.getCropStartX(), strategy.getCropStartY(),
+         BufferedImage subImage = cropImage(originalImage, strategy.getCropStartX(), strategy.getCropStartY(),
                 strategy.getCropEndX(), strategy.getCropEndY());
 
         if (strategy.isWhiteOnBlue())
@@ -22,7 +22,7 @@ public class GameScreenshotProcessorUtils
             processWhiteOnOrange(subImage, strategy.getRgbComparisonBuffer());
         } else
         {
-            convertToGreyscale(subImage);
+            subImage = convertToGreyscale(subImage);
         }
 
         if (strategy.shouldInvertGreyscale())
@@ -32,7 +32,7 @@ public class GameScreenshotProcessorUtils
 
         if (strategy.getAdditionalBorderSize() > 0)
         {
-            addWhiteBorder(subImage, strategy.getAdditionalBorderSize());
+            subImage = addWhiteBorder(subImage, strategy.getAdditionalBorderSize());
         }
         return subImage;
     }
@@ -43,7 +43,7 @@ public class GameScreenshotProcessorUtils
         ImageIO.write(image, "png", outputPath.toFile());
     }
 
-    private static void addWhiteBorder(final BufferedImage originalImage, final int borderSize)
+    private static BufferedImage addWhiteBorder(final BufferedImage originalImage, final int borderSize)
     {
         final int originalWidth = originalImage.getWidth();
         final int originalHeight = originalImage.getHeight();
@@ -52,13 +52,13 @@ public class GameScreenshotProcessorUtils
 
         final BufferedImage imageWithBorder = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
 
-        final Graphics2D graphics2D = imageWithBorder.createGraphics();
-        graphics2D.setColor(Color.WHITE);
-        graphics2D.fillRect(0, 0, newWidth, newHeight);
-        graphics2D.drawImage(originalImage, borderSize, borderSize, null);
-        graphics2D.dispose();
+        final Graphics2D newGraphics = imageWithBorder.createGraphics();
+        newGraphics.setColor(Color.WHITE);
+        newGraphics.fillRect(0, 0, newWidth, newHeight);
+        newGraphics.drawImage(originalImage, borderSize, borderSize, null);
+        newGraphics.dispose();
 
-        originalImage.setData(imageWithBorder.getData());
+        return imageWithBorder;
     }
 
     private static void processWhiteOnBlue(final BufferedImage image, final int rgbComparisonBuffer)
@@ -124,12 +124,11 @@ public class GameScreenshotProcessorUtils
         return originalImage.getSubimage(startX, startY, endX - startX, endY - startY);
     }
 
-    private static void convertToGreyscale(final BufferedImage colourImage)
+    private static BufferedImage convertToGreyscale(final BufferedImage colourImage)
     {
         BufferedImage greyscaleImage = new BufferedImage(colourImage.getWidth(), colourImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         greyscaleImage.getGraphics().drawImage(colourImage, 0, 0, null);
-
-        colourImage.setData(greyscaleImage.getData());
+        return greyscaleImage;
     }
 
     private static void invertGreyscale(final BufferedImage greyscaleImage)
