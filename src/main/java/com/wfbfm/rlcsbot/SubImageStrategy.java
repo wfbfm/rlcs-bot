@@ -7,6 +7,7 @@ public class SubImageStrategy
     private int cropStartY;
     private int cropEndX;
     private int cropEndY;
+    private boolean shouldKeepColour;
     private boolean shouldInvertGreyscale;
     private boolean isWhiteOnBlue;
     private boolean isWhiteOnOrange;
@@ -18,17 +19,19 @@ public class SubImageStrategy
                             final int cropStartY,
                             final int cropEndX,
                             final int cropEndY,
-                            final boolean shouldInvertGreyscale,
+                            final boolean shouldKeepColour,
                             final boolean isWhiteOnBlue,
                             final boolean isWhiteOnOrange,
                             final int rgbComparisonBuffer,
-                            final int additionalBorderSize)
+                            final int additionalBorderSize,
+                            final boolean shouldInvertGreyscale)
     {
         this.name = name;
         this.cropStartX = cropStartX;
         this.cropStartY = cropStartY;
         this.cropEndX = cropEndX;
         this.cropEndY = cropEndY;
+        this.shouldKeepColour = shouldKeepColour;
         this.shouldInvertGreyscale = shouldInvertGreyscale;
         this.isWhiteOnBlue = isWhiteOnBlue;
         this.isWhiteOnOrange = isWhiteOnOrange;
@@ -84,6 +87,16 @@ public class SubImageStrategy
     public void setCropEndY(final int cropEndY)
     {
         this.cropEndY = cropEndY;
+    }
+
+    public boolean shouldKeepColour()
+    {
+        return shouldKeepColour;
+    }
+
+    public void setShouldKeepColour(final boolean shouldKeepColour)
+    {
+        this.shouldKeepColour = shouldKeepColour;
     }
 
     public boolean shouldInvertGreyscale()

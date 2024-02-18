@@ -1,6 +1,7 @@
 package com.wfbfm.rlcsbot;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -24,7 +25,7 @@ public class GameScreenshotProcessor
     private static final File PROCESSING_DIRECTORY = new File("src/main/temp/processing/");
     private static final File COMPLETE_DIRECTORY = new File("src/main/temp/complete/");
     private static final File IGNORED_DIRECTORY = new File("src/main/temp/ignored/");
-    private static final int POLLING_SLEEP_TIME_MS = 200;
+    private static final int POLLING_SLEEP_TIME_MS = 20000;
     private static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
     private final List<SubImageStrategy> subImageStrategies = new ArrayList<>();
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
@@ -36,7 +37,7 @@ public class GameScreenshotProcessor
 
     private void initialiseBroadcastSchemaFromConfig()
     {
-        try (CSVReader csvReader = new CSVReader(new FileReader(BROADCAST_SCHEMA_FILE_PATH)))
+        try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(BROADCAST_SCHEMA_FILE_PATH)).withSkipLines(1).build())
         {
             String[] row;
             while ((row = csvReader.readNext()) != null)
@@ -46,14 +47,16 @@ public class GameScreenshotProcessor
                 final int startY = Integer.parseInt(row[2]);
                 final int endX = Integer.parseInt(row[3]);
                 final int endY = Integer.parseInt(row[4]);
-                final boolean shouldInvertGreyscale = Boolean.parseBoolean(row[5]);
-                final boolean isWhiteOnBlue = Boolean.parseBoolean(row[6]);
-                final boolean isWhiteOnOrange = Boolean.parseBoolean(row[7]);
-                final int rgbComparisonBuffer = Integer.parseInt(row[8]);
-                final int additionalBorderSize = Integer.parseInt(row[9]);
+                final boolean shouldKeepColour = Boolean.parseBoolean(row[5]);
+                final boolean shouldInvertGreyscale = Boolean.parseBoolean(row[6]);
+                final boolean isWhiteOnBlue = Boolean.parseBoolean(row[7]);
+                final boolean isWhiteOnOrange = Boolean.parseBoolean(row[8]);
+                final int rgbComparisonBuffer = Integer.parseInt(row[9]);
+                final int additionalBorderSize = Integer.parseInt(row[10]);
 
-                final SubImageStrategy subImageStrategy = new SubImageStrategy(name, startX, startY, endX, endY, shouldInvertGreyscale,
-                        isWhiteOnBlue, isWhiteOnOrange, rgbComparisonBuffer, additionalBorderSize);
+                final SubImageStrategy subImageStrategy = new SubImageStrategy(name, startX, startY, endX, endY, shouldKeepColour,
+                        isWhiteOnBlue, isWhiteOnOrange, rgbComparisonBuffer, additionalBorderSize, shouldInvertGreyscale
+                );
 
                 this.subImageStrategies.add(subImageStrategy);
             }

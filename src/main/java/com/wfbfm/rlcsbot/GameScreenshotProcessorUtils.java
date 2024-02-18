@@ -17,10 +17,12 @@ public class GameScreenshotProcessorUtils
         if (strategy.isWhiteOnBlue())
         {
             processWhiteOnBlue(subImage, strategy.getRgbComparisonBuffer());
-        } else if (strategy.isWhiteOnOrange())
+        }
+        else if (strategy.isWhiteOnOrange())
         {
             processWhiteOnOrange(subImage, strategy.getRgbComparisonBuffer());
-        } else
+        }
+        else if (!strategy.shouldKeepColour())
         {
             subImage = convertToGreyscale(subImage);
         }
