@@ -1,0 +1,150 @@
+package com.wfbfm.rlcsbot;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class GameScreenshotProcessorUtils
+{
+    public static BufferedImage createSubImageFromStrategy(final BufferedImage originalImage, final SubImageStrategy strategy)
+    {
+        final BufferedImage subImage = cropImage(originalImage, strategy.getCropStartX(), strategy.getCropStartY(),
+                strategy.getCropEndX(), strategy.getCropEndY());
+
+        if (strategy.isWhiteOnBlue())
+        {
+            processWhiteOnBlue(subImage, strategy.getRgbComparisonBuffer());
+        } else if (strategy.isWhiteOnOrange())
+        {
+            processWhiteOnOrange(subImage, strategy.getRgbComparisonBuffer());
+        } else
+        {
+            convertToGreyscale(subImage);
+        }
+
+        if (strategy.shouldInvertGreyscale())
+        {
+            invertGreyscale(subImage);
+        }
+
+        if (strategy.getAdditionalBorderSize() > 0)
+        {
+            addWhiteBorder(subImage, strategy.getAdditionalBorderSize());
+        }
+        return subImage;
+    }
+
+    public static void saveImage(final BufferedImage image, final String outputPathString) throws IOException
+    {
+        final Path outputPath = Paths.get(outputPathString);
+        ImageIO.write(image, "png", outputPath.toFile());
+    }
+
+    private static void addWhiteBorder(final BufferedImage originalImage, final int borderSize)
+    {
+        final int originalWidth = originalImage.getWidth();
+        final int originalHeight = originalImage.getHeight();
+        final int newWidth = originalWidth + 2 * borderSize;
+        final int newHeight = originalHeight + 2 * borderSize;
+
+        final BufferedImage imageWithBorder = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+
+        final Graphics2D graphics2D = imageWithBorder.createGraphics();
+        graphics2D.setColor(Color.WHITE);
+        graphics2D.fillRect(0, 0, newWidth, newHeight);
+        graphics2D.drawImage(originalImage, borderSize, borderSize, null);
+        graphics2D.dispose();
+
+        originalImage.setData(imageWithBorder.getData());
+    }
+
+    private static void processWhiteOnBlue(final BufferedImage image, final int rgbComparisonBuffer)
+    {
+        final int width = image.getWidth();
+        final int height = image.getHeight();
+
+        // Iterate through each pixel
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // Get the colour of the current pixel
+                final Color color = new Color(image.getRGB(x, y));
+
+                // Check if the pixel is within the blue channel
+                if (color.getBlue() > (color.getRed() + rgbComparisonBuffer))
+                {
+                    // Set everything in the Blue channel to White
+                    image.setRGB(x, y, Color.WHITE.getRGB());
+                } else
+                {
+                    // Set everything else to Black
+                    image.setRGB(x, y, Color.BLACK.getRGB());
+                }
+            }
+        }
+    }
+
+    private static void processWhiteOnOrange(final BufferedImage image, final int rgbComparisonBuffer)
+    {
+        final int width = image.getWidth();
+        final int height = image.getHeight();
+
+        // Iterate through each pixel
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // Get the color of the current pixel
+                Color color = new Color(image.getRGB(x, y));
+
+                // Check if the pixel is within the orange channel
+                if (color.getRed() > (color.getBlue() + rgbComparisonBuffer))
+                {
+                    // Set everything in the Orange channel to White
+                    image.setRGB(x, y, Color.WHITE.getRGB());
+                } else
+                {
+                    // Set everything else to Black
+                    image.setRGB(x, y, Color.BLACK.getRGB());
+                }
+            }
+        }
+    }
+
+    private static BufferedImage cropImage(final BufferedImage originalImage,
+                                           final int startX,
+                                           final int startY,
+                                           final int endX,
+                                           final int endY)
+    {
+        return originalImage.getSubimage(startX, startY, endX - startX, endY - startY);
+    }
+
+    private static void convertToGreyscale(final BufferedImage colourImage)
+    {
+        BufferedImage greyscaleImage = new BufferedImage(colourImage.getWidth(), colourImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        greyscaleImage.getGraphics().drawImage(colourImage, 0, 0, null);
+
+        colourImage.setData(greyscaleImage.getData());
+    }
+
+    private static void invertGreyscale(final BufferedImage greyscaleImage)
+    {
+        final int width = greyscaleImage.getWidth();
+        final int height = greyscaleImage.getHeight();
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int rgb = greyscaleImage.getRGB(x, y);
+                int invertedRgb = ~rgb & 0xFFFFFF; // Invert each pixel
+                greyscaleImage.setRGB(x, y, invertedRgb);
+            }
+        }
+    }
+}
