@@ -21,10 +21,14 @@ public class ReadNumbersFromImage
         fileNames.add("orangePlayer1");
         fileNames.add("orangePlayer2");
         fileNames.add("orangePlayer3");
+        fileNames.add("bestOf");
+        fileNames.add("clock");
+        fileNames.add("gameNumber");
+        fileNames.add("description");
 
         final List<String> numberFileNames = new ArrayList<>();
-        numberFileNames.add("blueScore");
-        numberFileNames.add("orangeScore");
+        numberFileNames.add("blueGameScore");
+        numberFileNames.add("orangeGameScore");
 
         Tesseract textTesseract = new Tesseract();
         textTesseract.setDatapath("src/main/resources/tessdata");
@@ -34,7 +38,7 @@ public class ReadNumbersFromImage
 
         for (String fileName : fileNames)
         {
-            final String filePath = "src/main/resources/" + fileName + ".png";
+            final String filePath = "src/main/temp/processing/test-screenshot-" + fileName + ".png";
             File image = new File(filePath);
             String result = textTesseract.doOCR(image);
             System.out.println("Parsed data from " + fileName);
@@ -50,7 +54,7 @@ public class ReadNumbersFromImage
 
         for (String fileName : numberFileNames)
         {
-            final String filePath = "src/main/resources/" + fileName + ".png";
+            final String filePath = "src/main/temp/processing/test-screenshot-" + fileName + ".png";
             File image = new File(filePath);
             String result = numberTesseract.doOCR(image);
             System.out.println("Parsed data from " + fileName);
