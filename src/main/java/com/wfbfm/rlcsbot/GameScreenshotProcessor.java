@@ -2,6 +2,7 @@ package com.wfbfm.rlcsbot;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.wfbfm.rlcsbot.series.SeriesSnapshot;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,6 +22,7 @@ public class GameScreenshotProcessor
 {
     // Crops and transforms sub-images of raw 1920x1080p screenshots of Twitch feed
     // Process sub-images using Tesseract to extract series information
+    private static final boolean DEBUGGING_ENABLED = true;
     private static final File INCOMING_DIRECTORY = new File("src/main/temp/incoming/");
     private static final File PROCESSING_DIRECTORY = new File("src/main/temp/processing/");
     private static final File COMPLETE_DIRECTORY = new File("src/main/temp/complete/");
@@ -29,6 +31,7 @@ public class GameScreenshotProcessor
     private static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
     private final List<SubImageStrategy> subImageStrategies = new ArrayList<>();
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
+    private final GameScreenshotSubImageWrapperBuilder subImageWrapperBuilder = new GameScreenshotSubImageWrapperBuilder();
 
     public GameScreenshotProcessor()
     {
@@ -42,7 +45,7 @@ public class GameScreenshotProcessor
             String[] row;
             while ((row = csvReader.readNext()) != null)
             {
-                final String name = row[0];
+                final SubImageType subImageType = SubImageType.valueOf(row[0]);
                 final int startX = Integer.parseInt(row[1]);
                 final int startY = Integer.parseInt(row[2]);
                 final int endX = Integer.parseInt(row[3]);
@@ -54,7 +57,7 @@ public class GameScreenshotProcessor
                 final int rgbComparisonBuffer = Integer.parseInt(row[9]);
                 final int additionalBorderSize = Integer.parseInt(row[10]);
 
-                final SubImageStrategy subImageStrategy = new SubImageStrategy(name, startX, startY, endX, endY, shouldKeepColour,
+                final SubImageStrategy subImageStrategy = new SubImageStrategy(subImageType, startX, startY, endX, endY, shouldKeepColour,
                         isWhiteOnBlue, isWhiteOnOrange, rgbComparisonBuffer, additionalBorderSize, shouldInvertGreyscale
                 );
 
@@ -98,9 +101,11 @@ public class GameScreenshotProcessor
 
     private void handleIncomingFile(final File incomingFile)
     {
+        this.subImageWrapperBuilder.clear();
         transformScreenshotToSubImages(incomingFile);
-        // TODO:
-//        parseSeriesDataFromSubImages();
+        final GameScreenshotSubImageWrapper subImageWrapper = this.subImageWrapperBuilder.build();
+
+        final SeriesSnapshot seriesSnapshot = parseSeriesDataFromSubImages();
 //
 //        if (isValidSeriesData())
 //        {
@@ -123,9 +128,13 @@ public class GameScreenshotProcessor
             for (final SubImageStrategy subImageStrategy : this.subImageStrategies)
             {
                 final BufferedImage subImage = GameScreenshotProcessorUtils.createSubImageFromStrategy(originalImage, subImageStrategy);
-                final String outputPath = PROCESSING_DIRECTORY + File.separator +
-                        incomingFile.getName().replace(".png", "") + "-" + subImageStrategy.getName() + ".png";
-                GameScreenshotProcessorUtils.saveImage(subImage, outputPath);
+                this.subImageWrapperBuilder.withSubImage(subImageStrategy.getSubImageType(), subImage);
+                if (DEBUGGING_ENABLED)
+                {
+                    final String outputPath = PROCESSING_DIRECTORY + File.separator +
+                            incomingFile.getName().replace(".png", "") + "-" + subImageStrategy.getSubImageType().name() + ".png";
+                    GameScreenshotProcessorUtils.saveImage(subImage, outputPath);
+                }
             }
         } catch (IOException e)
         {
@@ -137,9 +146,10 @@ public class GameScreenshotProcessor
         logger.log(Level.INFO, String.format("Time to create subImages: %d ms", elapsedMs));
     }
 
-    private void parseSeriesDataFromSubImages()
+    private SeriesSnapshot parseSeriesDataFromSubImages()
     {
-
+        // TODO
+        return null;
     }
 
     private void deleteSubImages()

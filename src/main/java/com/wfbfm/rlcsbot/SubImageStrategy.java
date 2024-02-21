@@ -2,7 +2,7 @@ package com.wfbfm.rlcsbot;
 
 public class SubImageStrategy
 {
-    private String name;
+    private SubImageType subImageType;
     private int cropStartX;
     private int cropStartY;
     private int cropEndX;
@@ -14,7 +14,7 @@ public class SubImageStrategy
     private int rgbComparisonBuffer;
     private int additionalBorderSize;
 
-    public SubImageStrategy(final String name,
+    public SubImageStrategy(final SubImageType subImageType,
                             final int cropStartX,
                             final int cropStartY,
                             final int cropEndX,
@@ -26,7 +26,7 @@ public class SubImageStrategy
                             final int additionalBorderSize,
                             final boolean shouldInvertGreyscale)
     {
-        this.name = name;
+        this.subImageType = subImageType;
         this.cropStartX = cropStartX;
         this.cropStartY = cropStartY;
         this.cropEndX = cropEndX;
@@ -39,14 +39,14 @@ public class SubImageStrategy
         this.additionalBorderSize = additionalBorderSize;
     }
 
-    public String getName()
+    public SubImageType getSubImageType()
     {
-        return name;
+        return subImageType;
     }
 
-    public void setName(final String name)
+    public void setSubImageType(final SubImageType subImageType)
     {
-        this.name = name;
+        this.subImageType = subImageType;
     }
 
     public int getCropStartX()
