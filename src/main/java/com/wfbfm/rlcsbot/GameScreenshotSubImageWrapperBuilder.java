@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 public class GameScreenshotSubImageWrapperBuilder
 {
+    private String fileName;
     private BufferedImage blueGameScore;
     private BufferedImage orangeGameScore;
     private BufferedImage blueSeriesTick1;
@@ -55,6 +56,12 @@ public class GameScreenshotSubImageWrapperBuilder
             case GAME_NUMBER -> this.gameNumber = subImage;
             case DESCRIPTION -> this.description = subImage;
         }
+        return this;
+    }
+
+    public GameScreenshotSubImageWrapperBuilder withFileName(final String fileName)
+    {
+        this.fileName = fileName;
         return this;
     }
 
@@ -193,7 +200,7 @@ public class GameScreenshotSubImageWrapperBuilder
     public GameScreenshotSubImageWrapper build()
     {
         return new GameScreenshotSubImageWrapper(
-                blueGameScore, orangeGameScore,
+                fileName, blueGameScore, orangeGameScore,
                 blueSeriesTick1, blueSeriesTick2, blueSeriesTick3, blueSeriesTick4,
                 orangeSeriesTick1, orangeSeriesTick2, orangeSeriesTick3, orangeSeriesTick4,
                 blueTeam, orangeTeam, bluePlayer1, bluePlayer2, bluePlayer3,
@@ -204,6 +211,7 @@ public class GameScreenshotSubImageWrapperBuilder
 
     public void clear()
     {
+        this.fileName = null;
         this.blueGameScore = null;
         this.orangeGameScore = null;
         this.blueSeriesTick1 = null;

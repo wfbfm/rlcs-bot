@@ -5,16 +5,30 @@ import java.util.concurrent.Executors;
 
 public class RlcsBotApplication
 {
+    private final static boolean BROADCAST_ENABLED = true;
+
     public static void main(String[] args)
     {
-        final ExecutorService executorService = Executors.newFixedThreadPool(1);
+        if (BROADCAST_ENABLED)
+        {
+            final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
-//        final HeadlessTwitchWatcher twitchWatcher = new HeadlessTwitchWatcher();
-//        executorService.submit(twitchWatcher::run);
+            final HeadlessTwitchWatcher twitchWatcher = new HeadlessTwitchWatcher();
+            executorService.submit(twitchWatcher::run);
 
-        final GameScreenshotProcessor snapshotParser = new GameScreenshotProcessor();
-        executorService.submit(snapshotParser::run);
+            final GameScreenshotProcessor snapshotParser = new GameScreenshotProcessor();
+            executorService.submit(snapshotParser::run);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
+            Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
+        }
+        else
+        {
+            final ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+            final GameScreenshotProcessor snapshotParser = new GameScreenshotProcessor();
+            executorService.submit(snapshotParser::run);
+
+            Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
+        }
     }
 }

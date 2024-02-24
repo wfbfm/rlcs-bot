@@ -84,13 +84,13 @@ public class ScreenshotToSeriesTransformer
             final String text = tesseract.doOCR(image);
             if (DEBUGGING_ENABLED)
             {
-                logger.log(Level.INFO, subImageType.name() + ": " + text);
+                logger.log(Level.INFO, subImageWrapper.getFileName() + "|" + subImageType.name() + ": " + text);
             }
             return text.trim();
         }
         catch (TesseractException e)
         {
-            logger.log(Level.INFO, "Error parsing image of type " + subImageType.name(), e);
+            logger.log(Level.INFO, "Error parsing image " + subImageWrapper.getFileName() + "|" + subImageType.name(), e);
             return null;
         }
     }
@@ -120,8 +120,15 @@ public class ScreenshotToSeriesTransformer
             this.seriesSnapshotBuilder.withCurrentGameNumber(0);
             return;
         }
-        final int gameNumber = Integer.parseInt(gameNumberString.replaceAll("[^0-9]", ""));
-        this.seriesSnapshotBuilder.withCurrentGameNumber(gameNumber);
+        final String gameNumber = gameNumberString.replaceAll("[^0-9]", "");
+        if (StringUtils.isNumeric(gameNumber))
+        {
+            this.seriesSnapshotBuilder.withCurrentGameNumber(Integer.parseInt(gameNumber));
+        }
+        else
+        {
+            logger.log(Level.INFO, "Unable to determine game number - defaulting to 0.");
+        }
     }
 
     private Score parseGameScore()
@@ -250,7 +257,14 @@ public class ScreenshotToSeriesTransformer
             this.seriesSnapshotBuilder.withBestOf(0);
             return;
         }
-        final int bestOf = Integer.parseInt(bestOfString.replaceAll("[^0-9]", ""));
-        this.seriesSnapshotBuilder.withBestOf(bestOf);
+        final String bestOf = bestOfString.replaceAll("[^0-9]", "");
+        if (StringUtils.isNumeric(bestOf))
+        {
+            this.seriesSnapshotBuilder.withBestOf(Integer.parseInt(bestOf));
+        }
+        else
+        {
+            logger.log(Level.INFO, "Unable to determine bestOf - defaulting to 0.");
+        }
     }
 }

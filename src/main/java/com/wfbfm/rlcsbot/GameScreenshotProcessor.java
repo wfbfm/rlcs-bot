@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +30,7 @@ public class GameScreenshotProcessor
     private static final File PROCESSING_DIRECTORY = new File("src/main/temp/processing/");
     private static final File COMPLETE_DIRECTORY = new File("src/main/temp/complete/");
     private static final File IGNORED_DIRECTORY = new File("src/main/temp/ignored/");
-    private static final int POLLING_SLEEP_TIME_MS = 20000;
+    private static final int POLLING_SLEEP_TIME_MS = 200;
     private static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
     private final List<SubImageStrategy> subImageStrategies = new ArrayList<>();
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
@@ -91,6 +93,7 @@ public class GameScreenshotProcessor
                 Arrays.sort(incomingFiles, Comparator.comparingLong(File::lastModified));
                 for (final File incomingFile : incomingFiles)
                 {
+                    logger.log(Level.INFO, "Beginning processing: " + incomingFile.getName());
                     handleIncomingFile(incomingFile);
                 }
             }
@@ -104,10 +107,22 @@ public class GameScreenshotProcessor
     private void handleIncomingFile(final File incomingFile)
     {
         this.subImageWrapperBuilder.clear();
+        this.subImageWrapperBuilder.withFileName(incomingFile.getName());
         transformScreenshotToSubImages(incomingFile);
         final GameScreenshotSubImageWrapper subImageWrapper = this.subImageWrapperBuilder.build();
 
         final SeriesSnapshot seriesSnapshot = this.screenshotToSeriesTransformer.transform(subImageWrapper);
+
+        try
+        {
+            final Path sourceFilePath = incomingFile.toPath();
+            final Path targetFilePath = COMPLETE_DIRECTORY.toPath().resolve(incomingFile.getName());
+            Files.move(sourceFilePath, targetFilePath);
+        }
+        catch (IOException e)
+        {
+            logger.log(Level.WARNING, "Unable to move screenshot " + incomingFile.getName() + " to completed folder.", e);
+        }
 //
 //        if (isValidSeriesData())
 //        {
@@ -166,6 +181,7 @@ public class GameScreenshotProcessor
 
     private void moveScreenshotToFolder(final String folder)
     {
+
 
     }
 

@@ -23,11 +23,10 @@ public class TwitchScoreTracker
         // Navigate to the Twitch stream page
         driver.get("https://www.twitch.tv/rocketleague");
 
-        captureAndSaveScreenshot(driver, "before-doing-anything.png");
+        // captureAndSaveScreenshot(driver, "before-doing-anything.png");
 
         Actions actions = new Actions(driver);
         actions.sendKeys(Keys.chord("f")).perform();
-        actions.sendKeys(Keys.chord("m")).perform();
 
         // Wait for the quality settings to take effect
         try
@@ -38,7 +37,7 @@ public class TwitchScoreTracker
             e.printStackTrace();
         }
 
-        captureAndSaveScreenshot(driver, "after-keyboard-shortcuts.png");
+        // captureAndSaveScreenshot(driver, "after-keyboard-shortcuts.png");
 
         WebElement settingsButton = driver.findElement(By.cssSelector("button[data-a-target='player-settings-button']"));
         settingsButton.click();
@@ -52,7 +51,7 @@ public class TwitchScoreTracker
             e.printStackTrace();
         }
 
-        captureAndSaveScreenshot(driver, "after-clicking-settings.png");
+        // captureAndSaveScreenshot(driver, "after-clicking-settings.png");
 
         WebElement qualityMenu = driver.findElement(By.xpath("//div[contains(@class, 'Layout') and contains(text(), 'Quality')]"));
         qualityMenu.click();
@@ -65,7 +64,7 @@ public class TwitchScoreTracker
             e.printStackTrace();
         }
 
-        captureAndSaveScreenshot(driver, "after-clicking-quality.png");
+        // captureAndSaveScreenshot(driver, "after-clicking-quality.png");
         WebElement qualityOptionSource = driver.findElement(By.xpath("//div[contains(@class, 'Layout') and contains(text(), '(Source)')]"));
 
         // Find and click on the 1080p60 (Source) quality option
@@ -80,7 +79,21 @@ public class TwitchScoreTracker
             e.printStackTrace();
         }
 
-        captureAndSaveScreenshot(driver, "after-clicking-1080p.png");
+        // captureAndSaveScreenshot(driver, "after-clicking-1080p.png");
+        int screenshotCount = 0;
+        while (screenshotCount < 100)
+        {
+            captureAndSaveScreenshot(driver, "test-" + screenshotCount + ".png");
+            screenshotCount++;
+            try
+            {
+                Thread.sleep(8000);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
 
 
         // Function to capture a frame from the video feed

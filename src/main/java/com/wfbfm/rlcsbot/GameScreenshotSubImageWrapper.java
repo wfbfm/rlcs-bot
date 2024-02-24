@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 public class GameScreenshotSubImageWrapper
 {
+    private final String fileName;
     private final BufferedImage blueGameScore;
     private final BufferedImage orangeGameScore;
     private final BufferedImage blueSeriesTick1;
@@ -27,7 +28,7 @@ public class GameScreenshotSubImageWrapper
     private final BufferedImage gameNumber;
     private final BufferedImage description;
 
-    public GameScreenshotSubImageWrapper(final BufferedImage blueGameScore, final BufferedImage orangeGameScore,
+    public GameScreenshotSubImageWrapper(final String fileName, final BufferedImage blueGameScore, final BufferedImage orangeGameScore,
                                          final BufferedImage blueSeriesTick1, final BufferedImage blueSeriesTick2,
                                          final BufferedImage blueSeriesTick3, final BufferedImage blueSeriesTick4,
                                          final BufferedImage orangeSeriesTick1, final BufferedImage orangeSeriesTick2,
@@ -38,6 +39,7 @@ public class GameScreenshotSubImageWrapper
                                          final BufferedImage orangePlayer3, final BufferedImage clock, final BufferedImage bestOf,
                                          final BufferedImage gameNumber, final BufferedImage description)
     {
+        this.fileName = fileName;
         this.blueGameScore = blueGameScore;
         this.orangeGameScore = orangeGameScore;
         this.blueSeriesTick1 = blueSeriesTick1;
@@ -89,6 +91,11 @@ public class GameScreenshotSubImageWrapper
                     case GAME_NUMBER -> getGameNumber();
                     case DESCRIPTION -> getDescription();
                 };
+    }
+
+    public String getFileName()
+    {
+        return fileName;
     }
 
     public BufferedImage getBlueGameScore()
