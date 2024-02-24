@@ -17,12 +17,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.wfbfm.rlcsbot.RuntimeConstants.DEBUGGING_ENABLED;
+
 
 public class GameScreenshotProcessor
 {
     // Crops and transforms sub-images of raw 1920x1080p screenshots of Twitch feed
     // Process sub-images using Tesseract to extract series information
-    private static final boolean DEBUGGING_ENABLED = true;
     private static final File INCOMING_DIRECTORY = new File("src/main/temp/incoming/");
     private static final File PROCESSING_DIRECTORY = new File("src/main/temp/processing/");
     private static final File COMPLETE_DIRECTORY = new File("src/main/temp/complete/");
@@ -32,6 +33,7 @@ public class GameScreenshotProcessor
     private final List<SubImageStrategy> subImageStrategies = new ArrayList<>();
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
     private final GameScreenshotSubImageWrapperBuilder subImageWrapperBuilder = new GameScreenshotSubImageWrapperBuilder();
+    private final ScreenshotToSeriesTransformer screenshotToSeriesTransformer = new ScreenshotToSeriesTransformer();
 
     public GameScreenshotProcessor()
     {
@@ -105,7 +107,7 @@ public class GameScreenshotProcessor
         transformScreenshotToSubImages(incomingFile);
         final GameScreenshotSubImageWrapper subImageWrapper = this.subImageWrapperBuilder.build();
 
-        final SeriesSnapshot seriesSnapshot = parseSeriesDataFromSubImages();
+        final SeriesSnapshot seriesSnapshot = this.screenshotToSeriesTransformer.transform(subImageWrapper);
 //
 //        if (isValidSeriesData())
 //        {

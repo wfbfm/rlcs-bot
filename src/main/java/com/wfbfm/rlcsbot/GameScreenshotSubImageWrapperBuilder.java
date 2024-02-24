@@ -202,7 +202,7 @@ public class GameScreenshotSubImageWrapperBuilder
         );
     }
 
-    public GameScreenshotSubImageWrapperBuilder clear()
+    public void clear()
     {
         this.blueGameScore = null;
         this.orangeGameScore = null;
@@ -226,7 +226,5 @@ public class GameScreenshotSubImageWrapperBuilder
         this.bestOf = null;
         this.gameNumber = null;
         this.description = null;
-
-        return this;
     }
 }

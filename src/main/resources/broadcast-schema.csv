@@ -1,6 +1,6 @@
 subImageType,startX,startY,endX,endY,shouldKeepColour,shouldInvertGreyscale,isWhiteOnBlue,isWhiteOnOrange,rgbComparisonBuffer,additionalBorderSize
 BLUE_GAME_SCORE,804,44,883,101,false,false,true,false,30,200
-ORANGE_GAME_SCORE,1038,44,1110,101,false,false,false,true,30,0
+ORANGE_GAME_SCORE,1038,44,1110,101,false,false,false,true,30,200
 BLUE_SERIES_TICK1,753,106,798,118,true,false,false,false,30,0
 BLUE_SERIES_TICK2,703,106,751,118,true,false,false,false,30,0
 BLUE_SERIES_TICK3,651,106,696,118,true,false,false,false,30,0

@@ -12,6 +12,13 @@ public class Game
         this.winner = null;
     }
 
+    public Game(final Score score, final Clock clock, final TeamColour winner)
+    {
+        this.score = score;
+        this.clock = clock;
+        this.winner = winner;
+    }
+
     public Score getScore()
     {
         return score;

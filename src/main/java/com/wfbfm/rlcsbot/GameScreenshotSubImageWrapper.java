@@ -62,6 +62,35 @@ public class GameScreenshotSubImageWrapper
         this.description = description;
     }
 
+    public BufferedImage getSubImageByType(final SubImageType subImageType)
+    {
+        return switch (subImageType)
+                {
+                    case BLUE_GAME_SCORE -> getBlueGameScore();
+                    case ORANGE_GAME_SCORE -> getOrangeGameScore();
+                    case BLUE_SERIES_TICK1 -> getBlueSeriesTick1();
+                    case BLUE_SERIES_TICK2 -> getBlueSeriesTick2();
+                    case BLUE_SERIES_TICK3 -> getBlueSeriesTick3();
+                    case BLUE_SERIES_TICK4 -> getBlueSeriesTick4();
+                    case ORANGE_SERIES_TICK1 -> getOrangeSeriesTick1();
+                    case ORANGE_SERIES_TICK2 -> getOrangeSeriesTick2();
+                    case ORANGE_SERIES_TICK3 -> getOrangeSeriesTick3();
+                    case ORANGE_SERIES_TICK4 -> getOrangeSeriesTick4();
+                    case BLUE_TEAM -> getBlueTeam();
+                    case ORANGE_TEAM -> getOrangeTeam();
+                    case BLUE_PLAYER1 -> getBluePlayer1();
+                    case BLUE_PLAYER2 -> getBluePlayer2();
+                    case BLUE_PLAYER3 -> getBluePlayer3();
+                    case ORANGE_PLAYER1 -> getOrangePlayer1();
+                    case ORANGE_PLAYER2 -> getOrangePlayer2();
+                    case ORANGE_PLAYER3 -> getOrangePlayer3();
+                    case CLOCK -> getClock();
+                    case BEST_OF -> getBestOf();
+                    case GAME_NUMBER -> getGameNumber();
+                    case DESCRIPTION -> getDescription();
+                };
+    }
+
     public BufferedImage getBlueGameScore()
     {
         return blueGameScore;

@@ -33,25 +33,27 @@ public class Score
 
     public int getTeamScore(final TeamColour teamColour)
     {
-        if (teamColour == TeamColour.BLUE)
+        switch (teamColour)
         {
-            return this.blueScore;
-        }
-        else
-        {
-            return this.orangeScore;
+            case BLUE:
+                return this.blueScore;
+            case ORANGE:
+                return this.orangeScore;
+            default:
+                return 0;
         }
     }
 
     public void setTeamScore(final int score, final TeamColour teamColour)
     {
-        if (teamColour == TeamColour.BLUE)
+        switch (teamColour)
         {
-            this.blueScore = score;
-        }
-        else
-        {
-            this.orangeScore = score;
+            case BLUE:
+                this.blueScore = score;
+                break;
+            case ORANGE:
+                this.orangeScore = score;
+                break;
         }
     }
 }
