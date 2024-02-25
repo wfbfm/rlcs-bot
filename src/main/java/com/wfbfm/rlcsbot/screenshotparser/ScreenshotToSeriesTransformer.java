@@ -13,8 +13,7 @@ import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.DEBUGGING_ENABLED;
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.LIQUIPEDIA_PAGE;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class ScreenshotToSeriesTransformer
 {
@@ -225,7 +224,7 @@ public class ScreenshotToSeriesTransformer
 
         final String[] clockParts = displayedTime.split(":");
 
-        int elapsedSeconds = 300;
+        int elapsedSeconds = GAME_TIME_SECONDS;
         if (clockParts.length != 2)
         {
             logger.log(Level.INFO, "Unable to parse game time from: " + displayedTime);

@@ -1,21 +1,21 @@
 package com.wfbfm.rlcsbot.series.handler;
 
 import com.wfbfm.rlcsbot.liquipedia.LiquipediaTeamGetter;
-import com.wfbfm.rlcsbot.series.Series;
-import com.wfbfm.rlcsbot.series.SeriesSnapshot;
-import com.wfbfm.rlcsbot.series.Team;
+import com.wfbfm.rlcsbot.series.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.LEVENSHTEIN_MINIMUM_DISTANCE;
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.LIQUIPEDIA_PAGE;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class SeriesUpdateHandler
 {
+    private static final Set<Integer> allowableBestOf = new HashSet<>(Set.of(3, 5, 7));
     private final LiquipediaTeamGetter liquipediaTeamGetter = new LiquipediaTeamGetter();
     private final LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
     private final Logger logger = Logger.getLogger(SeriesUpdateHandler.class.getName());
@@ -41,13 +41,98 @@ public class SeriesUpdateHandler
     private SeriesSnapshotEvaluation handleNonGameScreenshot(final Series existingSeries)
     {
         // TODO
+        if (existingSeries == null)
+        {
+            return SeriesSnapshotEvaluation.NOT_GAME_SCREENSHOT;
+        }
+        if (isGameCompletable(existingSeries))
+        {
+            return handleCompletedGame(existingSeries);
+        }
         return SeriesSnapshotEvaluation.NOT_GAME_SCREENSHOT;
+    }
+
+    private SeriesSnapshotEvaluation handleCompletedGame(final Series existingSeries)
+    {
+        // TODO:
+        return SeriesSnapshotEvaluation.SERIES_SCORE_CHANGED;
     }
 
     private SeriesSnapshotEvaluation handleGameScreenshot(final SeriesSnapshot snapshot, final Series existingSeries)
     {
-        // TODO
-        return SeriesSnapshotEvaluation.GAME_SCREENSHOT;
+        enrichBestOf(snapshot, existingSeries);
+        if (isHighlight(snapshot, existingSeries))
+        {
+            return  SeriesSnapshotEvaluation.HIGHLIGHT;
+        }
+        return handleGameUpdate(snapshot, existingSeries);
+    }
+
+    private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot, final Series existingSeries)
+    {
+        // TODO:
+        final Score snapshotGameScore = snapshot.getCurrentGame().getScore();
+        final Score existingGameScore = existingSeries.getCurrentGame().getScore();
+
+        final boolean hasBlueScoreChanged = snapshotGameScore.getBlueScore() > existingGameScore.getBlueScore();
+        final boolean hasOrangeScoreChanged = snapshotGameScore.getOrangeScore() > existingGameScore.getOrangeScore();
+        if (hasBlueScoreChanged)
+        {
+            existingGameScore.setBlueScore(snapshotGameScore.getBlueScore());
+        }
+        if (hasOrangeScoreChanged)
+        {
+            existingGameScore.setOrangeScore(snapshotGameScore.getOrangeScore());
+        }
+        if (hasBlueScoreChanged || hasOrangeScoreChanged)
+        {
+            return SeriesSnapshotEvaluation.GAME_SCORE_CHANGED;
+        }
+
+        return SeriesSnapshotEvaluation.SERIES_SCORE_CHANGED;
+    }
+
+    private boolean isGameCompletable(final Series existingSeries)
+    {
+        if (existingSeries == null)
+        {
+            return false;
+        }
+        final Score gameScore = existingSeries.getCurrentGame().getScore();
+        final boolean isTeamInLead = gameScore.getBlueScore() != gameScore.getOrangeScore();
+        final Clock clock = existingSeries.getCurrentGame().getClock();
+        final boolean isLittleTimeRemaining = clock.isOvertime() || (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * SCREENSHOT_INTERVAL_MS);
+        return isTeamInLead && isLittleTimeRemaining;
+    }
+
+    private void enrichBestOf(final SeriesSnapshot snapshot, final Series existingSeries)
+    {
+        // image recognition isn't the best, sometimes we need to correct what we parse
+        if (!allowableBestOf.contains(existingSeries.getBestOf()) && allowableBestOf.contains(snapshot.getBestOf()))
+        {
+            existingSeries.setBestOf(snapshot.getBestOf());
+        }
+    }
+
+    private boolean isHighlight(final SeriesSnapshot snapshot, final Series existingSeries)
+    {
+        if (snapshot.getCurrentGameNumber() < existingSeries.getCurrentGameNumber())
+        {
+            return true;
+        }
+        final int snapshotGamesCompleted = snapshot.getSeriesScore().getBlueScore() + snapshot.getSeriesScore().getOrangeScore();
+        final int existingGamesCompleted = existingSeries.getSeriesScore().getBlueScore() + existingSeries.getSeriesScore().getOrangeScore();
+        if (snapshotGamesCompleted < existingGamesCompleted)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isNewGame(final SeriesSnapshot snapshot, final Series existingSeries)
+    {
+        // TODO prior game should have completed
+        return false;
     }
 
     private boolean enrichAllNamesFromTeams(final SeriesSnapshot snapshot)

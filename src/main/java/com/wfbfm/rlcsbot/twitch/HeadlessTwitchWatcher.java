@@ -12,10 +12,11 @@ import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.SCREENSHOT_INTERVAL_MS;
+
 public class HeadlessTwitchWatcher
 {
     private static final String BROADCAST_URL = "https://www.twitch.tv/rocketleague";
-    private static final int SCREENSHOT_SLEEP_TIME_MS = 10_000;
     private static final File INCOMING_DIRECTORY = new File("src/main/temp/incoming/");
     private final Logger logger = Logger.getLogger(HeadlessTwitchWatcher.class.getName());
     private final WebDriver webDriver;
@@ -79,7 +80,7 @@ public class HeadlessTwitchWatcher
                 logger.log(Level.SEVERE, "Unable to take screenshot - stopping feed.", e);
                 break;
             }
-            sleepForMs(SCREENSHOT_SLEEP_TIME_MS);
+            sleepForMs(SCREENSHOT_INTERVAL_MS);
         }
         webDriver.quit();
     }
