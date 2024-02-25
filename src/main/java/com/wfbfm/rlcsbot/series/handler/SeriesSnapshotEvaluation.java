@@ -1,8 +1,8 @@
-package com.wfbfm.rlcsbot;
+package com.wfbfm.rlcsbot.series.handler;
 
 public enum SeriesSnapshotEvaluation
 {
     NOT_GAME_SCREENSHOT,
     HIGHLIGHT,
-    VALID
+    SCORE_UNCHANGED,
 }

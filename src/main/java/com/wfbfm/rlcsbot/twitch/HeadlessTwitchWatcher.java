@@ -1,4 +1,4 @@
-package com.wfbfm.rlcsbot;
+package com.wfbfm.rlcsbot.twitch;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
@@ -50,7 +50,7 @@ public class HeadlessTwitchWatcher
         // (Source) quality = highest
         final WebElement qualityOptionSource = webDriver.findElement(By.xpath("//div[contains(@class, 'Layout') and contains(text(), '(Source)')]"));
         qualityOptionSource.click();
-        sleepForMs(1000);
+        sleepForMs(3000);
     }
 
     private void sleepForMs(final int millis)

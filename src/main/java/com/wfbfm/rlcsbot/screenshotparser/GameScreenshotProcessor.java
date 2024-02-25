@@ -1,4 +1,4 @@
-package com.wfbfm.rlcsbot;
+package com.wfbfm.rlcsbot.screenshotparser;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.RuntimeConstants.DEBUGGING_ENABLED;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.DEBUGGING_ENABLED;
 
 
 public class GameScreenshotProcessor

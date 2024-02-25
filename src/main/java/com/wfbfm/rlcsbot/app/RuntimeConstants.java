@@ -1,4 +1,4 @@
-package com.wfbfm.rlcsbot;
+package com.wfbfm.rlcsbot.app;
 
 public class RuntimeConstants
 {

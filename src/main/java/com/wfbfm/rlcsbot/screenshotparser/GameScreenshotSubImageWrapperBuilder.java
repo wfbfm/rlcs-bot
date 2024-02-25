@@ -1,4 +1,4 @@
-package com.wfbfm.rlcsbot;
+package com.wfbfm.rlcsbot.screenshotparser;
 
 
 import java.awt.image.BufferedImage;

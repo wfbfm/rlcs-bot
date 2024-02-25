@@ -1,4 +1,7 @@
-package com.wfbfm.rlcsbot;
+package com.wfbfm.rlcsbot.app;
+
+import com.wfbfm.rlcsbot.screenshotparser.GameScreenshotProcessor;
+import com.wfbfm.rlcsbot.twitch.HeadlessTwitchWatcher;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

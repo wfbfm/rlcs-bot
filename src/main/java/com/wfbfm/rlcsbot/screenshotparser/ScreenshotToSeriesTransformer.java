@@ -1,4 +1,4 @@
-package com.wfbfm.rlcsbot;
+package com.wfbfm.rlcsbot.screenshotparser;
 
 import com.wfbfm.rlcsbot.series.*;
 import net.sourceforge.tess4j.ITessAPI;
@@ -13,8 +13,8 @@ import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.RuntimeConstants.DEBUGGING_ENABLED;
-import static com.wfbfm.rlcsbot.RuntimeConstants.LIQUIPEDIA_PAGE;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.DEBUGGING_ENABLED;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.LIQUIPEDIA_PAGE;
 
 public class ScreenshotToSeriesTransformer
 {
