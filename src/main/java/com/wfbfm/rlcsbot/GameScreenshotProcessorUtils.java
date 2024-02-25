@@ -11,7 +11,7 @@ public class GameScreenshotProcessorUtils
 {
     public static BufferedImage createSubImageFromStrategy(final BufferedImage originalImage, final SubImageStrategy strategy)
     {
-         BufferedImage subImage = cropImage(originalImage, strategy.getCropStartX(), strategy.getCropStartY(),
+        BufferedImage subImage = cropImage(originalImage, strategy.getCropStartX(), strategy.getCropStartY(),
                 strategy.getCropEndX(), strategy.getCropEndY());
 
         if (strategy.isWhiteOnBlue())
@@ -30,6 +30,11 @@ public class GameScreenshotProcessorUtils
         if (strategy.shouldInvertGreyscale())
         {
             invertGreyscale(subImage);
+        }
+
+        if (strategy.getAdditionalCopies() > 0)
+        {
+            subImage = createSideBySideImage(subImage, strategy.getAdditionalCopies());
         }
 
         if (strategy.getAdditionalBorderSize() > 0)
@@ -81,7 +86,8 @@ public class GameScreenshotProcessorUtils
                 {
                     // Set everything in the Blue channel to White
                     image.setRGB(x, y, Color.WHITE.getRGB());
-                } else
+                }
+                else
                 {
                     // Set everything else to Black
                     image.setRGB(x, y, Color.BLACK.getRGB());
@@ -108,7 +114,8 @@ public class GameScreenshotProcessorUtils
                 {
                     // Set everything in the Orange channel to White
                     image.setRGB(x, y, Color.WHITE.getRGB());
-                } else
+                }
+                else
                 {
                     // Set everything else to Black
                     image.setRGB(x, y, Color.BLACK.getRGB());
@@ -147,5 +154,24 @@ public class GameScreenshotProcessorUtils
                 greyscaleImage.setRGB(x, y, invertedRgb);
             }
         }
+    }
+
+    public static BufferedImage createSideBySideImage(final BufferedImage inputImage, final int additionalCopies)
+    {
+        final int numberOfCopies = additionalCopies + 1;
+        final int inputWidth = inputImage.getWidth();
+        final int inputHeight = inputImage.getHeight();
+        final int resultWidth = inputWidth * numberOfCopies;
+
+        final BufferedImage resultImage = new BufferedImage(resultWidth, inputHeight, BufferedImage.TYPE_BYTE_GRAY);
+        final Graphics g = resultImage.getGraphics();
+
+        for (int i = 0; i < numberOfCopies; i++)
+        {
+            int xPosition = i * inputWidth;
+            g.drawImage(inputImage, xPosition, 0, null);
+        }
+        g.dispose();
+        return resultImage;
     }
 }

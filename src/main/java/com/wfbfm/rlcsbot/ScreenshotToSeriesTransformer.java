@@ -55,7 +55,7 @@ public class ScreenshotToSeriesTransformer
 
         numberTesseract.setDatapath(TESSERACT_DATA_PATH);
         numberTesseract.setLanguage(TESSERACT_LANGUAGE);
-        numberTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SINGLE_CHAR);
+        numberTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SPARSE_TEXT);
         numberTesseract.setVariable("tessedit_char_whitelist", "0123456789");
     }
 
@@ -136,12 +136,10 @@ public class ScreenshotToSeriesTransformer
         final String blueScoreString = parseImage(numberTesseract, SubImageType.BLUE_GAME_SCORE);
         final String orangeScoreString = parseImage(numberTesseract, SubImageType.ORANGE_GAME_SCORE);
 
-        if (StringUtils.isEmpty(blueScoreString) || StringUtils.isEmpty(orangeScoreString))
-        {
-            logger.log(Level.INFO, "Unable to determine game score - defaulting to 0-0.");
-            return new Score(0, 0);
-        }
-        return new Score(Integer.parseInt(blueScoreString), Integer.parseInt(orangeScoreString));
+        final int blueScore = StringUtils.isEmpty(blueScoreString) ? 0 : Character.getNumericValue(blueScoreString.charAt(0));
+        final int orangeScore = StringUtils.isEmpty(orangeScoreString) ? 0 : Character.getNumericValue(orangeScoreString.charAt(0));
+
+        return new Score(blueScore, orangeScore);
     }
 
     private void parseSeriesScore()

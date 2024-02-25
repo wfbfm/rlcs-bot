@@ -13,6 +13,7 @@ public class SubImageStrategy
     private boolean isWhiteOnOrange;
     private int rgbComparisonBuffer;
     private int additionalBorderSize;
+    private int additionalCopies;
 
     public SubImageStrategy(final SubImageType subImageType,
                             final int cropStartX,
@@ -24,7 +25,8 @@ public class SubImageStrategy
                             final boolean isWhiteOnOrange,
                             final int rgbComparisonBuffer,
                             final int additionalBorderSize,
-                            final boolean shouldInvertGreyscale)
+                            final boolean shouldInvertGreyscale,
+                            final int additionalCopies)
     {
         this.subImageType = subImageType;
         this.cropStartX = cropStartX;
@@ -37,6 +39,7 @@ public class SubImageStrategy
         this.isWhiteOnOrange = isWhiteOnOrange;
         this.rgbComparisonBuffer = rgbComparisonBuffer;
         this.additionalBorderSize = additionalBorderSize;
+        this.additionalCopies = additionalCopies;
     }
 
     public SubImageType getSubImageType()
@@ -147,5 +150,15 @@ public class SubImageStrategy
     public void setAdditionalBorderSize(final int additionalBorderSize)
     {
         this.additionalBorderSize = additionalBorderSize;
+    }
+
+    public int getAdditionalCopies()
+    {
+        return additionalCopies;
+    }
+
+    public void setAdditionalCopies(final int additionalCopies)
+    {
+        this.additionalCopies = additionalCopies;
     }
 }

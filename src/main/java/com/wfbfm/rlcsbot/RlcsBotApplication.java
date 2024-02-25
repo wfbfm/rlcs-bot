@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 
 public class RlcsBotApplication
 {
-    private final static boolean BROADCAST_ENABLED = true;
+    private final static boolean BROADCAST_ENABLED = false;
 
     public static void main(String[] args)
     {

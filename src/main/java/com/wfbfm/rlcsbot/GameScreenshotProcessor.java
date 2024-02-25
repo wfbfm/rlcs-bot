@@ -60,9 +60,10 @@ public class GameScreenshotProcessor
                 final boolean isWhiteOnOrange = Boolean.parseBoolean(row[8]);
                 final int rgbComparisonBuffer = Integer.parseInt(row[9]);
                 final int additionalBorderSize = Integer.parseInt(row[10]);
+                final int additionalCopies = Integer.parseInt(row[11]);
 
                 final SubImageStrategy subImageStrategy = new SubImageStrategy(subImageType, startX, startY, endX, endY, shouldKeepColour,
-                        isWhiteOnBlue, isWhiteOnOrange, rgbComparisonBuffer, additionalBorderSize, shouldInvertGreyscale
+                        isWhiteOnBlue, isWhiteOnOrange, rgbComparisonBuffer, additionalBorderSize, shouldInvertGreyscale, additionalCopies
                 );
 
                 this.subImageStrategies.add(subImageStrategy);
