@@ -71,4 +71,9 @@ public class Team
     {
         this.player3 = player3;
     }
+
+    public String getPlayerNames()
+    {
+        return this.player1.getName() + " | " + this.player2.getName() + " | " + this.player3.getName();
+    }
 }
