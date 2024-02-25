@@ -1,0 +1,39 @@
+@startuml
+
+start
+:Capture Screenshot;
+if (Is game screenshot?) then (Yes)
+    :Enrich game snapshot;
+    if (Series Exists?) then (Yes)
+        if (Is Highlight?) then (Yes)
+            #grey:Skip Highlight;
+        else (No)
+            :Update scores;
+            if (Is Game Completable?) then (Yes)
+                #pink:Series Score Update;
+            if (Is Series Completable?) then (Yes)
+                #orange:Series Conclusion;
+            else (No)
+                :Create new Game;
+            endif
+            else (No)
+                #lightblue:Game Score Update;
+            endif
+        endif
+    else (No)
+        if (Passes New Game\nValidation?) then (Yes)
+            #palegreen:New Game;
+        else (No)
+            #grey: Ignore;
+        endif
+    endif
+else (No)
+    if (Current Game\nCompletable?) then (Yes)
+        :Flowering;
+        :End;
+    else (No)
+        :Continue Watering;
+    endif
+endif
+end
+@enduml
