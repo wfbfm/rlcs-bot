@@ -29,10 +29,14 @@ if (Is game screenshot?) then (Yes)
     endif
 else (No)
     if (Current Game\nCompletable?) then (Yes)
-        :Flowering;
-        :End;
+        #orange:Game Conclusion;
+            if (Is Series Completable?) then (Yes)
+                #orange:Series Conclusion;
+            else (No)
+                :Create new Game;
+            endif
     else (No)
-        :Continue Watering;
+        #grey:Skip non-game;
     endif
 endif
 end
