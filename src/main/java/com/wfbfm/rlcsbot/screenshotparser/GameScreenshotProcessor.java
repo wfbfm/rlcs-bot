@@ -3,6 +3,8 @@ package com.wfbfm.rlcsbot.screenshotparser;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.wfbfm.rlcsbot.series.SeriesSnapshot;
+import com.wfbfm.rlcsbot.series.handler.SeriesSnapshotEvaluation;
+import com.wfbfm.rlcsbot.series.handler.SeriesUpdateHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -36,6 +38,7 @@ public class GameScreenshotProcessor
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
     private final GameScreenshotSubImageWrapperBuilder subImageWrapperBuilder = new GameScreenshotSubImageWrapperBuilder();
     private final ScreenshotToSeriesTransformer screenshotToSeriesTransformer = new ScreenshotToSeriesTransformer();
+    private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler();
 
     public GameScreenshotProcessor()
     {
@@ -114,6 +117,11 @@ public class GameScreenshotProcessor
 
         final SeriesSnapshot seriesSnapshot = this.screenshotToSeriesTransformer.transform(subImageWrapper);
 
+        final SeriesSnapshotEvaluation evaluation = seriesUpdateHandler.evaluateSeries(seriesSnapshot);
+
+        logger.log(Level.INFO, "Evaluation Result: " + evaluation.name());
+        logger.log(Level.INFO, "Current Series Status: " + seriesUpdateHandler.getCurrentSeries());
+
         try
         {
             final Path sourceFilePath = incomingFile.toPath();
@@ -124,16 +132,6 @@ public class GameScreenshotProcessor
         {
             logger.log(Level.WARNING, "Unable to move screenshot " + incomingFile.getName() + " to completed folder.", e);
         }
-//
-//        if (isValidSeriesData())
-//        {
-//            processSeriesData();
-//            moveScreenshotToFolder("processed");
-//        } else
-//        {
-//            moveScreenshotToFolder("ignored");
-//        }
-//        deleteSubImages();
     }
 
     private void transformScreenshotToSubImages(final File incomingFile)
@@ -162,32 +160,5 @@ public class GameScreenshotProcessor
         final Instant endTime = Instant.now();
         final long elapsedMs = endTime.toEpochMilli() - startTime.toEpochMilli();
         logger.log(Level.INFO, String.format("Time to create subImages: %d ms", elapsedMs));
-    }
-
-    private SeriesSnapshot parseSeriesDataFromSubImages()
-    {
-        // TODO
-        return null;
-    }
-
-    private void deleteSubImages()
-    {
-
-    }
-
-    private void processSeriesData()
-    {
-
-    }
-
-    private void moveScreenshotToFolder(final String folder)
-    {
-
-
-    }
-
-    private boolean isValidSeriesData()
-    {
-        return false;
     }
 }

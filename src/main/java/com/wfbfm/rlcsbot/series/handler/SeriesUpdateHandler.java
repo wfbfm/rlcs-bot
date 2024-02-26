@@ -28,6 +28,7 @@ public class SeriesUpdateHandler
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
     {
+        // FIXME: This appears to be breaking on test data
         if (!enrichAllNamesFromTeams(snapshot))
         {
             if (!enrichAllNamesFromPlayers(snapshot))
@@ -68,17 +69,40 @@ public class SeriesUpdateHandler
 
     private SeriesSnapshotEvaluation handleGameScreenshot(final SeriesSnapshot snapshot)
     {
-        enrichBestOf(snapshot, currentSeries);
-        if (isHighlight(snapshot, currentSeries))
+        if (currentSeries == null)
+        {
+            if (isValidNewSeries(snapshot))
+            {
+                currentSeries = new Series(snapshot);
+                return SeriesSnapshotEvaluation.NEW_SERIES;
+            }
+            else
+            {
+                // TODO - what will cause this / do we need to handle?
+                return SeriesSnapshotEvaluation.INVALID_NEW_SERIES;
+            }
+        }
+        enrichBestOf(snapshot);
+        if (isHighlight(snapshot))
         {
             return  SeriesSnapshotEvaluation.HIGHLIGHT;
         }
         return handleGameUpdate(snapshot);
     }
 
+    private boolean isValidNewSeries(final SeriesSnapshot snapshot)
+    {
+        // TODO
+        return true;
+    }
+
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)
     {
         // TODO:
+        // update clock; update scores; sense-check the series score
+        senseCheckSeriesScore(snapshot);
+        currentSeries.getCurrentGame().setClock(snapshot.getCurrentGame().getClock());
+
         final Score snapshotGameScore = snapshot.getCurrentGame().getScore();
         final Score existingGameScore = currentSeries.getCurrentGame().getScore();
 
@@ -97,7 +121,33 @@ public class SeriesUpdateHandler
             return SeriesSnapshotEvaluation.GAME_SCORE_CHANGED;
         }
 
-        return SeriesSnapshotEvaluation.SERIES_SCORE_CHANGED;
+        return SeriesSnapshotEvaluation.SCORE_UNCHANGED;
+    }
+
+    private void senseCheckSeriesScore(final SeriesSnapshot snapshot)
+    {
+        // FIXME: When the screenshot feed is interrupted - i.e. we miss a game, we need a recovery mechanism.
+        // This is identifying the problematic series, but it's not handling them in any special way
+        final Score snapshotSeriesScore = snapshot.getSeriesScore();
+        final Score currentSeriesScore = currentSeries.getSeriesScore();
+
+        if (snapshotSeriesScore.getBlueScore() != currentSeriesScore.getBlueScore())
+        {
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot blueSeriesScore: " + currentSeriesScore.getBlueScore() +
+                    " vs. " + snapshotSeriesScore.getBlueScore());
+        }
+
+        if (snapshotSeriesScore.getOrangeScore() != currentSeriesScore.getOrangeScore())
+        {
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot orangeSeriesScore: " + currentSeriesScore.getOrangeScore() +
+                    " vs. " + snapshotSeriesScore.getOrangeScore());
+        }
+
+        if (snapshot.getCurrentGameNumber() != currentSeries.getCurrentGameNumber())
+        {
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot gameNumber: " + currentSeries.getCurrentGameNumber() +
+                    " vs. " + snapshot.getCurrentGameNumber());
+        }
     }
 
     private boolean isGameCompletable()
@@ -113,8 +163,9 @@ public class SeriesUpdateHandler
         return isTeamInLead && isLittleTimeRemaining;
     }
 
-    private void enrichBestOf(final SeriesSnapshot snapshot, final Series currentSeries)
+    private void enrichBestOf(final SeriesSnapshot snapshot)
     {
+        // FIXME: This is far too volatile and needs fixing.
         // image recognition isn't the best, sometimes we need to correct what we parse
         if (!allowableBestOf.contains(currentSeries.getBestOf()) && allowableBestOf.contains(snapshot.getBestOf()))
         {
@@ -122,7 +173,7 @@ public class SeriesUpdateHandler
         }
     }
 
-    private boolean isHighlight(final SeriesSnapshot snapshot, final Series currentSeries)
+    private boolean isHighlight(final SeriesSnapshot snapshot)
     {
         if (snapshot.getCurrentGameNumber() < currentSeries.getCurrentGameNumber())
         {
@@ -134,12 +185,6 @@ public class SeriesUpdateHandler
         {
             return true;
         }
-        return false;
-    }
-
-    private boolean isNewGame(final SeriesSnapshot snapshot, final Series currentSeries)
-    {
-        // TODO prior game should have completed
         return false;
     }
 
@@ -250,5 +295,10 @@ public class SeriesUpdateHandler
             }
         }
         return bestMatch;
+    }
+
+    public String getCurrentSeries()
+    {
+        return this.currentSeries.toString();
     }
 }

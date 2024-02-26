@@ -29,7 +29,6 @@ public class Series
         this.completedGames = new ArrayList<>();
         this.currentGame = snapshot.getCurrentGame();
         this.currentGameNumber = snapshot.getCurrentGameNumber();
-        this.completedGames.add(this.currentGame);
         this.seriesScore = snapshot.getSeriesScore();
         this.blueTeam = snapshot.getBlueTeam();
         this.orangeTeam = snapshot.getOrangeTeam();
@@ -50,6 +49,7 @@ public class Series
         }
         else
         {
+            this.currentGameNumber++;
             this.currentGame = new Game();
         }
     }
@@ -147,5 +147,22 @@ public class Series
     public void setComplete(final boolean complete)
     {
         isComplete = complete;
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(blueTeam.getTeamName() + " [" + blueTeam.getPlayerNames() + "]" + " vs "
+                + orangeTeam.getTeamName() + " [" + orangeTeam.getPlayerNames() + "]");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(currentGame.toString());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("Series Score: " + seriesScore.getBlueScore() + " - " + seriesScore.getOrangeScore());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("bestOf=" + bestOf + " currentGameNumber=" + currentGameNumber + " isComplete=" + isComplete +
+                " numberOfCompletedGames=" + completedGames.size());
+        return stringBuilder.toString();
     }
 }

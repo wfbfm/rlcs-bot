@@ -49,4 +49,10 @@ public class Game
     {
         this.winner = winner;
     }
+
+    @Override
+    public String toString()
+    {
+        return "Game Score: " + score.getBlueScore() + " - " + score.getOrangeScore() + " (Time: " + clock.getDisplayedTime() + ")";
+    }
 }
