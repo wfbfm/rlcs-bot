@@ -65,8 +65,7 @@ public class ScreenshotToSeriesTransformer
         seriesSnapshotBuilder.clear();
         parseSeriesMetadata();
         parseCurrentGame();
-        parseCurrentGameNumber();
-        parseSeriesScore();
+        parseSeriesScoreAndGameNumber();
         parseTeams();
         parseBestOf();
         final Instant endTime = Instant.now();
@@ -110,6 +109,7 @@ public class ScreenshotToSeriesTransformer
         this.seriesSnapshotBuilder.withCurrentGame(currentGame);
     }
 
+    // On further inspection, do not trust the game number parsing - derive from series score instead
     private void parseCurrentGameNumber()
     {
         final String gameNumberString = parseImage(textTesseract, SubImageType.GAME_NUMBER);
@@ -141,12 +141,13 @@ public class ScreenshotToSeriesTransformer
         return new Score(blueScore, orangeScore);
     }
 
-    private void parseSeriesScore()
+    private void parseSeriesScoreAndGameNumber()
     {
         final int blueSeriesScore = parseSeriesTicks(TeamColour.BLUE, blueSeriesTicks);
         final int orangeSeriesScore = parseSeriesTicks(TeamColour.ORANGE, orangeSeriesTicks);
         logger.log(Level.INFO, "Parsed series score: " + blueSeriesScore + "-" + orangeSeriesScore);
         this.seriesSnapshotBuilder.withSeriesScore(new Score(blueSeriesScore, orangeSeriesScore));
+        this.seriesSnapshotBuilder.withCurrentGameNumber(blueSeriesScore + orangeSeriesScore + 1);
     }
 
     private int parseSeriesTicks(final TeamColour teamColour, final SubImageType[] seriesTicks)
@@ -247,7 +248,7 @@ public class ScreenshotToSeriesTransformer
 
     private void parseBestOf()
     {
-        final String bestOfString = parseImage(textTesseract, SubImageType.GAME_NUMBER);
+        final String bestOfString = parseImage(textTesseract, SubImageType.BEST_OF);
         if (StringUtils.isEmpty(bestOfString))
         {
             logger.log(Level.INFO, "Unable to determine bestOf - defaulting to 0.");

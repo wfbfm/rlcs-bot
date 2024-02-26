@@ -28,7 +28,8 @@ public class SeriesUpdateHandler
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
     {
-        // FIXME: This appears to be breaking on test data
+        // FIXME - recovery mechanism in case we get the names wrong on the first assignment?
+        // FIXME - ditto gameNumber
         if (!enrichAllNamesFromTeams(snapshot))
         {
             if (!enrichAllNamesFromPlayers(snapshot))
@@ -85,6 +86,10 @@ public class SeriesUpdateHandler
         enrichBestOf(snapshot);
         if (isHighlight(snapshot))
         {
+            if (isGameCompletable())
+            {
+                return handleCompletedGame();
+            }
             return  SeriesSnapshotEvaluation.HIGHLIGHT;
         }
         return handleGameUpdate(snapshot);
@@ -165,7 +170,6 @@ public class SeriesUpdateHandler
 
     private void enrichBestOf(final SeriesSnapshot snapshot)
     {
-        // FIXME: This is far too volatile and needs fixing.
         // image recognition isn't the best, sometimes we need to correct what we parse
         if (!allowableBestOf.contains(currentSeries.getBestOf()) && allowableBestOf.contains(snapshot.getBestOf()))
         {
@@ -179,9 +183,11 @@ public class SeriesUpdateHandler
         {
             return true;
         }
-        final int snapshotGamesCompleted = snapshot.getSeriesScore().getBlueScore() + snapshot.getSeriesScore().getOrangeScore();
-        final int existingGamesCompleted = currentSeries.getSeriesScore().getBlueScore() + currentSeries.getSeriesScore().getOrangeScore();
-        if (snapshotGamesCompleted < existingGamesCompleted)
+        final int snapshotGameBlueScore = snapshot.getCurrentGame().getScore().getTeamScore(TeamColour.BLUE);
+        final int snapshotGameOrangeScore = snapshot.getCurrentGame().getScore().getTeamScore(TeamColour.ORANGE);
+        final int existingGameBlueScore = currentSeries.getCurrentGame().getScore().getTeamScore(TeamColour.BLUE);
+        final int existingGameOrangeScore = currentSeries.getCurrentGame().getScore().getTeamScore(TeamColour.ORANGE);
+        if (snapshotGameBlueScore < existingGameBlueScore || snapshotGameOrangeScore < existingGameOrangeScore)
         {
             return true;
         }
@@ -255,7 +261,7 @@ public class SeriesUpdateHandler
         final String blueTeamName = liquipediaTeamGetter.getPlayerToTeamNameMap().get(bluePlayerName);
         final String orangeTeamName = liquipediaTeamGetter.getPlayerToTeamNameMap().get(orangePlayerName);
 
-        blueTeam.setTeamName(bluePlayerName);
+        blueTeam.setTeamName(blueTeamName);
         orangeTeam.setTeamName(orangeTeamName);
         enrichPlayerNamesFromTeams(snapshot);
         return true;
@@ -280,6 +286,10 @@ public class SeriesUpdateHandler
 
     private String lookupImperfectName(final Map<String, String> nameMap, final String inputName)
     {
+        if (StringUtils.isEmpty(inputName))
+        {
+            return null;
+        }
         String bestMatch = null;
         int minDistance = Integer.MAX_VALUE;
 

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.DEBUGGING_ENABLED;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.RETAIN_PROCESSING_FILES;
 
 
 public class GameScreenshotProcessor
@@ -82,7 +82,15 @@ public class GameScreenshotProcessor
     {
         while (true)
         {
-            pollAndHandleIncomingFiles();
+            try
+            {
+                pollAndHandleIncomingFiles();
+            }
+            catch (Exception e)
+            {
+                logger.log(Level.SEVERE, "Unable to handle incoming file - stopping feed.", e);
+                break;
+            }
         }
     }
 
@@ -145,7 +153,7 @@ public class GameScreenshotProcessor
             {
                 final BufferedImage subImage = GameScreenshotProcessorUtils.createSubImageFromStrategy(originalImage, subImageStrategy);
                 this.subImageWrapperBuilder.withSubImage(subImageStrategy.getSubImageType(), subImage);
-                if (DEBUGGING_ENABLED)
+                if (RETAIN_PROCESSING_FILES)
                 {
                     final String outputPath = PROCESSING_DIRECTORY + File.separator +
                             incomingFile.getName().replace(".png", "") + "-" + subImageStrategy.getSubImageType().name() + ".png";
