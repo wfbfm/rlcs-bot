@@ -56,4 +56,32 @@ public class Score
                 break;
         }
     }
+
+    public TeamColour getTeamInLead()
+    {
+        if (blueScore > orangeScore)
+        {
+            return TeamColour.BLUE;
+        }
+        else if (blueScore < orangeScore)
+        {
+            return TeamColour.ORANGE;
+        }
+        else
+        {
+            return TeamColour.NONE;
+        }
+    }
+
+    public int getHighestScore()
+    {
+        if (blueScore > orangeScore)
+        {
+            return blueScore;
+        }
+        else
+        {
+            return orangeScore;
+        }
+    }
 }

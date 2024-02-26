@@ -6,13 +6,14 @@ import java.util.List;
 public class Series
 {
     private SeriesMetaData seriesMetaData;
-    private List<Game> games;
+    private List<Game> completedGames;
     private Game currentGame;
     private Score seriesScore;
     private Team blueTeam;
     private Team orangeTeam;
     private int bestOf;
     private int currentGameNumber;
+    private boolean isComplete;
 
     public Series(final SeriesMetaData seriesMetaData, final Team blueTeam, final Team orangeTeam, final int bestOf)
     {
@@ -25,14 +26,37 @@ public class Series
     public Series(final SeriesSnapshot snapshot)
     {
         this.seriesMetaData = snapshot.getSeriesMetaData();
-        this.games = new ArrayList<>();
+        this.completedGames = new ArrayList<>();
         this.currentGame = snapshot.getCurrentGame();
         this.currentGameNumber = snapshot.getCurrentGameNumber();
-        this.games.add(this.currentGame);
+        this.completedGames.add(this.currentGame);
         this.seriesScore = snapshot.getSeriesScore();
         this.blueTeam = snapshot.getBlueTeam();
         this.orangeTeam = snapshot.getOrangeTeam();
         this.bestOf = snapshot.getBestOf();
+    }
+
+    public void handleCompletedGame()
+    {
+        final TeamColour winningTeam = currentGame.getScore().getTeamInLead();
+        this.currentGame.setWinner(winningTeam);
+        final int newSeriesScore = this.seriesScore.getTeamScore(winningTeam) + 1;
+        this.seriesScore.setTeamScore(newSeriesScore, winningTeam);
+        this.completedGames.add(this.currentGame);
+        this.currentGame = null;
+        if (newSeriesScore >= getSeriesWinningGameScore())
+        {
+            this.isComplete = true;
+        }
+        else
+        {
+            this.currentGame = new Game();
+        }
+    }
+
+    public int getSeriesWinningGameScore()
+    {
+        return (this.bestOf + 1) / 2;
     }
 
     public SeriesMetaData getSeriesMetaData()
@@ -45,14 +69,14 @@ public class Series
         this.seriesMetaData = seriesMetaData;
     }
 
-    public List<Game> getGames()
+    public List<Game> getCompletedGames()
     {
-        return games;
+        return completedGames;
     }
 
-    public void setGames(final List<Game> games)
+    public void setCompletedGames(final List<Game> completedGames)
     {
-        this.games = games;
+        this.completedGames = completedGames;
     }
 
     public Game getCurrentGame()
@@ -113,5 +137,15 @@ public class Series
     public void setCurrentGameNumber(final int currentGameNumber)
     {
         this.currentGameNumber = currentGameNumber;
+    }
+
+    public boolean isComplete()
+    {
+        return isComplete;
+    }
+
+    public void setComplete(final boolean complete)
+    {
+        isComplete = complete;
     }
 }

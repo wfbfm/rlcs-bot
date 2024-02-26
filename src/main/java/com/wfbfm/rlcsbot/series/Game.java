@@ -9,7 +9,8 @@ public class Game
     public Game()
     {
         this.score = new Score(0, 0);
-        this.winner = null;
+        this.clock = new Clock("5:00", 0, false);
+        this.winner = TeamColour.NONE;
     }
 
     public Game(final Score score, final Clock clock, final TeamColour winner)
