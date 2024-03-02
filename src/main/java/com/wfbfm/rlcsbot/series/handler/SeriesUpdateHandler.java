@@ -15,15 +15,14 @@ public class SeriesUpdateHandler
 {
     private static final Set<Integer> allowableBestOf = new HashSet<>(Set.of(3, 5, 7));
     private final List<Series> completedSeries = new ArrayList<>();
-    private final LiquipediaTeamGetter liquipediaTeamGetter = new LiquipediaTeamGetter();
+    private final LiquipediaTeamGetter liquipediaTeamGetter;
     private final LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
     private final Logger logger = Logger.getLogger(SeriesUpdateHandler.class.getName());
     private Series currentSeries = null;
 
-    public SeriesUpdateHandler()
+    public SeriesUpdateHandler(final LiquipediaTeamGetter liquipediaTeamGetter)
     {
-        liquipediaTeamGetter.setLiquipediaUrl(LIQUIPEDIA_PAGE);
-        liquipediaTeamGetter.updateLiquipediaRefData();
+        this.liquipediaTeamGetter = liquipediaTeamGetter;
     }
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
@@ -191,6 +190,10 @@ public class SeriesUpdateHandler
         {
             return true;
         }
+        if (snapshot.getCurrentGame().getClock().getElapsedSeconds() < currentSeries.getCurrentGame().getClock().getElapsedSeconds())
+        {
+            return true;
+        }
         return false;
     }
 
@@ -307,8 +310,18 @@ public class SeriesUpdateHandler
         return bestMatch;
     }
 
-    public String getCurrentSeries()
+    public String getCurrentSeriesAsString()
     {
         return this.currentSeries.toString();
+    }
+
+    public List<Series> getCompletedSeries()
+    {
+        return completedSeries;
+    }
+
+    public Series getCurrentSeries()
+    {
+        return currentSeries;
     }
 }

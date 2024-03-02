@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LiquipediaTeamGetter
 {
@@ -18,6 +20,7 @@ public class LiquipediaTeamGetter
     private static final String TEAMCARD_COLUMN = "teamcard-column";
     private static final String CENTER = "center";
     private static final String TEAMCARD_INNER = "teamcard-inner";
+    private final Logger logger = Logger.getLogger(LiquipediaTeamGetter.class.getName());
     private Map<String, Map<String, String>> teamToPlayerAndCoachMap = new HashMap<>();
     private Map<String, Set<String>> teamToPlayerNameMap = new HashMap<>();
     private Map<String, String> playerToTeamNameMap = new HashMap<>();
@@ -67,6 +70,7 @@ public class LiquipediaTeamGetter
 
     public boolean updateLiquipediaRefData()
     {
+        logger.log(Level.INFO, "Attempting to fetch player/team data from Liquipedia: " + liquipediaUrl);
         final Document document = getDocumentFromLiquipediaUrl(liquipediaUrl);
         if (document == null)
         {
@@ -76,11 +80,14 @@ public class LiquipediaTeamGetter
 
         if (teamCards.size() == 0)
         {
+            logger.log(Level.SEVERE, "Unable to find player/team data from Liquipedia: " + liquipediaUrl);
             return false;
         }
         else
         {
             parseTeamToPlayerMap(teamCards.get(0));
+            logger.log(Level.INFO, "Fetched " + uppercasePlayerNameMap.size() + " players from Liquipedia.");
+            logger.log(Level.INFO, "Fetched " + uppercaseTeamNameMap.size() + " teams from Liquipedia.");
             return true;
         }
     }

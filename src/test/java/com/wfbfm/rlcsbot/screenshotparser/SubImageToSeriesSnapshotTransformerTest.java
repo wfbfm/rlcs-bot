@@ -9,16 +9,16 @@ import org.junit.jupiter.api.Test;
 import static com.wfbfm.rlcsbot.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SubImageToSeriesTransformerTest
+class SubImageToSeriesSnapshotTransformerTest
 {
     private final ScreenshotToSubImageTransformer screenshotToSubImageTransformer = new ScreenshotToSubImageTransformer();
-    private final SubImageToSeriesTransformer subImageToSeriesTransformer = new SubImageToSeriesTransformer();
+    private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer();
 
     @Test
     public void testParseScorelessGameScreenshot()
     {
         final GameScreenshotSubImageWrapper subImageWrapper = screenshotToSubImageTransformer.transformScreenshotToSubImages(GAME_1_SCORE_0_0);
-        final SeriesSnapshot snapshot = subImageToSeriesTransformer.transform(subImageWrapper);
+        final SeriesSnapshot snapshot = subImageToSeriesSnapshotTransformer.transform(subImageWrapper);
 
         final Game game = snapshot.getCurrentGame();
         assertEquals(TeamColour.NONE, game.getWinner());
@@ -56,7 +56,7 @@ class SubImageToSeriesTransformerTest
     public void testParseBo5SeriesInProgress()
     {
         final GameScreenshotSubImageWrapper subImageWrapper = screenshotToSubImageTransformer.transformScreenshotToSubImages(DIFFERENT_GAME);
-        final SeriesSnapshot snapshot = subImageToSeriesTransformer.transform(subImageWrapper);
+        final SeriesSnapshot snapshot = subImageToSeriesSnapshotTransformer.transform(subImageWrapper);
 
         final Game game = snapshot.getCurrentGame();
         assertEquals(TeamColour.NONE, game.getWinner());
@@ -94,7 +94,7 @@ class SubImageToSeriesTransformerTest
     public void testNonGameScreenshot()
     {
         final GameScreenshotSubImageWrapper subImageWrapper = screenshotToSubImageTransformer.transformScreenshotToSubImages(NON_GAME_SCREENSHOT);
-        final SeriesSnapshot snapshot = subImageToSeriesTransformer.transform(subImageWrapper);
+        final SeriesSnapshot snapshot = subImageToSeriesSnapshotTransformer.transform(subImageWrapper);
 
         final Game game = snapshot.getCurrentGame();
         assertEquals(TeamColour.NONE, game.getWinner());
@@ -130,7 +130,7 @@ class SubImageToSeriesTransformerTest
     public void testGameScoreboard()
     {
         final GameScreenshotSubImageWrapper subImageWrapper = screenshotToSubImageTransformer.transformScreenshotToSubImages(GAME_1_SCOREBOARD);
-        final SeriesSnapshot snapshot = subImageToSeriesTransformer.transform(subImageWrapper);
+        final SeriesSnapshot snapshot = subImageToSeriesSnapshotTransformer.transform(subImageWrapper);
 
         final Game game = snapshot.getCurrentGame();
         assertEquals(TeamColour.NONE, game.getWinner());

@@ -14,8 +14,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
+import static com.wfbfm.rlcsbot.screenshotparser.GameScreenshotProcessorUtils.parseClockFromTime;
 
-public class SubImageToSeriesTransformer
+public class SubImageToSeriesSnapshotTransformer
 {
     private static final String TESSERACT_DATA_PATH = "src/main/resources/tessdata";
     private static final String TESSERACT_LANGUAGE = "eng";
@@ -29,7 +30,7 @@ public class SubImageToSeriesTransformer
             SubImageType.ORANGE_SERIES_TICK4};
     private static final int TICK_COLOUR_DIFFERENTIATION_BUFFER = 50;
     private static final int TICK_FILLED_THRESHOLD = 150;
-    private final Logger logger = Logger.getLogger(SubImageToSeriesTransformer.class.getName());
+    private final Logger logger = Logger.getLogger(SubImageToSeriesSnapshotTransformer.class.getName());
     private final SeriesSnapshotBuilder seriesSnapshotBuilder = new SeriesSnapshotBuilder();
     private final Tesseract textTesseract = new Tesseract();
     private final Tesseract clockTesseract = new Tesseract();
@@ -37,7 +38,7 @@ public class SubImageToSeriesTransformer
     private final Tesseract bestOfTesseract = new Tesseract();
     private GameScreenshotSubImageWrapper subImageWrapper;
 
-    public SubImageToSeriesTransformer()
+    public SubImageToSeriesSnapshotTransformer()
     {
         initialiseTesseractParsers();
     }
@@ -227,30 +228,7 @@ public class SubImageToSeriesTransformer
     private Clock parseClock()
     {
         final String displayedTime = parseImage(clockTesseract, SubImageType.CLOCK);
-        final boolean isOvertime = displayedTime.contains("+");
-
-        final String[] clockParts = displayedTime.split(":");
-
-        int elapsedSeconds = GAME_TIME_SECONDS;
-        if (clockParts.length != 2)
-        {
-            logger.log(Level.INFO, "Unable to parse game time from: " + displayedTime);
-            elapsedSeconds = 0;
-        }
-        else
-        {
-            if (isOvertime) // clock is counting up
-            {
-                elapsedSeconds += (Integer.parseInt(clockParts[0]) * 60);
-                elapsedSeconds += Integer.parseInt(clockParts[1]);
-            }
-            else // clock is counting down
-            {
-                elapsedSeconds -= (Integer.parseInt(clockParts[0]) * 60);
-                elapsedSeconds -= Integer.parseInt(clockParts[1]);
-            }
-        }
-        return new Clock(displayedTime, elapsedSeconds, isOvertime);
+        return parseClockFromTime(displayedTime);
     }
 
     private void parseBestOf()
