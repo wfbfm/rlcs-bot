@@ -34,6 +34,7 @@ public class SubImageToSeriesTransformer
     private final Tesseract textTesseract = new Tesseract();
     private final Tesseract clockTesseract = new Tesseract();
     private final Tesseract numberTesseract = new Tesseract();
+    private final Tesseract bestOfTesseract = new Tesseract();
     private GameScreenshotSubImageWrapper subImageWrapper;
 
     public SubImageToSeriesTransformer()
@@ -56,6 +57,11 @@ public class SubImageToSeriesTransformer
         numberTesseract.setLanguage(TESSERACT_LANGUAGE);
         numberTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SPARSE_TEXT);
         numberTesseract.setVariable("tessedit_char_whitelist", "0123456789");
+
+        bestOfTesseract.setDatapath(TESSERACT_DATA_PATH);
+        bestOfTesseract.setLanguage(TESSERACT_LANGUAGE);
+        bestOfTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SPARSE_TEXT);
+        bestOfTesseract.setVariable("tessedit_char_whitelist", "357");
     }
 
     public SeriesSnapshot transform(final GameScreenshotSubImageWrapper subImageWrapper)
@@ -249,21 +255,16 @@ public class SubImageToSeriesTransformer
 
     private void parseBestOf()
     {
-        final String bestOfString = parseImage(textTesseract, SubImageType.BEST_OF);
+        final String bestOfString = parseImage(numberTesseract, SubImageType.BEST_OF);
         if (StringUtils.isEmpty(bestOfString))
         {
             logger.log(Level.INFO, "Unable to determine bestOf - defaulting to 0.");
             this.seriesSnapshotBuilder.withBestOf(0);
             return;
         }
-        final String bestOf = bestOfString.replaceAll("[^0-9]", "");
-        if (StringUtils.isNumeric(bestOf))
-        {
-            this.seriesSnapshotBuilder.withBestOf(Integer.parseInt(bestOf));
-        }
         else
         {
-            logger.log(Level.INFO, "Unable to determine bestOf - defaulting to 0.");
+            this.seriesSnapshotBuilder.withBestOf(Character.getNumericValue(bestOfString.charAt(0)));
         }
     }
 }

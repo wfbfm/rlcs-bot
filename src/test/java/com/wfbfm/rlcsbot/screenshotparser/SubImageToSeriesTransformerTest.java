@@ -66,8 +66,7 @@ class SubImageToSeriesTransformerTest
         assertEquals(231, game.getClock().getElapsedSeconds());
         assertEquals(false, game.getClock().isOvertime());
 
-        // TODO: Fix the parsing of the bestOf
-        // assertEquals(5, snapshot.getBestOf());
+        assertEquals(5, snapshot.getBestOf());
         assertEquals(0, snapshot.getSeriesScore().getOrangeScore());
         assertEquals(1, snapshot.getSeriesScore().getBlueScore());
         assertEquals(2, snapshot.getCurrentGameNumber());
