@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
-public class ScreenshotToSeriesTransformer
+public class SubImageToSeriesTransformer
 {
     private static final String TESSERACT_DATA_PATH = "src/main/resources/tessdata";
     private static final String TESSERACT_LANGUAGE = "eng";
@@ -29,14 +29,14 @@ public class ScreenshotToSeriesTransformer
             SubImageType.ORANGE_SERIES_TICK4};
     private static final int TICK_COLOUR_DIFFERENTIATION_BUFFER = 50;
     private static final int TICK_FILLED_THRESHOLD = 150;
-    private final Logger logger = Logger.getLogger(ScreenshotToSeriesTransformer.class.getName());
+    private final Logger logger = Logger.getLogger(SubImageToSeriesTransformer.class.getName());
     private final SeriesSnapshotBuilder seriesSnapshotBuilder = new SeriesSnapshotBuilder();
     private final Tesseract textTesseract = new Tesseract();
     private final Tesseract clockTesseract = new Tesseract();
     private final Tesseract numberTesseract = new Tesseract();
     private GameScreenshotSubImageWrapper subImageWrapper;
 
-    public ScreenshotToSeriesTransformer()
+    public SubImageToSeriesTransformer()
     {
         initialiseTesseractParsers();
     }
