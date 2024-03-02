@@ -229,6 +229,7 @@ public class SubImageToSeriesTransformer
         if (clockParts.length != 2)
         {
             logger.log(Level.INFO, "Unable to parse game time from: " + displayedTime);
+            elapsedSeconds = 0;
         }
         else
         {
