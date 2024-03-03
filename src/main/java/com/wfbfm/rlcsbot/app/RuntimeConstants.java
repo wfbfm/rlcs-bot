@@ -16,4 +16,6 @@ public class RuntimeConstants
     public static final File IGNORED_DIRECTORY = new File("src/main/temp/ignored/");
     public static final int INCOMING_POLLING_SLEEP_TIME_MS = 200;
     public static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
+    public static final String PYTHON_VENV_PATH = "venv" + File.separator + "Scripts" + File.separator + "python.exe";
+    public static final String PYTHON_SCRIPT = "python_scripts" + File.separator + "transcribe_commentary.py";
 }

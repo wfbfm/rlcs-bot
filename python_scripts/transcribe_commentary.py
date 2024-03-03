@@ -1,6 +1,7 @@
 import subprocess
 import time
 import whisper
+import sys
 
 
 def capture_last_seconds(input_file, output_file, duration=30):
@@ -39,10 +40,12 @@ def transcribe_audio_file(file_path, initial_prompt):
 
 
 if __name__ == "__main__":
-    input_file = r"../src/main/temp/audio/full-audio.wav"
-    output_file = r"../src/main/temp/audio/trimmed-audio.wav"
-    conditioning_words = ["ApparentlyJack", "FirstKiller", "GenG"]
-    initial_prompt = " ".join(conditioning_words)
+    input_file = sys.argv[1]
+    print("input file is: " + input_file)
+    output_file = sys.argv[2]
+    print("output file is: " + output_file)
+    initial_prompt = sys.argv[3]
+    print("initial prompt is: " + initial_prompt)
 
     capture_last_seconds(input_file, output_file)
     print(transcribe_audio_file(output_file, initial_prompt))
