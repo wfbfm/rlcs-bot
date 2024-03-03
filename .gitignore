@@ -2,6 +2,9 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+/venv/
+/src/test/data/
+/src/main/temp/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -36,5 +39,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/src/test/data/
-/src/main/temp/
