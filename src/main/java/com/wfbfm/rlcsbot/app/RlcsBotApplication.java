@@ -3,8 +3,12 @@ package com.wfbfm.rlcsbot.app;
 import com.wfbfm.rlcsbot.screenshotparser.GameScreenshotProcessor;
 import com.wfbfm.rlcsbot.twitch.HeadlessTwitchWatcher;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class RlcsBotApplication
 {
@@ -12,6 +16,8 @@ public class RlcsBotApplication
 
     public static void main(String[] args)
     {
+        initaliseTempDirectories();
+
         if (BROADCAST_ENABLED)
         {
             final ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -55,5 +61,27 @@ public class RlcsBotApplication
             throwable.printStackTrace();
         });
         return twitchWatcherThread;
+    }
+
+    private static void initaliseTempDirectories()
+    {
+        for (final File directory : Arrays.asList(INCOMING_DIRECTORY,
+                PROCESSING_DIRECTORY,
+                COMPLETE_DIRECTORY,
+                AUDIO_DIRECTORY))
+        {
+            if (!directory.exists())
+            {
+                boolean success = directory.mkdirs();
+                if (success)
+                {
+                    System.out.println("Directory created: " + directory.getAbsolutePath());
+                }
+                else
+                {
+                    System.err.println("Failed to create directory: " + directory.getAbsolutePath());
+                }
+            }
+        }
     }
 }
