@@ -1,0 +1,1 @@
+streamlink https://www.twitch.tv/rocketleague audio_only -o full-audio.wav --twitch-disable-ads
