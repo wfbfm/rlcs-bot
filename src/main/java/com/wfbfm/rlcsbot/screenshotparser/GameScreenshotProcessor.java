@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.screenshotparser;
 
+import com.wfbfm.rlcsbot.audiotranscriber.AudioTranscriptionDelegator;
 import com.wfbfm.rlcsbot.liquipedia.LiquipediaTeamGetter;
 import com.wfbfm.rlcsbot.series.SeriesSnapshot;
 import com.wfbfm.rlcsbot.series.handler.SeriesSnapshotEvaluation;
@@ -26,6 +27,7 @@ public class GameScreenshotProcessor
     private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer();
     private final LiquipediaTeamGetter liquipediaTeamGetter = new LiquipediaTeamGetter();
     private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler(liquipediaTeamGetter);
+    private final AudioTranscriptionDelegator audioTranscriptionDelegator = new AudioTranscriptionDelegator();
 
     public GameScreenshotProcessor()
     {
@@ -77,9 +79,33 @@ public class GameScreenshotProcessor
         final SeriesSnapshot seriesSnapshot = this.subImageToSeriesSnapshotTransformer.transform(subImageWrapper);
         final SeriesSnapshotEvaluation evaluation = seriesUpdateHandler.evaluateSeries(seriesSnapshot);
 
+        switch (evaluation)
+        {
+            case NEW_SERIES:
+            case GAME_SCORE_CHANGED:
+            case SERIES_SCORE_CHANGED:
+            case SERIES_COMPLETE:
+                audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries());
+                break;
+            default:
+                break;
+        }
+
         logger.log(Level.INFO, "Evaluation Result: " + evaluation.name());
         logger.log(Level.INFO, "Current Series Status: " + seriesUpdateHandler.getCurrentSeriesAsString());
 
+        if (RETAIN_SCREENSHOTS)
+        {
+            moveFileToCompletedDirectory(incomingFile);
+        }
+        else
+        {
+            incomingFile.delete();
+        }
+    }
+
+    private void moveFileToCompletedDirectory(final File incomingFile)
+    {
         try
         {
             final Path sourceFilePath = incomingFile.toPath();

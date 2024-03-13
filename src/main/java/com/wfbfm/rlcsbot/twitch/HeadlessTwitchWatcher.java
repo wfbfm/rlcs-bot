@@ -51,7 +51,7 @@ public class HeadlessTwitchWatcher
         // (Source) quality = highest
         final WebElement qualityOptionSource = webDriver.findElement(By.xpath("//div[contains(@class, 'Layout') and contains(text(), '(Source)')]"));
         qualityOptionSource.click();
-        sleepForMs(3000);
+        sleepForMs(10_000);
     }
 
     private void sleepForMs(final int millis)
@@ -59,7 +59,8 @@ public class HeadlessTwitchWatcher
         try
         {
             Thread.sleep(millis);
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             e.printStackTrace();
         }
