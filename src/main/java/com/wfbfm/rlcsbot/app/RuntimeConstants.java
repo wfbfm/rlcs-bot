@@ -1,6 +1,9 @@
 package com.wfbfm.rlcsbot.app;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class RuntimeConstants
 {
@@ -22,4 +25,23 @@ public class RuntimeConstants
     public static final File FULL_AUDIO_FILE = new File("src/main/temp/audio/full-audio.wav");
     public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
     public static final int TRANSCRIPTION_FILE_SECONDS = 30;
+    public static final String ELASTIC_SEARCH_SERVER = "https://localhost:9200";
+    public static final String ELASTIC_API_KEY;
+
+    static
+    {
+        try
+        {
+            ELASTIC_API_KEY = readApiKeyFromFile("appconfig/elastic_api_key.txt");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String readApiKeyFromFile(final String filePath) throws IOException
+    {
+        return Files.readString(Paths.get(filePath)).trim();
+    }
 }

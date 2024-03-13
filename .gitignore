@@ -5,6 +5,7 @@ target/
 /venv/
 /src/test/data/
 /src/main/temp/
+/appconfig
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
