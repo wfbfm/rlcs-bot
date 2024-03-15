@@ -1,6 +1,7 @@
 package com.wfbfm.rlcsbot.elastic;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.UpdateResponse;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
@@ -112,6 +113,23 @@ public class ElasticSearchPublisher
         {
             logger.log(Level.SEVERE, "Unable to upload new series event", e);
         }
+    }
+
+    public SeriesEvent searchForSeriesEvent(final String seriesEventId)
+    {
+        try
+        {
+            final GetResponse<SeriesEvent> response = client.get(s -> s
+                    .index(ELASTIC_INDEX_SERIES_EVENT)
+                    .id(seriesEventId),
+                    SeriesEvent.class);
+            return response.source();
+        }
+        catch (IOException e)
+        {
+            logger.log(Level.SEVERE, "Unable to search for existing series event", e);
+        }
+        return null;
     }
 
     public void updateSeriesEvent(final SeriesEvent seriesEvent)
