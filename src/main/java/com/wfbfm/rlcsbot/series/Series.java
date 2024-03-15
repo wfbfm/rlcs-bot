@@ -1,10 +1,12 @@
 package com.wfbfm.rlcsbot.series;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Series
 {
+    private final String seriesId;
     private SeriesMetaData seriesMetaData;
     private List<Game> completedGames;
     private Game currentGame;
@@ -21,6 +23,7 @@ public class Series
         this.blueTeam = blueTeam;
         this.orangeTeam = orangeTeam;
         this.bestOf = bestOf;
+        this.seriesId = createSeriesId();
     }
 
     public Series(final SeriesSnapshot snapshot)
@@ -33,6 +36,7 @@ public class Series
         this.blueTeam = snapshot.getBlueTeam();
         this.orangeTeam = snapshot.getOrangeTeam();
         this.bestOf = snapshot.getBestOf();
+        this.seriesId = createSeriesId();
     }
 
     public void handleCompletedGame()
@@ -147,6 +151,24 @@ public class Series
     public void setComplete(final boolean complete)
     {
         isComplete = complete;
+    }
+
+    private String createSeriesId()
+    {
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(this.blueTeam.getTeamName());
+        stringBuilder.append(" | ");
+        stringBuilder.append(this.orangeTeam.getTeamName());
+        stringBuilder.append(" | ");
+        stringBuilder.append(this.seriesMetaData.getDate());
+        stringBuilder.append(" | ");
+        stringBuilder.append(Instant.now().toEpochMilli());
+        return stringBuilder.toString();
+    }
+
+    public String getSeriesId()
+    {
+        return seriesId;
     }
 
     @Override

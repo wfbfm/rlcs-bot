@@ -27,6 +27,8 @@ public class RuntimeConstants
     public static final int TRANSCRIPTION_FILE_SECONDS = 30;
     public static final String ELASTIC_SEARCH_SERVER = "https://localhost:9200";
     public static final String ELASTIC_API_KEY;
+    public static final String ELASTIC_INDEX_SERIES = "series";
+    public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesEvent";
 
     static
     {
