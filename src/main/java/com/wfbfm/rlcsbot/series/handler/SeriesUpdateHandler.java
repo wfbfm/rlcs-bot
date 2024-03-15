@@ -27,8 +27,8 @@ public class SeriesUpdateHandler
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
     {
-        // FIXME - recovery mechanism in case we get the names wrong on the first assignment?
-        // FIXME - ditto gameNumber
+        // TODO - recovery mechanism in case we get the names wrong on the first assignment?
+        // TODO - ditto gameNumber
         if (!enrichAllNamesFromTeams(snapshot))
         {
             if (!enrichAllNamesFromPlayers(snapshot))

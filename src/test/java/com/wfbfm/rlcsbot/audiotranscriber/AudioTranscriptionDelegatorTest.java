@@ -33,7 +33,7 @@ public class AudioTranscriptionDelegatorTest
         when(series.getBlueTeam()).thenReturn(blueTeam);
         when(series.getOrangeTeam()).thenReturn(orangeTeam);
 
-        transcriber.delegateAudioTranscription(series);
+        transcriber.delegateAudioTranscription(series, "seriesEventId");
 
         // TODO: Find a better way to assert this
         Thread.sleep(TRANSCRIPTION_WAIT_TIME_MS + 5_000);

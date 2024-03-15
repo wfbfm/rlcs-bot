@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class ElasticSearchPublisherTest
 {
     private final Player bluePlayer1 = new Player("bluePlayer1");
@@ -24,7 +22,6 @@ public class ElasticSearchPublisherTest
     @Test
     public void testElasticPublisher()
     {
-        // elasticSearchPublisher.createIndex();
         elasticSearchPublisher.uploadSeriesSnapshot(mockSeriesSnapshot(0, 0, 0, 0, 7, "5:00"), "snapshot1");
         elasticSearchPublisher.uploadSeriesSnapshot(mockSeriesSnapshot(3, 2, 1, 2, 7, "3:19"), "snapshot2");
         elasticSearchPublisher.uploadSeriesSnapshot(mockSeriesSnapshot(0, 1, 2, 2, 7, "4:31"), "snapshot3");

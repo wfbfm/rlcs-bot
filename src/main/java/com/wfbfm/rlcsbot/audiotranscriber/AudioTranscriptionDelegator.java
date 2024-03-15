@@ -11,27 +11,25 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 public class AudioTranscriptionDelegator
 {
     private static final String FULL_AUDIO_PATH = FULL_AUDIO_FILE.getAbsolutePath();
-    private static final String TRIMMED_FILE_PATH = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "trimmed-audio-%d.wav";
-    private static final String TRANSCRIPTION_FILENAME = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "TRANSCRIPTION-%d.txt";
+    private static final String TRIMMED_FILE_PATH = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "trimmed-audio-%s.wav";
+    private static final String TRANSCRIPTION_FILENAME = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "TRANSCRIPTION-%s.txt";
     private final Logger logger = Logger.getLogger(AudioTranscriptionDelegator.class.getName());
-    private int numberOfTranscriptions = 0;
 
-    public void delegateAudioTranscription(final Series series)
+    public void delegateAudioTranscription(final Series series, final String seriesEventId)
     {
-        numberOfTranscriptions++;
         if (!FULL_AUDIO_FILE.exists())
         {
             logger.log(Level.SEVERE, "Unable to transcribe audio - the full audio file does not exist!");
             return;
         }
         final String initialPrompt = generateInitialPrompt(series);
-        logger.log(Level.INFO, String.format("In %d ms, attempting audio transcription #%d", TRANSCRIPTION_WAIT_TIME_MS, numberOfTranscriptions));
+        logger.log(Level.INFO, String.format("In %d ms, attempting audio transcription %s", TRANSCRIPTION_WAIT_TIME_MS, seriesEventId));
 
-        final Thread transcriptionScriptThread = createTranscriptionThread(initialPrompt);
+        final Thread transcriptionScriptThread = createTranscriptionThread(initialPrompt, seriesEventId);
         transcriptionScriptThread.start();
     }
 
-    private Thread createTranscriptionThread(final String initialPrompt)
+    private Thread createTranscriptionThread(final String initialPrompt, final String seriesEventId)
     {
         return new Thread(() ->
         {
@@ -45,7 +43,7 @@ public class AudioTranscriptionDelegator
             }
             try
             {
-                final ProcessBuilder processBuilder = createTranscriptionProcess(initialPrompt);
+                final ProcessBuilder processBuilder = createTranscriptionProcess(initialPrompt, seriesEventId);
                 final Process process = processBuilder.start();
                 final int exitCode = process.waitFor();
                 logger.log(Level.INFO, String.format("Python transcription script exited with code: %d", exitCode));
@@ -57,17 +55,22 @@ public class AudioTranscriptionDelegator
         });
     }
 
-    private ProcessBuilder createTranscriptionProcess(final String initialPrompt)
+    private ProcessBuilder createTranscriptionProcess(final String initialPrompt, final String seriesEventId)
     {
         return new ProcessBuilder(
                 PYTHON_VENV_PATH,
                 PYTHON_SCRIPT,
                 FULL_AUDIO_PATH,
-                String.format(TRIMMED_FILE_PATH, numberOfTranscriptions),
+                escapeSpaces(String.format(TRIMMED_FILE_PATH, seriesEventId)),
                 String.valueOf(TRANSCRIPTION_FILE_SECONDS),
-                String.format(TRANSCRIPTION_FILENAME, numberOfTranscriptions),
-                "\"" + initialPrompt + "\"" // spaces in the initialPrompt need to be escaped
+                escapeSpaces(String.format(TRANSCRIPTION_FILENAME, seriesEventId)),
+                escapeSpaces(initialPrompt)
         );
+    }
+
+    private String escapeSpaces(final String inputString)
+    {
+        return "\"" + inputString + "\"";
     }
 
     private String generateInitialPrompt(final Series series)

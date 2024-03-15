@@ -13,9 +13,10 @@ public class SeriesEvent
     private final SeriesSnapshotEvaluation evaluation;
     private String commentary = null;
 
-    public SeriesEvent(final Series series, final SeriesSnapshotEvaluation evaluation, final int updateNumber)
+    public SeriesEvent(final Series series, final SeriesSnapshotEvaluation evaluation)
     {
-        this.eventId = "#" + String.valueOf(updateNumber) + " | " + series.getSeriesId();
+        final int updateNumber = series.uptickEventNumber();
+        this.eventId = "#" + String.valueOf(updateNumber) + "-" + series.getSeriesId();
         this.seriesId = series.getSeriesId();
         this.currentGame = series.getCurrentGame();
         this.seriesScore = series.getSeriesScore();

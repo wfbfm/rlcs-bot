@@ -9,6 +9,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.annotations.VisibleForTesting;
 import com.wfbfm.rlcsbot.series.Series;
 import com.wfbfm.rlcsbot.series.SeriesEvent;
 import com.wfbfm.rlcsbot.series.SeriesSnapshot;
@@ -129,6 +130,7 @@ public class ElasticSearchPublisher
         }
     }
 
+    @VisibleForTesting
     public void uploadSeriesSnapshot(final SeriesSnapshot seriesSnapshot, final String id)
     {
         try

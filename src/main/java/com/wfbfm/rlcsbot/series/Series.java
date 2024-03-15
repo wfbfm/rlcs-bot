@@ -16,6 +16,7 @@ public class Series
     private int bestOf;
     private int currentGameNumber;
     private boolean isComplete;
+    private int numberOfEvents;
 
     public Series(final SeriesMetaData seriesMetaData, final Team blueTeam, final Team orangeTeam, final int bestOf)
     {
@@ -153,15 +154,21 @@ public class Series
         isComplete = complete;
     }
 
+    public int uptickEventNumber()
+    {
+        this.numberOfEvents++;
+        return this.numberOfEvents;
+    }
+
     private String createSeriesId()
     {
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(this.blueTeam.getTeamName());
-        stringBuilder.append(" | ");
+        stringBuilder.append("-");
         stringBuilder.append(this.orangeTeam.getTeamName());
-        stringBuilder.append(" | ");
+        stringBuilder.append("-");
         stringBuilder.append(this.seriesMetaData.getDate());
-        stringBuilder.append(" | ");
+        stringBuilder.append("-");
         stringBuilder.append(Instant.now().toEpochMilli());
         return stringBuilder.toString();
     }
