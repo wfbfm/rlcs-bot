@@ -7,14 +7,14 @@ import java.nio.file.Paths;
 
 public class RuntimeConstants
 {
-    public final static boolean BROADCAST_ENABLED = false;
-    public final static boolean TRANSCRIPTION_ENABLED = false;
+    public final static boolean BROADCAST_ENABLED = true;
+    public final static boolean TRANSCRIPTION_ENABLED = true;
     public final static boolean COMMENTARY_ENABLED = false;
-    public static final String BROADCAST_URL = "https://www.twitch.tv/rocketleague";
-    public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1/Europe/Open_Qualifier_2";
+    public static final String BROADCAST_URL = "https://www.twitch.tv/videos/2086841398?t=03h30m10s";
+    public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1/Europe/Open_Qualifier_3";
     public static boolean DEBUGGING_ENABLED = true;
     public static boolean RETAIN_PROCESSING_FILES = false;
-    public static boolean RETAIN_SCREENSHOTS = false;
+    public static boolean RETAIN_SCREENSHOTS = true;
     public static final int LEVENSHTEIN_MINIMUM_DISTANCE = 2;
     public static final int GAME_TIME_SECONDS = 300;
     public static final int SCREENSHOT_INTERVAL_MS = 10_000;
@@ -32,7 +32,7 @@ public class RuntimeConstants
     public static final String ELASTIC_SEARCH_SERVER = "https://localhost:9200";
     public static final String ELASTIC_API_KEY;
     public static final String ELASTIC_INDEX_SERIES = "series";
-    public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesEvent";
+    public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
 
     static
     {

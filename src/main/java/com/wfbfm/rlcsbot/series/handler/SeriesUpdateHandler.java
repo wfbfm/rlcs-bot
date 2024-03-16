@@ -312,7 +312,11 @@ public class SeriesUpdateHandler
 
     public String getCurrentSeriesAsString()
     {
-        return this.currentSeries.toString();
+        if (this.currentSeries != null)
+        {
+            return this.currentSeries.toString();
+        }
+        return null;
     }
 
     public List<Series> getCompletedSeries()

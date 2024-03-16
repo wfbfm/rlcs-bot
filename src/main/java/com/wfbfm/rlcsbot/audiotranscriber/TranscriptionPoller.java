@@ -23,6 +23,14 @@ public class TranscriptionPoller
 
     public void run()
     {
+        while (true)
+        {
+            pollAndHandleTranscriptionFiles();
+        }
+    }
+
+    private void pollAndHandleTranscriptionFiles()
+    {
         try
         {
             final File[] transcriptionFiles = AUDIO_DIRECTORY.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
@@ -35,7 +43,8 @@ public class TranscriptionPoller
                 }
             }
             Thread.sleep(INCOMING_POLLING_SLEEP_TIME_MS);
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             Thread.currentThread().interrupt();
         }
@@ -66,7 +75,9 @@ public class TranscriptionPoller
             logger.log(Level.WARNING, "Unable to find seriesEventId in elastic - cannot upload transcription for: " + seriesEventId);
             return;
         }
+        logger.log(Level.INFO, "Attempting to update Elastic with commentary for " + seriesEventId);
         seriesEvent.setCommentary(transcription);
         elasticSearchPublisher.updateSeriesEvent(seriesEvent);
+        logger.log(Level.INFO, "Finished attempt to update Elastic with commentary for " + seriesEventId);
     }
 }

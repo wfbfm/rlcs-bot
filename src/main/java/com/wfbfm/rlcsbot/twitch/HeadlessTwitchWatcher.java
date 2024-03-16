@@ -66,6 +66,8 @@ public class HeadlessTwitchWatcher
 
     public void run()
     {
+        Runtime.getRuntime().addShutdownHook(new Thread(webDriver::quit));
+
         getStreamInFullScreen();
 
         while (true)

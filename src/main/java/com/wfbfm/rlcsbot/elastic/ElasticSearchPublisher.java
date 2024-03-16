@@ -137,7 +137,7 @@ public class ElasticSearchPublisher
         try
         {
             final UpdateResponse<SeriesEvent> response = client.update(u -> u.index(ELASTIC_INDEX_SERIES_EVENT)
-                            .id(seriesEvent.getSeriesId())
+                            .id(seriesEvent.getEventId())
                             .doc(seriesEvent),
                     SeriesEvent.class);
             logger.log(Level.INFO, response.toString());

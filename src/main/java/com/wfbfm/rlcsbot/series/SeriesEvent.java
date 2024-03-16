@@ -13,10 +13,22 @@ public class SeriesEvent
     private final SeriesSnapshotEvaluation evaluation;
     private String commentary = null;
 
+    public SeriesEvent()
+    {
+        // default constructor for Jackson deserialisation
+        this.eventId = null;
+        this.seriesId = null;
+        this.currentGame = null;
+        this.seriesScore = null;
+        this.bestOf = 0;
+        this.currentGameNumber = 0;
+        this.evaluation = null;
+    }
+
     public SeriesEvent(final Series series, final SeriesSnapshotEvaluation evaluation)
     {
         final int updateNumber = series.uptickEventNumber();
-        this.eventId = "#" + String.valueOf(updateNumber) + "-" + series.getSeriesId();
+        this.eventId = "Event" + String.valueOf(updateNumber) + "-" + series.getSeriesId();
         this.seriesId = series.getSeriesId();
         this.currentGame = series.getCurrentGame();
         this.seriesScore = series.getSeriesScore();

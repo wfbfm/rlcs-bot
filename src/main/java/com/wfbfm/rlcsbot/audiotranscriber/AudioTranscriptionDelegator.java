@@ -12,7 +12,7 @@ public class AudioTranscriptionDelegator
 {
     private static final String FULL_AUDIO_PATH = FULL_AUDIO_FILE.getAbsolutePath();
     private static final String TRIMMED_FILE_PATH = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "trimmed-audio-%s.wav";
-    private static final String TRANSCRIPTION_FILENAME = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "TRANSCRIPTION-%s.txt";
+    private static final String TRANSCRIPTION_FILENAME = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "%s.txt";
     private final Logger logger = Logger.getLogger(AudioTranscriptionDelegator.class.getName());
 
     public void delegateAudioTranscription(final Series series, final String seriesEventId)

@@ -4,11 +4,21 @@ public class Score
 {
     private int blueScore;
     private int orangeScore;
+    private TeamColour teamInLead;
+
+    public Score()
+    {
+        // default constructor for Jackson deserialisation
+        this.blueScore = 0;
+        this.orangeScore = 0;
+        this.teamInLead = TeamColour.NONE;
+    }
 
     public Score(final int blueScore, final int orangeScore)
     {
         this.blueScore = blueScore;
         this.orangeScore = orangeScore;
+        assignTeamInLead();
     }
 
     public int getBlueScore()
@@ -55,33 +65,28 @@ public class Score
                 this.orangeScore = score;
                 break;
         }
+        assignTeamInLead();
+    }
+
+    private void assignTeamInLead()
+    {
+        if (blueScore > orangeScore)
+        {
+            this.teamInLead = TeamColour.BLUE;
+        }
+        else if (blueScore < orangeScore)
+        {
+            this.teamInLead = TeamColour.ORANGE;
+        }
+        else
+        {
+            this.teamInLead = TeamColour.NONE;
+        }
     }
 
     public TeamColour getTeamInLead()
     {
-        if (blueScore > orangeScore)
-        {
-            return TeamColour.BLUE;
-        }
-        else if (blueScore < orangeScore)
-        {
-            return TeamColour.ORANGE;
-        }
-        else
-        {
-            return TeamColour.NONE;
-        }
-    }
-
-    public int getHighestScore()
-    {
-        if (blueScore > orangeScore)
-        {
-            return blueScore;
-        }
-        else
-        {
-            return orangeScore;
-        }
+        assignTeamInLead();
+        return teamInLead;
     }
 }

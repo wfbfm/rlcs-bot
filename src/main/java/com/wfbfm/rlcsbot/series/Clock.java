@@ -6,6 +6,14 @@ public class Clock
     private int elapsedSeconds;
     private boolean isOvertime;
 
+    public Clock()
+    {
+        // default constructor for Jackson deserialisation
+        this.displayedTime = null;
+        this.elapsedSeconds = 0;
+        this.isOvertime = false;
+    }
+
     public Clock(final String displayedTime, final int elapsedSeconds, final boolean isOvertime)
     {
         this.displayedTime = displayedTime;

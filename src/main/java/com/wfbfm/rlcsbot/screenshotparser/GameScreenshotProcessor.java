@@ -92,7 +92,7 @@ public class GameScreenshotProcessor
                 seriesEvent = new SeriesEvent(seriesUpdateHandler.getCurrentSeries(), evaluation);
                 elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
                 elasticSearchPublisher.uploadNewSeries(seriesUpdateHandler.getCurrentSeries());
-                audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getSeriesId());
+                audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getEventId());
                 break;
             case GAME_SCORE_CHANGED:
             case SERIES_SCORE_CHANGED:
