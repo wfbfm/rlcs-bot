@@ -9,10 +9,24 @@ public class CommentaryRecorder
 {
     private static final String STREAMLINK_COMMAND = "streamlink";
     private Process process;
+    private String streamUrl;
+
+    public CommentaryRecorder(final String streamUrl)
+    {
+        this.streamUrl = streamUrl;
+    }
+
+    public CommentaryRecorder()
+    {
+    }
 
     public void run()
     {
-        final ProcessBuilder processBuilder = createStreamlinkProcess();
+        if (streamUrl == null)
+        {
+            streamUrl = BROADCAST_URL;
+        }
+        final ProcessBuilder processBuilder = createStreamlinkProcess(streamUrl);
 
         try
         {
@@ -32,11 +46,11 @@ public class CommentaryRecorder
         }));
     }
 
-    private ProcessBuilder createStreamlinkProcess()
+    private ProcessBuilder createStreamlinkProcess(final String streamUrl)
     {
         return new ProcessBuilder(
                 STREAMLINK_COMMAND,
-                BROADCAST_URL,
+                streamUrl,
                 "audio_only",
                 "-o",
                 escapeSpaces(FULL_AUDIO_FILE.getAbsolutePath()),

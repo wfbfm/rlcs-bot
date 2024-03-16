@@ -31,6 +31,10 @@ public class RlcsBotApplication
             final Thread transcriptionThread = initialiseTranscriptionPollerThread();
             executorService.submit(transcriptionThread);
 
+        }
+
+        if (COMMENTARY_ENABLED)
+        {
             final Thread commentaryRecorder = initialiseCommentaryRecorderThread();
             executorService.submit(commentaryRecorder);
         }
@@ -46,12 +50,15 @@ public class RlcsBotApplication
         int numberOfThreads = 1; // game screenshot processor
         if (BROADCAST_ENABLED)
         {
-            numberOfThreads++; // twitch watcher
+            numberOfThreads++;
         }
         if (TRANSCRIPTION_ENABLED)
         {
-            numberOfThreads++; // transcription poller
-            numberOfThreads++; // commentary recorder
+            numberOfThreads++;
+        }
+        if (COMMENTARY_ENABLED)
+        {
+            numberOfThreads++;
         }
         return numberOfThreads;
     }
