@@ -1,6 +1,8 @@
 package com.wfbfm.rlcsbot.audiotranscriber;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.wfbfm.rlcsbot.elastic.ElasticSearchPublisher;
+import com.wfbfm.rlcsbot.series.SeriesEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +18,18 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.INCOMING_POLLING_SLEEP_TIME
 
 public class TranscriptionPoller
 {
+    private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
     private final Logger logger = Logger.getLogger(TranscriptionPoller.class.getName());
 
     public void run()
+    {
+        while (true)
+        {
+            pollAndHandleTranscriptionFiles();
+        }
+    }
+
+    private void pollAndHandleTranscriptionFiles()
     {
         try
         {
@@ -32,7 +43,8 @@ public class TranscriptionPoller
                 }
             }
             Thread.sleep(INCOMING_POLLING_SLEEP_TIME_MS);
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             Thread.currentThread().interrupt();
         }
@@ -45,7 +57,9 @@ public class TranscriptionPoller
         {
             final String transcription = new String(Files.readAllBytes(Paths.get(transcriptionFile.getAbsolutePath())));
             logger.log(Level.INFO, transcriptionFile.getName() + ": " + transcription);
-            uploadTranscription(transcription);
+            final String seriesEventId = transcriptionFile.getName().substring(0, transcriptionFile.getName().lastIndexOf('.'));
+            uploadTranscription(transcription, seriesEventId);
+            transcriptionFile.delete();
         }
         catch (IOException e)
         {
@@ -53,9 +67,17 @@ public class TranscriptionPoller
         }
     }
 
-    private boolean uploadTranscription(final String transcription)
+    private void uploadTranscription(final String transcription, final String seriesEventId)
     {
-        // TODO: publish to elastic.
-        return true;
+        final SeriesEvent seriesEvent = elasticSearchPublisher.searchForSeriesEvent(seriesEventId);
+        if (seriesEvent == null)
+        {
+            logger.log(Level.WARNING, "Unable to find seriesEventId in elastic - cannot upload transcription for: " + seriesEventId);
+            return;
+        }
+        logger.log(Level.INFO, "Attempting to update Elastic with commentary for " + seriesEventId);
+        seriesEvent.setCommentary(transcription);
+        elasticSearchPublisher.updateSeriesEvent(seriesEvent);
+        logger.log(Level.INFO, "Finished attempt to update Elastic with commentary for " + seriesEventId);
     }
 }

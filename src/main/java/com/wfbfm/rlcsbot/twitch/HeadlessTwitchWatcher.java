@@ -12,12 +12,10 @@ import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.SCREENSHOT_INTERVAL_MS;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class HeadlessTwitchWatcher
 {
-    private static final String BROADCAST_URL = "https://www.twitch.tv/rocketleague";
-    private static final File INCOMING_DIRECTORY = new File("src/main/temp/incoming/");
     private final Logger logger = Logger.getLogger(HeadlessTwitchWatcher.class.getName());
     private final WebDriver webDriver;
     private final Actions actions;
@@ -68,6 +66,8 @@ public class HeadlessTwitchWatcher
 
     public void run()
     {
+        Runtime.getRuntime().addShutdownHook(new Thread(webDriver::quit));
+
         getStreamInFullScreen();
 
         while (true)

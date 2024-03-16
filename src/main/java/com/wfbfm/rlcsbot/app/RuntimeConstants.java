@@ -1,13 +1,20 @@
 package com.wfbfm.rlcsbot.app;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class RuntimeConstants
 {
-    public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1/Europe/Open_Qualifier_2";
+    public final static boolean BROADCAST_ENABLED = true;
+    public final static boolean TRANSCRIPTION_ENABLED = true;
+    public final static boolean COMMENTARY_ENABLED = false;
+    public static final String BROADCAST_URL = "https://www.twitch.tv/videos/2086841398?t=03h30m10s";
+    public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1/Europe/Open_Qualifier_3";
     public static boolean DEBUGGING_ENABLED = true;
     public static boolean RETAIN_PROCESSING_FILES = false;
-    public static boolean RETAIN_SCREENSHOTS = false;
+    public static boolean RETAIN_SCREENSHOTS = true;
     public static final int LEVENSHTEIN_MINIMUM_DISTANCE = 2;
     public static final int GAME_TIME_SECONDS = 300;
     public static final int SCREENSHOT_INTERVAL_MS = 10_000;
@@ -22,4 +29,25 @@ public class RuntimeConstants
     public static final File FULL_AUDIO_FILE = new File("src/main/temp/audio/full-audio.wav");
     public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
     public static final int TRANSCRIPTION_FILE_SECONDS = 30;
+    public static final String ELASTIC_SEARCH_SERVER = "https://localhost:9200";
+    public static final String ELASTIC_API_KEY;
+    public static final String ELASTIC_INDEX_SERIES = "series";
+    public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
+
+    static
+    {
+        try
+        {
+            ELASTIC_API_KEY = readApiKeyFromFile("appconfig/elastic_api_key.txt");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String readApiKeyFromFile(final String filePath) throws IOException
+    {
+        return Files.readString(Paths.get(filePath)).trim();
+    }
 }

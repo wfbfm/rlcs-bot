@@ -27,8 +27,8 @@ public class SeriesUpdateHandler
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
     {
-        // FIXME - recovery mechanism in case we get the names wrong on the first assignment?
-        // FIXME - ditto gameNumber
+        // TODO - recovery mechanism in case we get the names wrong on the first assignment?
+        // TODO - ditto gameNumber
         if (!enrichAllNamesFromTeams(snapshot))
         {
             if (!enrichAllNamesFromPlayers(snapshot))
@@ -312,7 +312,11 @@ public class SeriesUpdateHandler
 
     public String getCurrentSeriesAsString()
     {
-        return this.currentSeries.toString();
+        if (this.currentSeries != null)
+        {
+            return this.currentSeries.toString();
+        }
+        return null;
     }
 
     public List<Series> getCompletedSeries()

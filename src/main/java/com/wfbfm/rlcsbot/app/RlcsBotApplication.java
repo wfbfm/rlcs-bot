@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.app;
 
+import com.wfbfm.rlcsbot.audiotranscriber.CommentaryRecorder;
 import com.wfbfm.rlcsbot.audiotranscriber.TranscriptionPoller;
 import com.wfbfm.rlcsbot.screenshotparser.GameScreenshotProcessor;
 import com.wfbfm.rlcsbot.twitch.HeadlessTwitchWatcher;
@@ -13,34 +14,54 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class RlcsBotApplication
 {
-    private final static boolean BROADCAST_ENABLED = false;
-
     public static void main(String[] args)
     {
         initaliseTempDirectories();
 
-        final ExecutorService executorService;
+        final ExecutorService executorService = Executors.newFixedThreadPool(getTotalNumberOfThreads());
+
         if (BROADCAST_ENABLED)
         {
-            executorService = Executors.newFixedThreadPool(3);
-
             final Thread twitchWatcherThread = initialiseTwitchWatcher();
             executorService.submit(twitchWatcherThread);
         }
-        else
+
+        if (TRANSCRIPTION_ENABLED)
         {
-            executorService = Executors.newFixedThreadPool(2);
+            final Thread transcriptionThread = initialiseTranscriptionPollerThread();
+            executorService.submit(transcriptionThread);
+
+        }
+
+        if (COMMENTARY_ENABLED)
+        {
+            final Thread commentaryRecorder = initialiseCommentaryRecorderThread();
+            executorService.submit(commentaryRecorder);
         }
 
         final GameScreenshotProcessor snapshotParser = initialiseSnapshotParser();
         executorService.submit(snapshotParser::run);
 
-        final Thread transcriptionThread = initialiseTranscriptionThread();
-        executorService.submit(transcriptionThread);
-
         Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
     }
 
+    private static int getTotalNumberOfThreads()
+    {
+        int numberOfThreads = 1; // game screenshot processor
+        if (BROADCAST_ENABLED)
+        {
+            numberOfThreads++;
+        }
+        if (TRANSCRIPTION_ENABLED)
+        {
+            numberOfThreads++;
+        }
+        if (COMMENTARY_ENABLED)
+        {
+            numberOfThreads++;
+        }
+        return numberOfThreads;
+    }
     private static GameScreenshotProcessor initialiseSnapshotParser()
     {
         final GameScreenshotProcessor snapshotParser = new GameScreenshotProcessor();
@@ -63,7 +84,7 @@ public class RlcsBotApplication
         return twitchWatcherThread;
     }
 
-    private static Thread initialiseTranscriptionThread()
+    private static Thread initialiseTranscriptionPollerThread()
     {
         final TranscriptionPoller transcriptionPoller = new TranscriptionPoller();
         final Thread transcriptionThread = new Thread(transcriptionPoller::run);
@@ -72,6 +93,17 @@ public class RlcsBotApplication
             throwable.printStackTrace();
         });
         return transcriptionThread;
+    }
+
+    private static Thread initialiseCommentaryRecorderThread()
+    {
+        final CommentaryRecorder commentaryRecorder = new CommentaryRecorder();
+        final Thread commentaryRecorderThread = new Thread(commentaryRecorder::run);
+        commentaryRecorderThread.setUncaughtExceptionHandler((thread, throwable) ->
+        {
+            throwable.printStackTrace();
+        });
+        return commentaryRecorderThread;
     }
 
     private static void initaliseTempDirectories()
