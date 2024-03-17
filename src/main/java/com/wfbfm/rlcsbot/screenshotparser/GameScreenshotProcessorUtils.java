@@ -1,6 +1,7 @@
 package com.wfbfm.rlcsbot.screenshotparser;
 
 import com.wfbfm.rlcsbot.series.Clock;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -192,15 +193,17 @@ public class GameScreenshotProcessorUtils
         }
         else
         {
+            final int minutes = StringUtils.isNumeric(clockParts[0]) ? Integer.parseInt(clockParts[0]) : 0;
+            final int seconds = StringUtils.isNumeric(clockParts[1]) ? Integer.parseInt(clockParts[1]) : 0;
             if (isOvertime) // clock is counting up
             {
-                elapsedSeconds += (Integer.parseInt(clockParts[0]) * 60);
-                elapsedSeconds += Integer.parseInt(clockParts[1]);
+                elapsedSeconds += (minutes * 60);
+                elapsedSeconds += seconds;
             }
             else // clock is counting down
             {
-                elapsedSeconds -= (Integer.parseInt(clockParts[0]) * 60);
-                elapsedSeconds -= Integer.parseInt(clockParts[1]);
+                elapsedSeconds -= (minutes * 60);
+                elapsedSeconds -= seconds;
             }
         }
         return new Clock(displayedTime, elapsedSeconds, isOvertime);
