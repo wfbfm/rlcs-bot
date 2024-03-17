@@ -27,6 +27,7 @@ public class HeadlessTwitchWatcher
         final ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--window-size=1920,1080");
+        // options.add_argument("--mute-audio")
         webDriver = new ChromeDriver(options);
         actions = new Actions(webDriver);
         screenshotDriver = (TakesScreenshot) webDriver;
@@ -35,8 +36,8 @@ public class HeadlessTwitchWatcher
     private void getStreamInFullScreen()
     {
         webDriver.get(BROADCAST_URL);
+        sleepForMs(5000);
         actions.sendKeys(Keys.chord("f")).perform();
-        sleepForMs(1000);
 
         final WebElement settingsButton = webDriver.findElement(By.cssSelector("button[data-a-target='player-settings-button']"));
         settingsButton.click();

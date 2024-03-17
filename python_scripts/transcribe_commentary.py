@@ -1,16 +1,15 @@
 import subprocess
-import time
 import whisper
 import sys
 import os
 
 
-def trim_last_seconds_of_audio(full_audio_file, trimmed_audio_file, seconds_to_capture):
+def trim_audio_segment(full_audio_file, trimmed_audio_file, start_seconds, seconds_to_capture):
     # Use ffmpeg to create a trimmed copy of the input file
     subprocess.run([
         "ffmpeg",
         "-y",  # Overwrite output file if it exists
-        "-ss", str(max(0, get_file_duration(full_audio_file) - seconds_to_capture)),  # Trimming the last X seconds
+        "-ss", str(start_seconds),
         "-i", full_audio_file,
         "-t", str(seconds_to_capture),  # Set the duration of the output
         "-c", "pcm_s16le",  # Use PCM codec for compatibility
@@ -43,11 +42,16 @@ def transcribe_audio_file(file_path, initial_prompt):
 if __name__ == "__main__":
     full_audio_filename = sys.argv[1]
     trimmed_audio_filename = sys.argv[2]
-    seconds_to_keep = int(sys.argv[3])
-    transcription_filename = sys.argv[4]
-    initial_prompt = sys.argv[5]
+    seconds_to_capture = int(sys.argv[3])
+    start_seconds = int(sys.argv[4])
+    transcription_filename = sys.argv[5]
+    initial_prompt = sys.argv[6]
 
-    trim_last_seconds_of_audio(full_audio_filename, trimmed_audio_filename, seconds_to_keep)
+    if start_seconds == 0:
+        # if start_seconds has not been set - get the last seconds_to_capture of the clip
+        start_seconds = max(0, get_file_duration(full_audio_filename) - seconds_to_capture)
+
+    trim_audio_segment(full_audio_filename, trimmed_audio_filename, start_seconds, seconds_to_capture)
     transcription = transcribe_audio_file(trimmed_audio_filename, initial_prompt)
     input_directory = os.path.dirname(full_audio_filename)
     transcription_file = os.path.join(input_directory, transcription_filename)

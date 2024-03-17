@@ -33,7 +33,7 @@ public class RlcsBotApplication
 
         }
 
-        if (COMMENTARY_ENABLED)
+        if (LIVE_COMMENTARY_RECORDING_ENABLED)
         {
             final Thread commentaryRecorder = initialiseCommentaryRecorderThread();
             executorService.submit(commentaryRecorder);
@@ -56,7 +56,7 @@ public class RlcsBotApplication
         {
             numberOfThreads++;
         }
-        if (COMMENTARY_ENABLED)
+        if (LIVE_COMMENTARY_RECORDING_ENABLED)
         {
             numberOfThreads++;
         }

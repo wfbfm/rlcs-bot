@@ -3,6 +3,7 @@ package com.wfbfm.rlcsbot.audiotranscriber;
 import com.wfbfm.rlcsbot.series.Series;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +15,7 @@ public class AudioTranscriptionDelegator
     private static final String TRIMMED_FILE_PATH = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "trimmed-audio-%s.wav";
     private static final String TRANSCRIPTION_FILENAME = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "%s.txt";
     private final Logger logger = Logger.getLogger(AudioTranscriptionDelegator.class.getName());
+    private final long initialisationTime = Instant.now().getEpochSecond();
 
     public void delegateAudioTranscription(final Series series, final String seriesEventId)
     {
@@ -57,12 +59,23 @@ public class AudioTranscriptionDelegator
 
     private ProcessBuilder createTranscriptionProcess(final String initialPrompt, final String seriesEventId)
     {
+        final long startSeconds;
+        if (LIVE_COMMENTARY_RECORDING_ENABLED)
+        {
+            startSeconds = 0L;
+        }
+        else
+        {
+            startSeconds = Instant.now().getEpochSecond() - initialisationTime;
+        }
+
         return new ProcessBuilder(
                 PYTHON_VENV_PATH,
                 PYTHON_SCRIPT,
                 FULL_AUDIO_PATH,
                 escapeSpaces(String.format(TRIMMED_FILE_PATH, seriesEventId)),
                 String.valueOf(TRANSCRIPTION_FILE_SECONDS),
+                String.valueOf(startSeconds),
                 escapeSpaces(String.format(TRANSCRIPTION_FILENAME, seriesEventId)),
                 escapeSpaces(initialPrompt)
         );
