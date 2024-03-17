@@ -18,6 +18,7 @@ public class RuntimeConstants
     public static final int LEVENSHTEIN_MINIMUM_DISTANCE = 2;
     public static final int GAME_TIME_SECONDS = 300;
     public static final int SCREENSHOT_INTERVAL_MS = 10_000;
+    public static final File TEMP_DIRECTORY = new File("src/main/temp/");
     public static final File INCOMING_DIRECTORY = new File("src/main/temp/incoming/");
     public static final File PROCESSING_DIRECTORY = new File("src/main/temp/processing/");
     public static final File COMPLETE_DIRECTORY = new File("src/main/temp/complete/");

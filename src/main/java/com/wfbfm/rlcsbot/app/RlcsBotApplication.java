@@ -108,7 +108,7 @@ public class RlcsBotApplication
 
     private static void initaliseTempDirectories()
     {
-        for (final File directory : Arrays.asList(INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY))
+        for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY))
         {
             if (!directory.exists())
             {
