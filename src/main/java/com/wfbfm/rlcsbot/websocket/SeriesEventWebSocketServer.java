@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +27,8 @@ public class SeriesEventWebSocketServer extends WebSocketServer
 {
     private final Logger logger = Logger.getLogger(SeriesEventWebSocketServer.class.getName());
     private final ElasticsearchClient client = ElasticSearchClientBuilder.getElasticsearchClient();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final Semaphore semaphore = new Semaphore(1);
     private final Set<String> allBroadcastDocumentIds = new HashSet<>();
     private final Set<String> allBroadcastDocuments = new HashSet<>();
 
@@ -33,6 +36,24 @@ public class SeriesEventWebSocketServer extends WebSocketServer
     {
         super(new InetSocketAddress(port));
         startPollingForNewDocuments();
+    }
+
+    private void startPollingForNewDocuments()
+    {
+        scheduler.scheduleAtFixedRate(() ->
+        {
+            try
+            {
+                semaphore.acquire();
+                pollAndBroadcastNewDocuments();
+            } catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+            } finally
+            {
+                semaphore.release();
+            }
+        }, 0, 10, TimeUnit.SECONDS);
     }
 
     @Override
@@ -68,23 +89,16 @@ public class SeriesEventWebSocketServer extends WebSocketServer
         allBroadcastDocuments.forEach(this::broadcast);
     }
 
-    private void startPollingForNewDocuments()
-    {
-        final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this::pollAndBroadcastNewDocuments, 0, 10, TimeUnit.SECONDS);
-    }
-
     private void pollAndBroadcastNewDocuments()
     {
         logger.info("Polling for new Elastic documents.");
         try
         {
-            final SearchResponse<SeriesEvent> response = client.search(s -> s.index(ELASTIC_INDEX_SERIES_EVENT), SeriesEvent.class);
+            final SearchResponse<SeriesEvent> response = client.search(s -> s.index(ELASTIC_INDEX_SERIES_EVENT).size(1000), SeriesEvent.class);
 
             for (final Hit<SeriesEvent> hit : response.hits().hits())
             {
                 final String documentId = hit.id();
-                // FIXME - this seems to be capping out at 10 records, need to see why.  Probably because the set is not thread safe.
                 if (!allBroadcastDocumentIds.contains(documentId))
                 {
                     logger.info("Found new document - broadcasting to all clients: " + documentId);
