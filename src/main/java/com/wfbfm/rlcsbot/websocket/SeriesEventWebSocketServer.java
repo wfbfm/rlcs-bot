@@ -3,6 +3,7 @@ package com.wfbfm.rlcsbot.websocket;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonpUtils;
 import com.wfbfm.rlcsbot.elastic.ElasticSearchClientBuilder;
 import com.wfbfm.rlcsbot.series.SeriesEvent;
 import org.java_websocket.WebSocket;
@@ -25,6 +26,7 @@ public class SeriesEventWebSocketServer extends WebSocketServer
 {
     private final Logger logger = Logger.getLogger(SeriesEventWebSocketServer.class.getName());
     private final ElasticsearchClient client = ElasticSearchClientBuilder.getElasticsearchClient();
+    private final Set<String> allBroadcastDocumentIds = new HashSet<>();
     private final Set<String> allBroadcastDocuments = new HashSet<>();
 
     public SeriesEventWebSocketServer(final int port)
@@ -38,8 +40,7 @@ public class SeriesEventWebSocketServer extends WebSocketServer
     {
         logger.log(Level.INFO, "Connection opened: " + webSocket.getRemoteSocketAddress() +
                 " - broadcasting all " + allBroadcastDocuments.size() + " documents");
-        final String response = fetchAllDocuments();
-        webSocket.send(response);
+        allBroadcastDocuments.forEach(webSocket::send);
     }
 
     @Override
@@ -64,31 +65,16 @@ public class SeriesEventWebSocketServer extends WebSocketServer
     public void onStart()
     {
         logger.log(Level.INFO, "SeriesEventWebSocketServer initialised - broadcasting all documents");
-        final String response = fetchAllDocuments();
-        broadcast(response);
-    }
-
-    private String fetchAllDocuments()
-    {
-        try
-        {
-            final SearchResponse<SeriesEvent> response = client.search(s -> s.index(ELASTIC_INDEX_SERIES_EVENT), SeriesEvent.class);
-
-            return response.toString();
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        allBroadcastDocuments.forEach(this::broadcast);
     }
 
     private void startPollingForNewDocuments()
     {
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this::broadcastAnyNewSeriesEvents, 0, 10, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::pollAndBroadcastNewDocuments, 0, 10, TimeUnit.SECONDS);
     }
 
-    private void broadcastAnyNewSeriesEvents()
+    private void pollAndBroadcastNewDocuments()
     {
         logger.info("Polling for new Elastic documents.");
         try
@@ -98,11 +84,14 @@ public class SeriesEventWebSocketServer extends WebSocketServer
             for (final Hit<SeriesEvent> hit : response.hits().hits())
             {
                 final String documentId = hit.id();
-                if (!allBroadcastDocuments.contains(documentId))
+                // FIXME - this seems to be capping out at 10 records, need to see why.  Probably because the set is not thread safe.
+                if (!allBroadcastDocumentIds.contains(documentId))
                 {
                     logger.info("Found new document - broadcasting to all clients: " + documentId);
-                    broadcast(hit.source().toString());
-                    allBroadcastDocuments.add(documentId);
+                    final String newDocumentAsJson = JsonpUtils.toJsonString(hit, client._jsonpMapper());
+                    broadcast(newDocumentAsJson);
+                    allBroadcastDocumentIds.add(documentId);
+                    allBroadcastDocuments.add(newDocumentAsJson);
                 }
             }
         }
