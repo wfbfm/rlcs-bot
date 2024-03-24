@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
+import { SeriesEventContainer } from './seriesEventContainer';
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -61,7 +62,7 @@ const App: React.FC = () => {
       <div>
         {seriesEvents.map((seriesEvent, index) => (
           <div key={index}>
-            {JSON.stringify(seriesEvent)};
+            <SeriesEventContainer seriesEvent={seriesEvent} />
           </div>
         ))}
       </div>
