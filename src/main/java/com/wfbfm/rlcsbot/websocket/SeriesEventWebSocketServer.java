@@ -25,7 +25,7 @@ public class SeriesEventWebSocketServer extends WebSocketServer
 {
     private final Logger logger = Logger.getLogger(SeriesEventWebSocketServer.class.getName());
     private final ElasticsearchClient client = ElasticSearchClientBuilder.getElasticsearchClient();
-    private final Set<String> sentDocumentIds = new HashSet<>();
+    private final Set<String> allBroadcastDocuments = new HashSet<>();
 
     public SeriesEventWebSocketServer(final int port)
     {
@@ -36,7 +36,8 @@ public class SeriesEventWebSocketServer extends WebSocketServer
     @Override
     public void onOpen(final WebSocket webSocket, final ClientHandshake clientHandshake)
     {
-        logger.log(Level.INFO, "Connection opened: " + webSocket.getRemoteSocketAddress() + " - broadcasting all documents");
+        logger.log(Level.INFO, "Connection opened: " + webSocket.getRemoteSocketAddress() +
+                " - broadcasting all " + allBroadcastDocuments.size() + " documents");
         final String response = fetchAllDocuments();
         webSocket.send(response);
     }
@@ -65,18 +66,6 @@ public class SeriesEventWebSocketServer extends WebSocketServer
         logger.log(Level.INFO, "SeriesEventWebSocketServer initialised - broadcasting all documents");
         final String response = fetchAllDocuments();
         broadcast(response);
-    }
-
-    public static void main(String[] args) throws InterruptedException, IOException
-    {
-        final int port = 8887;
-        final SeriesEventWebSocketServer server = new SeriesEventWebSocketServer(port);
-        server.start();
-
-        while (true)
-        {
-
-        }
     }
 
     private String fetchAllDocuments()
@@ -109,11 +98,11 @@ public class SeriesEventWebSocketServer extends WebSocketServer
             for (final Hit<SeriesEvent> hit : response.hits().hits())
             {
                 final String documentId = hit.id();
-                if (!sentDocumentIds.contains(documentId))
+                if (!allBroadcastDocuments.contains(documentId))
                 {
                     logger.info("Found new document - broadcasting to all clients: " + documentId);
                     broadcast(hit.source().toString());
-                    sentDocumentIds.add(documentId);
+                    allBroadcastDocuments.add(documentId);
                 }
             }
         }
