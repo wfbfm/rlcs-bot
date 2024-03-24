@@ -1,9 +1,12 @@
 package com.wfbfm.rlcsbot.series;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Series
 {
     private final String seriesId;
@@ -17,6 +20,12 @@ public class Series
     private int currentGameNumber;
     private boolean isComplete;
     private int numberOfEvents;
+
+    public Series()
+    {
+        // default constructor for Jackson deserialisation
+        seriesId = null;
+    }
 
     public Series(final SeriesMetaData seriesMetaData, final Team blueTeam, final Team orangeTeam, final int bestOf)
     {

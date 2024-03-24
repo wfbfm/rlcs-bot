@@ -143,4 +143,10 @@ public class ElasticSearchPublisher
             throw new RuntimeException(e);
         }
     }
+
+    @VisibleForTesting
+    public ElasticsearchClient getClient()
+    {
+        return client;
+    }
 }

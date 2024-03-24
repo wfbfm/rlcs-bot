@@ -8,6 +8,12 @@ public class Team
 
     private TeamColour teamColour;
     private String teamName;
+    private String playerNames;
+
+    public Team()
+    {
+        // default constructor for Jackson deserialisation
+    }
 
     public Team(final String teamName,
                 final Player player1,
@@ -20,6 +26,7 @@ public class Team
         this.player2 = player2;
         this.player3 = player3;
         this.teamColour = teamColour;
+        this.playerNames = setPlayerNames();
     }
 
     public String getTeamName()
@@ -72,8 +79,13 @@ public class Team
         this.player3 = player3;
     }
 
-    public String getPlayerNames()
+    public String setPlayerNames()
     {
         return this.player1.getName() + " | " + this.player2.getName() + " | " + this.player3.getName();
+    }
+
+    public String getPlayerNames()
+    {
+        return this.playerNames;
     }
 }

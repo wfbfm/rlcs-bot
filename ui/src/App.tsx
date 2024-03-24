@@ -2,10 +2,70 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 
 interface Series {
-  title: string;
-  name: string;
-  type: string;
+  _index: 'series';
+  _id: string;
+  _score: number;
+  _source: {
+    seriesId: string;
+    seriesMetaData: {
+      date: number[];
+      seriesDescription: string;
+      liquipediaPage: string;
+    };
+    completedGames: {
+      score: {
+        blueScore: number;
+        orangeScore: number;
+        teamInLead: string;
+      };
+      clock: {
+        displayedTime: string;
+        elapsedSeconds: number;
+        overtime: boolean;
+      };
+      winner: string;
+    }[];
+    currentGame: {
+      score: {
+        blueScore: number;
+        orangeScore: number;
+        teamInLead: string;
+      };
+      clock: {
+        displayedTime: string;
+        elapsedSeconds: number;
+        overtime: boolean;
+      };
+      winner: string;
+    };
+    seriesScore: {
+      blueScore: number;
+      orangeScore: number;
+      teamInLead: string;
+    };
+    blueTeam: {
+      player1: { name: string };
+      player2: { name: string };
+      player3: { name: string };
+      teamColour: string;
+      teamName: string;
+      playerNames: string;
+    };
+    orangeTeam: {
+      player1: { name: string };
+      player2: { name: string };
+      player3: { name: string };
+      teamColour: string;
+      teamName: string;
+      playerNames: string;
+    };
+    bestOf: number;
+    currentGameNumber: number;
+    seriesWinningGameScore: number;
+    complete: boolean;
+  };
 }
+
 
 interface SeriesEvent {
   _index: 'seriesevent';
@@ -42,6 +102,7 @@ interface SeriesEvent {
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  // FIXME: these can't be lists, they need to be maps - as the same ID can be sent down multiple times on update
   const [seriesEvents, setSeriesEvents] = useState<(SeriesEvent)[]>([]);
   const [series, setSeries] = useState<(Series)[]>([]);
   const [messages, setMessages] = useState<(String)[]>([]);
@@ -69,8 +130,11 @@ const App: React.FC = () => {
       {
         console.log("it's a series event");
         setSeriesEvents((prevSeriesEvents) => [...prevSeriesEvents, newData]);
-        // setMessages((prevMessages) => [...prevMessages, newData]);
-      };
+      } else if (newData._index === 'series')
+      {
+        console.log("it's a series");
+        setSeries((prevSeries) => [...prevSeries, newData]);
+      }
       setMessages((prevMessages) => [...prevMessages, event.data]);
     }
 

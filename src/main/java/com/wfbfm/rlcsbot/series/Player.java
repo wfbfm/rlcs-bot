@@ -4,6 +4,11 @@ public class Player
 {
     private String name;
 
+    public Player()
+    {
+        // default constructor for Jackson deserialisation
+    }
+
     public Player(final String name)
     {
         this.name = name;
