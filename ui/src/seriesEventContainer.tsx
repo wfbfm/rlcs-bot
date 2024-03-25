@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import SeriesEvent from './model/seriesEvent';
 import { Box, Center, Divider, HStack, Stack, Text, VStack } from '@chakra-ui/react';
 import Series from './model/series';
-import { MinusIcon } from '@chakra-ui/icons';
+import { MinusIcon, TimeIcon } from '@chakra-ui/icons';
 
 
 const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, colour: string, filledFirst: boolean) => {
@@ -16,7 +16,7 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
         const iconColour = isFilled ? colour : 'grey';
 
         icons.push(
-            <MinusIcon key={`${iconName}-${colour}-${i}`} name={iconName} color={iconColour} />
+            <MinusIcon boxSize={6} key={`${iconName}-${colour}-${i}`} name={iconName} color={iconColour} />
         );
     }
     return icons;
@@ -25,26 +25,41 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
 export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: Series }> = ({ seriesEvent, series }) => {
     return (
         <Box maxW='500px' borderWidth='1px' borderRadius='lg' overflow='hidden'>
-            <Box height='5px' bg='grey'></Box>
+            <Box bg='blue.100'>
+                <Text as='i' fontSize='sm'>Game {seriesEvent._source.currentGameNumber}</Text>
+            </Box>
             <Box>
                 <Box bg='gray.200' p={2}>
                     <HStack>
+                        <Box minW='10px'>
+                        </Box>
                         <VStack>
                             <Text as='b' fontSize='sm'>{series._source.blueTeam.teamName}</Text>
                             <HStack>
                                 {seriesScoreIcons(series._source.seriesWinningGameScore, seriesEvent._source.seriesScore.blueScore, 'blue.500', false)}
                             </HStack>
                         </VStack>
-                        <Box p={2} bg='blue.500' borderRadius='lg'>
-                            <Text as='b' fontSize='m' color={'white'}>
-                                {seriesEvent._source.currentGame.score.blueScore}
-                            </Text>
-                        </Box>
-                        <Box p={2} bg='orange.300' borderRadius='lg'>
-                            <Text as='b' fontSize='m' color={'white'}>
-                                {seriesEvent._source.currentGame.score.orangeScore}
-                            </Text>
-                        </Box>
+                        <VStack>
+                            <HStack>
+                                <Box p={1.5} bg='blue.500' borderRadius='lg'>
+                                    <Text as='b' fontSize='m' color={'white'}>
+                                        {seriesEvent._source.currentGame.score.blueScore}
+                                    </Text>
+                                </Box>
+                                    <Text as='b' fontSize='m'>
+                                        -
+                                    </Text>
+                                <Box p={1.5} bg='orange.300' borderRadius='lg'>
+                                    <Text as='b' fontSize='m' color={'white'}>
+                                        {seriesEvent._source.currentGame.score.orangeScore}
+                                    </Text>
+                                </Box>
+                            </HStack>
+                            <HStack>
+                                <TimeIcon></TimeIcon>
+                                <Text as='b' fontSize='sm'>{seriesEvent._source.currentGame.clock.displayedTime}</Text>
+                            </HStack>
+                        </VStack>
                         <VStack>
                             <Text as='b' fontSize='sm'>{series._source.orangeTeam.teamName}</Text>
                             <HStack>

@@ -3,6 +3,7 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
+import { Box, HStack } from '@chakra-ui/react';
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -52,20 +53,24 @@ const App: React.FC = () => {
     <div>
       <h1>RLCS Commentary App</h1>
       <h2>All series events</h2>
-      <div>
-        {Object.values(seriesEvents)
-          .sort((a, b) => {
-            const regex = /Event(\d+)-/;
-            const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
-            const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
-            return eventIdB - eventIdA;
-          })
-          .map((seriesEvent, index) => (
-            <div key={index}>
-              <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
-            </div>
-          ))}
-      </div>
+      <HStack>
+        <Box p={4} minW='10px'>
+        </Box>
+        <Box>
+          {Object.values(seriesEvents)
+            .sort((a, b) => {
+              const regex = /Event(\d+)-/;
+              const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
+              const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
+              return eventIdB - eventIdA;
+            })
+            .map((seriesEvent, index) => (
+              <Box key={index} p={4}>
+                <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
+              </Box>
+            ))}
+        </Box>
+      </HStack>
       <h2>All series</h2>
       <div>
         {Object.values(series).map((series, index) => (
