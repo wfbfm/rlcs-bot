@@ -3,8 +3,9 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
-import { Box, HStack } from '@chakra-ui/react';
+import { Box, Center, Flex, HStack, Heading, VStack } from '@chakra-ui/react';
 import ReactTwitchEmbedVideo from "react-twitch-embed-video"
+import NavBar from './navBar';
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -51,37 +52,48 @@ const App: React.FC = () => {
   }, [socket]);
 
   return (
-    <div>
-      <Box minW='500px' maxH='300px'>
-        <ReactTwitchEmbedVideo height='300px' width='500px' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
+    <Box>
+      <Box position='fixed' width='100%' height='30px' zIndex={999} boxShadow={'md'}>
+        <NavBar></NavBar>
       </Box>
-      <h1>RLCS Commentary App</h1>
-      <h2>All series events</h2>
-      <HStack>
-        <Box p={4} minW='10px'>
+      <Box height='30px' p={2}></Box>
+      <Box minW='100%' maxH='300px'>
+        <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
+      </Box>
+      <Flex alignItems='center' justifyContent='space-between'>
+        <Box minW='20%' color={'gray'}>
+          What can go here?
         </Box>
-        <Box>
-          {Object.values(seriesEvents)
-            .sort((a, b) => {
-              const regex = /Event(\d+)-/;
-              const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
-              const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
-              return eventIdB - eventIdA;
-            })
-            .map((seriesEvent, index) => (
-              <Box key={index} p={4}>
-                <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
-              </Box>
+        <Center>
+          <HStack>
+            <Box p={4} minW='10px'>
+            </Box>
+            <Box>
+              {Object.values(seriesEvents)
+                .sort((a, b) => {
+                  const regex = /Event(\d+)-/;
+                  const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
+                  const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
+                  return eventIdB - eventIdA;
+                })
+                .map((seriesEvent, index) => (
+                  <Box key={index} p={4}>
+                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
+                  </Box>
+                ))}
+            </Box>
+          </HStack>
+        </Center>
+        <VStack maxW='25%'>
+          <Heading>All series</Heading>
+          <Box>
+            {Object.values(series).map((series, index) => (
+              <Box key={index}>{JSON.stringify(series)}</Box>
             ))}
-        </Box>
-      </HStack>
-      <h2>All series</h2>
-      <div>
-        {Object.values(series).map((series, index) => (
-          <div key={index}>{JSON.stringify(series)}</div>
-        ))}
-      </div>
-    </div>
+          </Box>
+        </VStack>
+      </Flex>
+    </Box>
   );
 };
 
