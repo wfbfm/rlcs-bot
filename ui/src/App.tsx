@@ -3,9 +3,11 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
-import { Box, Center, Flex, HStack, Heading, VStack } from '@chakra-ui/react';
+import { Box, Center, Flex, HStack, Heading, Image, Text, VStack } from '@chakra-ui/react';
 import ReactTwitchEmbedVideo from "react-twitch-embed-video"
 import NavBar from './navBar';
+import blueLogo from './Karmine_Corp_lightmode.png';
+import orangeLogo from './Team_Vitality_2023_lightmode.png';
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -60,9 +62,12 @@ const App: React.FC = () => {
       <Box minW='100%' maxH='300px'>
         <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
       </Box>
-      <Flex alignItems='center' justifyContent='space-between'>
-        <Box minW='20%' color={'gray'}>
-          What can go here?
+      <Flex justifyContent='space-between'>
+        <Box width={'20%'} color={'gray'}>
+          <HStack>
+            <Image maxWidth='8%' src={blueLogo}></Image>
+            <Image maxWidth='8%' src={orangeLogo}></Image>
+          </HStack>
         </Box>
         <Center>
           <HStack>
@@ -84,13 +89,13 @@ const App: React.FC = () => {
             </Box>
           </HStack>
         </Center>
-        <VStack maxW='25%'>
+        <VStack width='25%'>
           <Heading>All series</Heading>
-          <Box>
+          <Text fontSize='xs'>
             {Object.values(series).map((series, index) => (
               <Box key={index}>{JSON.stringify(series)}</Box>
             ))}
-          </Box>
+          </Text>
         </VStack>
       </Flex>
     </Box>
