@@ -4,6 +4,7 @@ import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
 import { Box, HStack } from '@chakra-ui/react';
+import ReactTwitchEmbedVideo from "react-twitch-embed-video"
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -51,6 +52,9 @@ const App: React.FC = () => {
 
   return (
     <div>
+      <Box minW='500px' maxH='300px'>
+        <ReactTwitchEmbedVideo height='300px' width='500px' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
+      </Box>
       <h1>RLCS Commentary App</h1>
       <h2>All series events</h2>
       <HStack>
