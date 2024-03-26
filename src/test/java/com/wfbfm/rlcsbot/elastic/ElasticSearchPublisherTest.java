@@ -1,11 +1,14 @@
 package com.wfbfm.rlcsbot.elastic;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.wfbfm.rlcsbot.screenshotparser.GameScreenshotProcessorUtils;
 import com.wfbfm.rlcsbot.series.*;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.ELASTIC_INDEX_SERIES;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ElasticSearchPublisherTest
@@ -30,12 +33,19 @@ public class ElasticSearchPublisherTest
     }
 
     @Test
-    public void testJacksonDeserialisation()
+    public void testJacksonDeserialisationSeriesEvent()
     {
         final SeriesEvent seriesEvent = elasticSearchPublisher.searchForSeriesEvent("Event1-Karmine Corp-Team Vitality-2024-03-16-1710552480311");
         assertNotNull(seriesEvent);
         seriesEvent.setCommentary("Test-Commentary");
         elasticSearchPublisher.updateSeriesEvent(seriesEvent);
+    }
+
+    @Test
+    public void testJacksonDeserialisationSeries() throws IOException
+    {
+        final SearchResponse<Series> response = elasticSearchPublisher.getClient().search(s -> s.index(ELASTIC_INDEX_SERIES).size(1000), Series.class);
+        assertNotNull(response);
     }
 
     private SeriesSnapshot mockSeriesSnapshot(final int blueGameScore,

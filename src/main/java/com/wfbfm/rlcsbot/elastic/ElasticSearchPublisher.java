@@ -5,19 +5,10 @@ import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.UpdateResponse;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.annotations.VisibleForTesting;
 import com.wfbfm.rlcsbot.series.Series;
 import com.wfbfm.rlcsbot.series.SeriesEvent;
 import com.wfbfm.rlcsbot.series.SeriesSnapshot;
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.message.BasicHeader;
-import org.elasticsearch.client.RestClient;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,7 +16,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.ELASTIC_INDEX_SERIES;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.ELASTIC_INDEX_SERIES_EVENT;
+import static com.wfbfm.rlcsbot.elastic.ElasticSearchClientBuilder.getElasticsearchClient;
 
 public class ElasticSearchPublisher
 {
@@ -34,18 +27,7 @@ public class ElasticSearchPublisher
 
     public ElasticSearchPublisher()
     {
-        final RestClient restClient = RestClient
-                .builder(HttpHost.create(ELASTIC_SEARCH_SERVER))
-                .setDefaultHeaders(new Header[]{
-                        new BasicHeader("Authorization", "ApiKey " + ELASTIC_API_KEY)
-                })
-                .build();
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        final ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(objectMapper));
-
-        client = new ElasticsearchClient(transport);
+        client = getElasticsearchClient();
 
         try
         {
@@ -160,5 +142,11 @@ public class ElasticSearchPublisher
         {
             throw new RuntimeException(e);
         }
+    }
+
+    @VisibleForTesting
+    public ElasticsearchClient getClient()
+    {
+        return client;
     }
 }

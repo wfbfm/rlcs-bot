@@ -8,6 +8,14 @@ public class SeriesMetaData
     private String seriesDescription;
     private String liquipediaPage;
 
+    public SeriesMetaData()
+    {
+        // default constructor for Jackson deserialisation
+        this.date = LocalDate.now();
+        this.seriesDescription = null;
+        this.liquipediaPage = null;
+    }
+
     public SeriesMetaData(final LocalDate date, final String seriesDescription, final String liquipediaPage)
     {
         this.date = date;
