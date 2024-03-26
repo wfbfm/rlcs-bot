@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { IoRocketOutline } from "react-icons/io5";
+import logo from './rlcs-high-resolution-logo-transparent.svg'
 
 export default function NavBar(): JSX.Element {
     const { colorMode, toggleColorMode } = useColorMode();
@@ -23,7 +24,7 @@ export default function NavBar(): JSX.Element {
         <>
             <Box px={10} bgGradient={bannerColour}>
                 <Flex h={14} alignItems='center' justifyContent='space-between'>
-                    <Icon boxSize={12} as={IoRocketOutline}></Icon>
+                    <Image src={logo} boxSize={16}></Image>
                     <Heading>
                         Rocket League Commentary Service
                     </Heading>
