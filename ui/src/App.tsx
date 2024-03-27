@@ -8,10 +8,10 @@ import ReactTwitchEmbedVideo from "react-twitch-embed-video"
 import NavBar from './navBar';
 import blueLogo from './Karmine_Corp_lightmode.png';
 import orangeLogo from './Team_Vitality_2023_lightmode.png';
+import { SeriesContainer } from './seriesContainer';
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  // FIXME: these can't be lists, they need to be maps - as the same ID can be sent down multiple times on update
   const [seriesEvents, setSeriesEvents] = useState<{ [eventId: string]: SeriesEvent }>({});
   const [series, setSeries] = useState<{ [seriesId: string]: Series }>({});
   const [messages, setMessages] = useState<(String)[]>([]);
@@ -53,6 +53,12 @@ const App: React.FC = () => {
     };
   }, [socket]);
 
+  function getLastNumberFromSeriesId(seriesId: string): number {
+    const parts = seriesId.split('-');
+    const lastPart = parts[parts.length - 1];
+    return parseInt(lastPart, 10);
+  }
+
   return (
     <Box>
       <Box position='fixed' width='100%' height='30px' zIndex={999} boxShadow={'md'}>
@@ -90,12 +96,25 @@ const App: React.FC = () => {
           </HStack>
         </Center>
         <VStack width='25%'>
-          <Heading>All series</Heading>
-          <Text fontSize='xs'>
-            {Object.values(series).map((series, index) => (
-              <Box key={index}>{JSON.stringify(series)}</Box>
-            ))}
-          </Text>
+          <Center>
+            <HStack>
+              <Box p={4} minW='10px'>
+              </Box>
+              <Box>
+                {Object.values(series)
+                  .sort((a, b) => {
+                    const eventIdA = getLastNumberFromSeriesId(a._source.seriesId);
+                    const eventIdB = getLastNumberFromSeriesId(b._source.seriesId);
+                    return eventIdB - eventIdA;
+                  })
+                  .map((series, index) => (
+                    <Box key={index} p={4}>
+                      <SeriesContainer series={series} />
+                    </Box>
+                  ))}
+              </Box>
+            </HStack>
+          </Center>
         </VStack>
       </Flex>
     </Box>
