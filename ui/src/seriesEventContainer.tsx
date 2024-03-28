@@ -74,7 +74,7 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
                         {evaluationResult === 'BLUE_GOAL' && <Icon boxSize={6} as={IoFootball} color={'blue.500'}></Icon>}
                         {evaluationResult === 'BLUE_GAME' && <Icon boxSize={6} as={MdOutlineSportsScore} color={'blue.500'}></Icon>}
                         </Center>
-                        <VStack>
+                        <VStack spacing={0}>
                             <Text as='b' fontSize='sm'>{series._source.blueTeam.teamName}</Text>
                             <HStack>
                                 {seriesScoreIcons(series._source.seriesWinningGameScore, seriesEvent._source.seriesScore.blueScore, 'blue.500', false)}
@@ -100,7 +100,7 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
                             <HStack>
                             </HStack>
                         </VStack>
-                        <VStack>
+                        <VStack spacing={0}>
                             <Text as='b' fontSize='sm'>{series._source.orangeTeam.teamName}</Text>
                             <HStack>
                                 {seriesScoreIcons(series._source.seriesWinningGameScore, seriesEvent._source.seriesScore.orangeScore, 'orange.400', true)}
