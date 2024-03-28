@@ -40,7 +40,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         startPollingForNewDocuments();
     }
 
-    private void startPollingForNewDocuments()
+    public void startPollingForNewDocuments()
     {
         scheduler.scheduleAtFixedRate(() ->
         {
@@ -102,8 +102,6 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         logger.info("Polling for new Elastic documents.");
         try
         {
-//            broadcastLatestSeries();
-//            broadcastLatestSeriesEvents();
             broadcastLatestDocuments(ELASTIC_INDEX_SERIES, allBroadcastSeries, Series.class);
             broadcastLatestDocuments(ELASTIC_INDEX_SERIES_EVENT, allBroadcastSeriesEvents, SeriesEvent.class);
         }
@@ -127,41 +125,6 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
                 documentMap.put(documentId, documentJson);
                 logger.info("Found new document - broadcasting to all clients: " + documentId);
                 broadcast(documentJson);
-            }
-        }
-    }
-
-    private void broadcastLatestSeries() throws IOException
-    {
-        final SearchResponse<Series> response = client.search(s -> s.index(ELASTIC_INDEX_SERIES).size(1000), Series.class);
-
-        for (final Hit<Series> hit : response.hits().hits())
-        {
-            final String seriesId = hit.id();
-            final String seriesJson = JsonpUtils.toJsonString(hit, client._jsonpMapper());
-            final String cachedSeriesJson = allBroadcastSeries.get(seriesId);
-            if (cachedSeriesJson == null || !cachedSeriesJson.equals(seriesJson))
-            {
-                allBroadcastSeries.put(seriesId, seriesJson);
-                broadcast(seriesJson);
-            }
-        }
-    }
-
-    private void broadcastLatestSeriesEvents() throws IOException
-    {
-        final SearchResponse<SeriesEvent> response = client.search(s -> s.index(ELASTIC_INDEX_SERIES_EVENT).size(1000), SeriesEvent.class);
-
-        for (final Hit<SeriesEvent> hit : response.hits().hits())
-        {
-            final String seriesEventId = hit.id();
-            final String seriesEventJson = JsonpUtils.toJsonString(hit, client._jsonpMapper());
-            final String cachedSeriesEventJson = allBroadcastSeriesEvents.get(seriesEventId);
-            if (cachedSeriesEventJson == null || !cachedSeriesEventJson.equals(seriesEventJson))
-            {
-                allBroadcastSeriesEvents.put(seriesEventId, seriesEventJson);
-                broadcast(seriesEventJson);
-                logger.info("Found new document - broadcasting to all clients: " + seriesEventId);
             }
         }
     }

@@ -4,6 +4,7 @@ import com.wfbfm.rlcsbot.audiotranscriber.CommentaryRecorder;
 import com.wfbfm.rlcsbot.audiotranscriber.TranscriptionPoller;
 import com.wfbfm.rlcsbot.screenshotparser.GameScreenshotProcessor;
 import com.wfbfm.rlcsbot.twitch.HeadlessTwitchWatcher;
+import com.wfbfm.rlcsbot.websocket.ElasticSeriesWebSocketServer;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,6 +18,12 @@ public class RlcsBotApplication
     public static void main(String[] args)
     {
         initaliseTempDirectories();
+
+        if (WEBSOCKET_ENABLED)
+        {
+            final ElasticSeriesWebSocketServer webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT);
+            webSocketServer.start();
+        }
 
         final ExecutorService executorService = Executors.newFixedThreadPool(getTotalNumberOfThreads());
 

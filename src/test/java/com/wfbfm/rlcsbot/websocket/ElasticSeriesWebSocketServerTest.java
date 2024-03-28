@@ -9,7 +9,6 @@ public class ElasticSeriesWebSocketServerTest
     {
         final int port = 8887;
         final ElasticSeriesWebSocketServer server = new ElasticSeriesWebSocketServer(port);
-        server.start();
 
         while (true)
         {

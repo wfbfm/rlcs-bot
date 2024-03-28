@@ -94,8 +94,10 @@ public class GameScreenshotProcessor
                 elasticSearchPublisher.uploadNewSeries(seriesUpdateHandler.getCurrentSeries());
                 audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getEventId());
                 break;
-            case GAME_SCORE_CHANGED:
-            case SERIES_SCORE_CHANGED:
+            case BLUE_GAME:
+            case ORANGE_GAME:
+            case BLUE_GOAL:
+            case ORANGE_GOAL:
             case SERIES_COMPLETE:
                 seriesEvent = new SeriesEvent(seriesUpdateHandler.getCurrentSeries(), evaluation);
                 elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);

@@ -26,11 +26,21 @@ public class LiquipediaTeamGetter
     private Map<String, String> playerToTeamNameMap = new HashMap<>();
     private Map<String, String> uppercasePlayerNameMap = new HashMap<>();
     private Map<String, String> uppercaseTeamNameMap = new HashMap<>();
+    private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
     private String liquipediaUrl;
 
     public LiquipediaTeamGetter()
     {
         this.liquipediaUrl = null;
+        initialiseDisplayNameCache();
+    }
+
+    private void initialiseDisplayNameCache()
+    {
+        // TODO: flesh this out, derive from config file
+        this.uppercaseDisplayToLiquipediaName.put("FURIA", "FURIA Esports");
+        this.uppercaseDisplayToLiquipediaName.put("YANXNZ^^", "yANXNZ");
+        this.uppercaseDisplayToLiquipediaName.put("RADOSINHO", "Radosin");
     }
 
     public String getLiquipediaUrl()
@@ -66,6 +76,11 @@ public class LiquipediaTeamGetter
     public Map<String, String> getUppercaseTeamNameMap()
     {
         return uppercaseTeamNameMap;
+    }
+
+    public Map<String, String> getUppercaseDisplayToLiquipediaName()
+    {
+        return uppercaseDisplayToLiquipediaName;
     }
 
     public boolean updateLiquipediaRefData()

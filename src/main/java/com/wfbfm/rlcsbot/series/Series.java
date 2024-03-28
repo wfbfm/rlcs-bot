@@ -49,7 +49,7 @@ public class Series
         this.seriesId = createSeriesId();
     }
 
-    public void handleCompletedGame()
+    public TeamColour handleCompletedGame()
     {
         final TeamColour winningTeam = currentGame.getScore().getTeamInLead();
         this.currentGame.setWinner(winningTeam);
@@ -66,6 +66,7 @@ public class Series
             this.currentGameNumber++;
             this.currentGame = new Game();
         }
+        return winningTeam;
     }
 
     public int getSeriesWinningGameScore()
