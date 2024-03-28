@@ -3,7 +3,7 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
-import { Box, Center, Flex, HStack, Heading, Image, Spacer, Text, VStack } from '@chakra-ui/react';
+import { Box, Center, Flex, HStack, Heading, Image, Link, Spacer, Text, VStack } from '@chakra-ui/react';
 import ReactTwitchEmbedVideo from "react-twitch-embed-video"
 import NavBar from './navBar';
 import blueLogo from './Karmine_Corp_lightmode.png';
@@ -62,11 +62,44 @@ const App: React.FC = () => {
 
   return (
     <Flex>
-      <Box position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
+      <Box bg='gray.100' position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
         <SideBar></SideBar>
+        <Flex flexDirection={'column'} height='90%'>
+          <VStack flex='1'>
+            <Box>
+              {Object.values(series)
+                .sort((a, b) => {
+                  const eventIdA = getLastNumberFromSeriesId(a._source.seriesId);
+                  const eventIdB = getLastNumberFromSeriesId(b._source.seriesId);
+                  return eventIdB - eventIdA;
+                })
+                .map((series, index) => (
+                  <Box key={index} p={4}>
+                    <SeriesContainer series={series} />
+                  </Box>
+                ))}
+            </Box>
+          </VStack>
+
+          <Box p={4}>
+            <Text fontSize='xs'>
+              RL Commentary Service is a fan-made hobby project and is not a reliable source.
+              <br></br>
+              <br></br>
+              Scores are determined by real-time parsing of the <b><Link color={'blue.500'} href='https://www.twitch.tv/rocketleague'>official Twitch broadcast</Link></b> - similarly,
+              the text feed is populated from a raw AI transcription of live audio commentary.
+              <br></br>
+              All reference data is sourced from <b><Link color={'blue.500'} href='https://liquipedia.net/rocketleague/Main_Page'>Liquipedia</Link></b>.
+            </Text>
+          </Box>
+
+        </Flex>
       </Box>
+
       <Spacer></Spacer>
+
       <Box width='80%' p={4}>
+
         <VStack p={4}>
           <Box borderRadius='md' overflow={'hidden'} width='100%'>
             <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
@@ -86,33 +119,6 @@ const App: React.FC = () => {
               ))}
           </Box>
         </VStack>
-        <Flex justifyContent='space-between'>
-          <Center>
-            <HStack>
-            </HStack>
-          </Center>
-          <VStack width='25%'>
-            <Center>
-              <HStack>
-                <Box p={4} minW='10px'>
-                </Box>
-                <Box>
-                  {Object.values(series)
-                    .sort((a, b) => {
-                      const eventIdA = getLastNumberFromSeriesId(a._source.seriesId);
-                      const eventIdB = getLastNumberFromSeriesId(b._source.seriesId);
-                      return eventIdB - eventIdA;
-                    })
-                    .map((series, index) => (
-                      <Box key={index} p={4}>
-                        <SeriesContainer series={series} />
-                      </Box>
-                    ))}
-                </Box>
-              </HStack>
-            </Center>
-          </VStack>
-        </Flex>
       </Box>
     </Flex>
   );

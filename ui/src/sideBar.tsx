@@ -21,7 +21,7 @@ export default function SideBar(): JSX.Element {
 
     return (
         <>
-            <Box px={10} bgGradient={bannerColour}>
+            <Box px={10} borderBottom='1px solid gray'>
                 <Flex h={14} alignItems='center' justifyContent='space-between'>
                     <Image src={logo} boxSize={16}></Image>
                     <Flex alignItems='center'>
