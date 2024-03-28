@@ -3,12 +3,13 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
-import { Box, Center, Flex, HStack, Heading, Image, Text, VStack } from '@chakra-ui/react';
+import { Box, Center, Flex, HStack, Heading, Image, Spacer, Text, VStack } from '@chakra-ui/react';
 import ReactTwitchEmbedVideo from "react-twitch-embed-video"
 import NavBar from './navBar';
 import blueLogo from './Karmine_Corp_lightmode.png';
 import orangeLogo from './Team_Vitality_2023_lightmode.png';
 import { SeriesContainer } from './seriesContainer';
+import SideBar from './sideBar';
 
 const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -60,64 +61,60 @@ const App: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Box position='fixed' width='100%' height='30px' zIndex={999} boxShadow={'md'}>
-        <NavBar></NavBar>
+    <Flex>
+      <Box position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
+        <SideBar></SideBar>
       </Box>
-      <Box height='30px' p={2}></Box>
-      <Box minW='100%' maxH='300px'>
-        <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
-      </Box>
-      <Flex justifyContent='space-between'>
-        <Box width={'20%'} color={'gray'}>
-          <HStack>
-            <Image maxWidth='8%' src={blueLogo}></Image>
-            <Image maxWidth='8%' src={orangeLogo}></Image>
-          </HStack>
-        </Box>
-        <Center>
-          <HStack>
-            <Box p={4} minW='10px'>
-            </Box>
-            <Box>
-              {Object.values(seriesEvents)
-                .sort((a, b) => {
-                  const regex = /Event(\d+)-/;
-                  const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
-                  const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
-                  return eventIdB - eventIdA;
-                })
-                .map((seriesEvent, index) => (
-                  <Box key={index} p={4}>
-                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
-                  </Box>
-                ))}
-            </Box>
-          </HStack>
-        </Center>
-        <VStack width='25%'>
+      <Spacer></Spacer>
+      <Box width='80%' p={4}>
+        <VStack p={4}>
+          <Box borderRadius='md' overflow={'hidden'} width='100%'>
+            <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
+          </Box>
+          <Box>
+            {Object.values(seriesEvents)
+              .sort((a, b) => {
+                const regex = /Event(\d+)-/;
+                const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
+                const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
+                return eventIdB - eventIdA;
+              })
+              .map((seriesEvent, index) => (
+                <Box key={index} p={4}>
+                  <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
+                </Box>
+              ))}
+          </Box>
+        </VStack>
+        <Flex justifyContent='space-between'>
           <Center>
             <HStack>
-              <Box p={4} minW='10px'>
-              </Box>
-              <Box>
-                {Object.values(series)
-                  .sort((a, b) => {
-                    const eventIdA = getLastNumberFromSeriesId(a._source.seriesId);
-                    const eventIdB = getLastNumberFromSeriesId(b._source.seriesId);
-                    return eventIdB - eventIdA;
-                  })
-                  .map((series, index) => (
-                    <Box key={index} p={4}>
-                      <SeriesContainer series={series} />
-                    </Box>
-                  ))}
-              </Box>
             </HStack>
           </Center>
-        </VStack>
-      </Flex>
-    </Box>
+          <VStack width='25%'>
+            <Center>
+              <HStack>
+                <Box p={4} minW='10px'>
+                </Box>
+                <Box>
+                  {Object.values(series)
+                    .sort((a, b) => {
+                      const eventIdA = getLastNumberFromSeriesId(a._source.seriesId);
+                      const eventIdB = getLastNumberFromSeriesId(b._source.seriesId);
+                      return eventIdB - eventIdA;
+                    })
+                    .map((series, index) => (
+                      <Box key={index} p={4}>
+                        <SeriesContainer series={series} />
+                      </Box>
+                    ))}
+                </Box>
+              </HStack>
+            </Center>
+          </VStack>
+        </Flex>
+      </Box>
+    </Flex>
   );
 };
 
