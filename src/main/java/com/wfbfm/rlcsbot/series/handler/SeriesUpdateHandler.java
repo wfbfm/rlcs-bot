@@ -19,6 +19,7 @@ public class SeriesUpdateHandler
     private final LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
     private final Logger logger = Logger.getLogger(SeriesUpdateHandler.class.getName());
     private Series currentSeries = null;
+    private Series mostRecentCompletedSeries;
 
     public SeriesUpdateHandler(final LiquipediaTeamGetter liquipediaTeamGetter)
     {
@@ -368,6 +369,11 @@ public class SeriesUpdateHandler
     public List<Series> getCompletedSeries()
     {
         return completedSeries;
+    }
+
+    public Series getMostRecentCompletedSeries()
+    {
+        return mostRecentCompletedSeries;
     }
 
     public Series getCurrentSeries()

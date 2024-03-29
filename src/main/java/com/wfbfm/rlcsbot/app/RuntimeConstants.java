@@ -31,7 +31,7 @@ public class RuntimeConstants
     public static final String PYTHON_SCRIPT = "python_scripts" + File.separator + "transcribe_commentary.py";
     public static final File FULL_AUDIO_FILE = new File("src/main/temp/audio/full-audio.wav");
     public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
-    public static final int TRANSCRIPTION_FILE_SECONDS = 30;
+    public static final int TRANSCRIPTION_FILE_SECONDS = 20;
     public static final String ELASTIC_SEARCH_SERVER = "https://localhost:9200";
     public static final String ELASTIC_API_KEY;
     public static final String ELASTIC_INDEX_SERIES = "series";

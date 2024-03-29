@@ -93,7 +93,7 @@ public class GameScreenshotProcessor
                 if (ELASTIC_ENABLED)
                 {
                     elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
-                    elasticSearchPublisher.updateSeries(seriesUpdateHandler.getCurrentSeries());
+                    elasticSearchPublisher.uploadNewSeries(seriesUpdateHandler.getCurrentSeries());
                 }
                 if (TRANSCRIPTION_ENABLED)
                 {
@@ -105,15 +105,15 @@ public class GameScreenshotProcessor
             case BLUE_GOAL:
             case ORANGE_GOAL:
             case SERIES_COMPLETE:
-                seriesEvent = new SeriesEvent(seriesUpdateHandler.getCurrentSeries(), evaluation);
+                seriesEvent = new SeriesEvent(seriesUpdateHandler.getMostRecentCompletedSeries(), evaluation);
                 if (ELASTIC_ENABLED)
                 {
                     elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
-                    elasticSearchPublisher.updateSeries(seriesUpdateHandler.getCurrentSeries());
+                    elasticSearchPublisher.updateSeries(seriesUpdateHandler.getMostRecentCompletedSeries());
                 }
                 if (TRANSCRIPTION_ENABLED)
                 {
-                    audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getEventId());
+                    audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getMostRecentCompletedSeries(), seriesEvent.getEventId());
                 }
                 break;
             case SCORE_UNCHANGED:

@@ -43,6 +43,7 @@ public class LiquipediaTeamGetter
         this.uppercaseDisplayToLiquipediaName.put("RADOSINHO", "Radosin");
 
         this.uppercaseDisplayToLiquipediaName.put("GENG MOBIL1", "Gen.G Mobil1 Racing");
+        this.uppercaseDisplayToLiquipediaName.put("COMPLEXITY", "Complexity Gaming");
     }
 
     public String getLiquipediaUrl()
