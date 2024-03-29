@@ -9,9 +9,9 @@ public class RuntimeConstants
 {
     public final static boolean BROADCAST_ENABLED = true;
     public final static boolean TRANSCRIPTION_ENABLED = true;
-    public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = false;
+    public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = true;
     public final static boolean WEBSOCKET_ENABLED = true;
-    public static final String BROADCAST_URL = "https://www.twitch.tv/videos/2103815939?t=06h53m41s";
+    public static final String BROADCAST_URL = "https://www.twitch.tv/rocketleague/";
     public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1";
     public static boolean DEBUGGING_ENABLED = true;
     public static boolean RETAIN_PROCESSING_FILES = false;

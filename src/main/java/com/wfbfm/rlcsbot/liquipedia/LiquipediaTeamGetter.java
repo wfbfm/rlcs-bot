@@ -41,6 +41,8 @@ public class LiquipediaTeamGetter
         this.uppercaseDisplayToLiquipediaName.put("FURIA", "FURIA Esports");
         this.uppercaseDisplayToLiquipediaName.put("YANXNZ^^", "yANXNZ");
         this.uppercaseDisplayToLiquipediaName.put("RADOSINHO", "Radosin");
+
+        this.uppercaseDisplayToLiquipediaName.put("GENG MOBIL1", "Gen.G Mobil1 Racing");
     }
 
     public String getLiquipediaUrl()

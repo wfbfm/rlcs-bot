@@ -1,6 +1,8 @@
 package com.wfbfm.rlcsbot.audiotranscriber;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.BROADCAST_URL;
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.FULL_AUDIO_FILE;
@@ -8,6 +10,7 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.FULL_AUDIO_FILE;
 public class CommentaryRecorder
 {
     private static final String STREAMLINK_COMMAND = "streamlink";
+    private final Logger logger = Logger.getLogger(CommentaryRecorder.class.getName());
     private Process process;
     private String streamUrl;
 
@@ -30,10 +33,12 @@ public class CommentaryRecorder
 
         try
         {
+            logger.log(Level.INFO, "Submitting process: " + processBuilder.command());
             process = processBuilder.start();
         }
         catch (IOException e)
         {
+            logger.log(Level.SEVERE, "Unsuccessful commentary recording", e);
             throw new RuntimeException(e);
         }
 

@@ -104,13 +104,13 @@ public class SeriesUpdateHandler
     private boolean isValidNewSeries(final SeriesSnapshot snapshot)
     {
         // TODO
-        return true;
+        final boolean littleTimeElapsed = snapshot.getCurrentGame().getClock().getElapsedSeconds() < 100;
+        final boolean zeroSeriesScore = snapshot.getSeriesScore().getBlueScore() == 0 && snapshot.getSeriesScore().getOrangeScore() == 0;
+        return littleTimeElapsed && zeroSeriesScore;
     }
 
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)
     {
-        // TODO:
-        // update clock; update scores; sense-check the series score
         senseCheckSeriesScore(snapshot);
         currentSeries.getCurrentGame().setClock(snapshot.getCurrentGame().getClock());
 
@@ -227,6 +227,11 @@ public class SeriesUpdateHandler
         if (orangeTeamName == null)
         {
             logger.log(Level.INFO, "Unable to resolve orange team: " + orangeTeam.getTeamName());
+            return false;
+        }
+        if (blueTeamName.equals(orangeTeamName))
+        {
+            logger.log(Level.INFO, "Unable to resolve team - same team parsed:" + orangeTeam.getTeamName());
             return false;
         }
         blueTeam.setTeamName(blueTeamName);
