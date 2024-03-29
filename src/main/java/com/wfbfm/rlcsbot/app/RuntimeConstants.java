@@ -11,6 +11,7 @@ public class RuntimeConstants
     public final static boolean TRANSCRIPTION_ENABLED = true;
     public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = true;
     public final static boolean WEBSOCKET_ENABLED = true;
+    public final static boolean ELASTIC_ENABLED = true;
     public static final String BROADCAST_URL = "https://www.twitch.tv/rocketleague/";
     public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1";
     public static boolean DEBUGGING_ENABLED = true;

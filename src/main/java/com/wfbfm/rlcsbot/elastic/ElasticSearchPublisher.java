@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.ELASTIC_INDEX_SERIES;
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.ELASTIC_INDEX_SERIES_EVENT;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 import static com.wfbfm.rlcsbot.elastic.ElasticSearchClientBuilder.getElasticsearchClient;
 
 public class ElasticSearchPublisher
@@ -29,6 +28,10 @@ public class ElasticSearchPublisher
     {
         client = getElasticsearchClient();
 
+        if (!ELASTIC_ENABLED)
+        {
+            return;
+        }
         try
         {
             createIndices();
