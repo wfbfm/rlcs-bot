@@ -36,6 +36,7 @@ public class RuntimeConstants
     public static final String ELASTIC_INDEX_SERIES = "series";
     public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
     public static final int WEBSOCKET_PORT = 8887;
+    public static final int DEFAULT_BEST_OF = 5;
 
     static
     {
