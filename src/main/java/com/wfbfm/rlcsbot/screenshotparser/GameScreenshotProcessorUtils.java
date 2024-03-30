@@ -149,14 +149,18 @@ public class GameScreenshotProcessorUtils
     {
         final int width = greyscaleImage.getWidth();
         final int height = greyscaleImage.getHeight();
+        final int threshold = 128;
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 int rgb = greyscaleImage.getRGB(x, y);
-                int invertedRgb = ~rgb & 0xFFFFFF; // Invert each pixel
-                greyscaleImage.setRGB(x, y, invertedRgb);
+                int greyValue = (rgb >> 16) & 0xFF; // Extract the red component assuming greyscale
+                int binaryValue = greyValue < threshold ? 0 : 255; // Set binary value based on threshold
+                int invertedBinaryValue = binaryValue == 0 ? 255 : 0; // Invert the binary value
+                int newRgb = (invertedBinaryValue << 16) | (invertedBinaryValue << 8) | invertedBinaryValue; // Create new RGB value
+                greyscaleImage.setRGB(x, y, newRgb);
             }
         }
     }

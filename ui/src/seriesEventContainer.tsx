@@ -24,27 +24,6 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
     return icons;
 };
 
-// TODO: this is a placeholder to test out some formatting in the UI.  This kind of logic will live in the backend.
-function getEvaluationResult(seriesEvent: SeriesEvent): string {
-    const { evaluation, currentGame, seriesScore } = seriesEvent._source;
-
-    if (evaluation === 'GAME_SCORE_CHANGED') {
-        if (currentGame.score.blueScore > currentGame.score.orangeScore) {
-            return 'BLUE_GOAL';
-        } else {
-            return 'ORANGE_GOAL';
-        }
-    } else if (evaluation === 'SERIES_SCORE_CHANGED') {
-        if (seriesScore.blueScore > seriesScore.orangeScore) {
-            return 'BLUE_GAME';
-        } else {
-            return 'ORANGE_GAME';
-        }
-    } else {
-        return ''; // Handle other evaluation values if necessary
-    }
-}
-
 function getBackgroundColour(evaluationResult: string): string {
     if (evaluationResult === 'BLUE_GOAL') {
         return 'blue.100';
@@ -62,7 +41,7 @@ function getBackgroundColour(evaluationResult: string): string {
 }
 
 export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: Series }> = ({ seriesEvent, series }) => {
-    const evaluationResult = getEvaluationResult(seriesEvent);
+    const evaluationResult:string = seriesEvent._source.evaluation;
     const backgroundColour = getBackgroundColour(evaluationResult);
 
     return (

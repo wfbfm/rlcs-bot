@@ -100,7 +100,7 @@ public class SeriesUpdateHandlerTest
         assertSeriesValues(startSnapshot, startSeries);
 
         final SeriesSnapshot blueGoalSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "2:59");
-        assertEquals(SeriesSnapshotEvaluation.GAME_SCORE_CHANGED, seriesUpdateHandler.evaluateSeries(blueGoalSnapshot));
+        assertEquals(SeriesSnapshotEvaluation.BLUE_GOAL, seriesUpdateHandler.evaluateSeries(blueGoalSnapshot));
         final Series blueGoalSeries = seriesUpdateHandler.getCurrentSeries();
         assertSeriesValues(blueGoalSnapshot, blueGoalSeries);
 
@@ -110,17 +110,17 @@ public class SeriesUpdateHandlerTest
         assertSeriesValues(noChangeSnapshot, noChangeSeries);
 
         final SeriesSnapshot orangeGoalSnapshot = mockSeriesSnapshot(1, 1, 0, 0, 7, "0:00");
-        assertEquals(SeriesSnapshotEvaluation.GAME_SCORE_CHANGED, seriesUpdateHandler.evaluateSeries(orangeGoalSnapshot));
+        assertEquals(SeriesSnapshotEvaluation.ORANGE_GOAL, seriesUpdateHandler.evaluateSeries(orangeGoalSnapshot));
         final Series orangeGoalSeries = seriesUpdateHandler.getCurrentSeries();
         assertSeriesValues(orangeGoalSnapshot, orangeGoalSeries);
 
         final SeriesSnapshot overTimeSnapshot = mockSeriesSnapshot(1, 2, 0, 0, 7, "+0:37");
-        assertEquals(SeriesSnapshotEvaluation.GAME_SCORE_CHANGED, seriesUpdateHandler.evaluateSeries(overTimeSnapshot));
+        assertEquals(SeriesSnapshotEvaluation.ORANGE_GOAL, seriesUpdateHandler.evaluateSeries(overTimeSnapshot));
         final Series overTimeSeries = seriesUpdateHandler.getCurrentSeries();
         assertSeriesValues(overTimeSnapshot, overTimeSeries);
 
         final SeriesSnapshot nonGameSnapshot = mockNonGameSnapshot();
-        assertEquals(SeriesSnapshotEvaluation.SERIES_SCORE_CHANGED, seriesUpdateHandler.evaluateSeries(nonGameSnapshot));
+        assertEquals(SeriesSnapshotEvaluation.ORANGE_GAME, seriesUpdateHandler.evaluateSeries(nonGameSnapshot));
         final Series postGameSeries = seriesUpdateHandler.getCurrentSeries();
         final SeriesSnapshot expectedPostGameSnapshot = mockSeriesSnapshot(0, 0, 0, 1, 7, "5:00");
         assertSeriesValues(expectedPostGameSnapshot, postGameSeries);
@@ -140,7 +140,7 @@ public class SeriesUpdateHandlerTest
         assertSeriesValues(startSnapshot, startSeries);
 
         final SeriesSnapshot blueGoalSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "1:00");
-        assertEquals(SeriesSnapshotEvaluation.GAME_SCORE_CHANGED, seriesUpdateHandler.evaluateSeries(blueGoalSnapshot));
+        assertEquals(SeriesSnapshotEvaluation.BLUE_GOAL, seriesUpdateHandler.evaluateSeries(blueGoalSnapshot));
         final Series blueGoalSeries = seriesUpdateHandler.getCurrentSeries();
         assertSeriesValues(blueGoalSnapshot, blueGoalSeries);
 
@@ -150,7 +150,7 @@ public class SeriesUpdateHandlerTest
         assertSeriesValues(lateGameSnapshot, lateGameSeries);
 
         final SeriesSnapshot firstHighlightSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "0:30");
-        assertEquals(SeriesSnapshotEvaluation.SERIES_SCORE_CHANGED, seriesUpdateHandler.evaluateSeries(firstHighlightSnapshot));
+        assertEquals(SeriesSnapshotEvaluation.BLUE_GAME, seriesUpdateHandler.evaluateSeries(firstHighlightSnapshot));
         final Series postFirstHighlightSeries = seriesUpdateHandler.getCurrentSeries();
         final SeriesSnapshot expectedPostGameSnapshot = mockSeriesSnapshot(0, 0, 1, 0, 7, "5:00");
         assertSeriesValues(expectedPostGameSnapshot, postFirstHighlightSeries);

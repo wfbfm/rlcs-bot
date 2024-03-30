@@ -90,20 +90,37 @@ public class GameScreenshotProcessor
         {
             case NEW_SERIES:
                 seriesEvent = new SeriesEvent(seriesUpdateHandler.getCurrentSeries(), evaluation);
-                elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
-                elasticSearchPublisher.uploadNewSeries(seriesUpdateHandler.getCurrentSeries());
-                audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getEventId());
+                if (ELASTIC_ENABLED)
+                {
+                    elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
+                    elasticSearchPublisher.uploadNewSeries(seriesUpdateHandler.getCurrentSeries());
+                }
+                if (TRANSCRIPTION_ENABLED)
+                {
+                    audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getEventId());
+                }
                 break;
-            case GAME_SCORE_CHANGED:
-            case SERIES_SCORE_CHANGED:
+            case BLUE_GAME:
+            case ORANGE_GAME:
+            case BLUE_GOAL:
+            case ORANGE_GOAL:
             case SERIES_COMPLETE:
-                seriesEvent = new SeriesEvent(seriesUpdateHandler.getCurrentSeries(), evaluation);
-                elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
-                elasticSearchPublisher.updateSeries(seriesUpdateHandler.getCurrentSeries());
-                audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getEventId());
+                seriesEvent = new SeriesEvent(seriesUpdateHandler.getMostRecentCompletedSeries(), evaluation);
+                if (ELASTIC_ENABLED)
+                {
+                    elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
+                    elasticSearchPublisher.updateSeries(seriesUpdateHandler.getMostRecentCompletedSeries());
+                }
+                if (TRANSCRIPTION_ENABLED)
+                {
+                    audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getMostRecentCompletedSeries(), seriesEvent.getEventId());
+                }
                 break;
             case SCORE_UNCHANGED:
-                elasticSearchPublisher.updateSeries(seriesUpdateHandler.getCurrentSeries());
+                if (ELASTIC_ENABLED)
+                {
+                    elasticSearchPublisher.updateSeries(seriesUpdateHandler.getCurrentSeries());
+                }
                 break;
             default:
                 break;

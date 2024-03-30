@@ -54,7 +54,7 @@ public class SeriesUpdateHandler
 
     private SeriesSnapshotEvaluation handleCompletedGame()
     {
-        currentSeries.handleCompletedGame();
+        final TeamColour winningTeam = currentSeries.handleCompletedGame();
         if (currentSeries.isComplete())
         {
             this.completedSeries.add(currentSeries);
@@ -63,7 +63,14 @@ public class SeriesUpdateHandler
         }
         else
         {
-            return SeriesSnapshotEvaluation.SERIES_SCORE_CHANGED;
+            if (winningTeam == TeamColour.BLUE)
+            {
+                return SeriesSnapshotEvaluation.BLUE_GAME;
+            }
+            else
+            {
+                return SeriesSnapshotEvaluation.ORANGE_GAME;
+            }
         }
     }
 
@@ -97,32 +104,31 @@ public class SeriesUpdateHandler
     private boolean isValidNewSeries(final SeriesSnapshot snapshot)
     {
         // TODO
-        return true;
+        final boolean littleTimeElapsed = snapshot.getCurrentGame().getClock().getElapsedSeconds() < 100;
+        final boolean zeroSeriesScore = snapshot.getSeriesScore().getBlueScore() == 0 && snapshot.getSeriesScore().getOrangeScore() == 0;
+        return littleTimeElapsed && zeroSeriesScore;
     }
 
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)
     {
-        // TODO:
-        // update clock; update scores; sense-check the series score
         senseCheckSeriesScore(snapshot);
         currentSeries.getCurrentGame().setClock(snapshot.getCurrentGame().getClock());
 
         final Score snapshotGameScore = snapshot.getCurrentGame().getScore();
         final Score existingGameScore = currentSeries.getCurrentGame().getScore();
 
+        // TODO - recovery logic here, in case we miss a goal
         final boolean hasBlueScoreChanged = snapshotGameScore.getBlueScore() > existingGameScore.getBlueScore();
         final boolean hasOrangeScoreChanged = snapshotGameScore.getOrangeScore() > existingGameScore.getOrangeScore();
         if (hasBlueScoreChanged)
         {
             existingGameScore.setBlueScore(snapshotGameScore.getBlueScore());
+            return SeriesSnapshotEvaluation.BLUE_GOAL;
         }
         if (hasOrangeScoreChanged)
         {
             existingGameScore.setOrangeScore(snapshotGameScore.getOrangeScore());
-        }
-        if (hasBlueScoreChanged || hasOrangeScoreChanged)
-        {
-            return SeriesSnapshotEvaluation.GAME_SCORE_CHANGED;
+            return SeriesSnapshotEvaluation.ORANGE_GOAL;
         }
 
         return SeriesSnapshotEvaluation.SCORE_UNCHANGED;
@@ -207,8 +213,10 @@ public class SeriesUpdateHandler
         }
 
         final String blueTeamName = lookupImperfectName(liquipediaTeamGetter.getUppercaseTeamNameMap(),
+                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
                 blueTeam.getTeamName().toUpperCase());
         final String orangeTeamName = lookupImperfectName(liquipediaTeamGetter.getUppercaseTeamNameMap(),
+                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
                 orangeTeam.getTeamName().toUpperCase());
 
         if (blueTeamName == null)
@@ -219,6 +227,11 @@ public class SeriesUpdateHandler
         if (orangeTeamName == null)
         {
             logger.log(Level.INFO, "Unable to resolve orange team: " + orangeTeam.getTeamName());
+            return false;
+        }
+        if (blueTeamName.equals(orangeTeamName))
+        {
+            logger.log(Level.INFO, "Unable to resolve team - same team parsed:" + orangeTeam.getTeamName());
             return false;
         }
         blueTeam.setTeamName(blueTeamName);
@@ -263,10 +276,13 @@ public class SeriesUpdateHandler
     private String resolveTeamFromImperfectPlayerNames(final Team team)
     {
         final String resolvedPlayerName1 = lookupImperfectName(liquipediaTeamGetter.getUppercasePlayerNameMap(),
+                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer1().getName().toUpperCase());
         final String resolvedPlayerName2 = lookupImperfectName(liquipediaTeamGetter.getUppercasePlayerNameMap(),
+                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer2().getName().toUpperCase());
         final String resolvedPlayerName3 = lookupImperfectName(liquipediaTeamGetter.getUppercasePlayerNameMap(),
+                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer3().getName().toUpperCase());
 
         //  Only return a team name if the resolved players are all part of the same team.  At least 2 players must be resolved.
@@ -298,7 +314,9 @@ public class SeriesUpdateHandler
         return null;
     }
 
-    private String lookupImperfectName(final Map<String, String> nameMap, final String inputName)
+    private String lookupImperfectName(final Map<String, String> liquipediaNameMap,
+                                       final Map<String, String> displayNameOverrideMap,
+                                       final String inputName)
     {
         if (StringUtils.isEmpty(inputName))
         {
@@ -307,7 +325,7 @@ public class SeriesUpdateHandler
         String bestMatch = null;
         int minDistance = Integer.MAX_VALUE;
 
-        for (Map.Entry<String, String> entry : nameMap.entrySet())
+        for (Map.Entry<String, String> entry : liquipediaNameMap.entrySet())
         {
             String name = entry.getKey();
             int distance = levenshteinDistance.apply(inputName.toLowerCase(), name.toLowerCase());
@@ -318,6 +336,23 @@ public class SeriesUpdateHandler
                 bestMatch = entry.getValue();
             }
         }
+
+        if (bestMatch == null)
+        {
+            // TODO - refactor to common method
+            for (Map.Entry<String, String> entry : displayNameOverrideMap.entrySet())
+            {
+                String name = entry.getKey();
+                int distance = levenshteinDistance.apply(inputName.toLowerCase(), name.toLowerCase());
+
+                if (distance < minDistance && distance <= LEVENSHTEIN_MINIMUM_DISTANCE)
+                {
+                    minDistance = distance;
+                    bestMatch = entry.getValue();
+                }
+            }
+        }
+
         return bestMatch;
     }
 
@@ -333,6 +368,16 @@ public class SeriesUpdateHandler
     public List<Series> getCompletedSeries()
     {
         return completedSeries;
+    }
+
+    public Series getMostRecentCompletedSeries()
+    {
+        final int numberOfCompletedSeries = completedSeries.size();
+        if (numberOfCompletedSeries == 0)
+        {
+            return null;
+        }
+        return completedSeries.get(numberOfCompletedSeries - 1);
     }
 
     public Series getCurrentSeries()

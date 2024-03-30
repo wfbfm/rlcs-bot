@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LiquipediaTeamGetterTest
 {
-    private static final String LIQUIPEDIA_URL = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1/Europe/Open_Qualifier_2";
+    private static final String LIQUIPEDIA_URL = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1";
     private final LiquipediaTeamGetter liquipediaTeamGetter = new LiquipediaTeamGetter();
     private Map<String, Map<String, String>> teamToPlayerAndCoachMap;
     private Map<String, Set<String>> teamToPlayerNameMap;

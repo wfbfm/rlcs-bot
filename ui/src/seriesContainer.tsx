@@ -9,7 +9,7 @@ export const SeriesContainer: React.FC<{ series: Series }> = ({ series }) => {
     const orangeColour: string = series._source.complete ? (series._source.seriesScore.teamInLead === 'ORANGE' ? 'orange.400' : 'gray.400') : 'teal.300'
 
     return (
-        <Box maxW='500px' borderWidth='1px' borderRadius='lg' overflow='hidden'>
+        <Box width='100%' borderWidth='1px' borderRadius='lg' overflow='hidden'>
             <Box>
                 <Center p={2}>
                     <HStack>

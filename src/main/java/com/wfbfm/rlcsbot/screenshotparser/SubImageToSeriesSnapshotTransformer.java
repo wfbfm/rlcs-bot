@@ -236,9 +236,8 @@ public class SubImageToSeriesSnapshotTransformer
         final String bestOfString = parseImage(numberTesseract, SubImageType.BEST_OF);
         if (StringUtils.isEmpty(bestOfString))
         {
-            logger.log(Level.INFO, "Unable to determine bestOf - defaulting to 0.");
-            this.seriesSnapshotBuilder.withBestOf(0);
-            return;
+            logger.log(Level.INFO, "Unable to determine bestOf - defaulting to " + DEFAULT_BEST_OF);
+            this.seriesSnapshotBuilder.withBestOf(DEFAULT_BEST_OF);
         }
         else
         {
