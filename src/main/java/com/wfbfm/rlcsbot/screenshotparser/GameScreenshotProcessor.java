@@ -2,7 +2,7 @@ package com.wfbfm.rlcsbot.screenshotparser;
 
 import com.wfbfm.rlcsbot.audiotranscriber.AudioTranscriptionDelegator;
 import com.wfbfm.rlcsbot.elastic.ElasticSearchPublisher;
-import com.wfbfm.rlcsbot.liquipedia.LiquipediaTeamGetter;
+import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
 import com.wfbfm.rlcsbot.series.SeriesEvent;
 import com.wfbfm.rlcsbot.series.SeriesSnapshot;
 import com.wfbfm.rlcsbot.series.handler.SeriesSnapshotEvaluation;
@@ -27,15 +27,15 @@ public class GameScreenshotProcessor
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
     private final ScreenshotToSubImageTransformer screenshotToSubImageTransformer = new ScreenshotToSubImageTransformer();
     private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer();
-    private final LiquipediaTeamGetter liquipediaTeamGetter = new LiquipediaTeamGetter();
-    private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler(liquipediaTeamGetter);
+    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher = new LiquipediaRefDataFetcher();
+    private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
     private final AudioTranscriptionDelegator audioTranscriptionDelegator = new AudioTranscriptionDelegator();
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
 
     public GameScreenshotProcessor()
     {
-        this.liquipediaTeamGetter.setLiquipediaUrl(LIQUIPEDIA_PAGE);
-        this.liquipediaTeamGetter.updateLiquipediaRefData();
+        this.liquipediaRefDataFetcher.setLiquipediaUrl(LIQUIPEDIA_PAGE);
+        this.liquipediaRefDataFetcher.updateLiquipediaRefData();
     }
 
     public void run()
@@ -104,6 +104,17 @@ public class GameScreenshotProcessor
             case ORANGE_GAME:
             case BLUE_GOAL:
             case ORANGE_GOAL:
+                seriesEvent = new SeriesEvent(seriesUpdateHandler.getCurrentSeries(), evaluation);
+                if (ELASTIC_ENABLED)
+                {
+                    elasticSearchPublisher.uploadNewSeriesEvent(seriesEvent);
+                    elasticSearchPublisher.updateSeries(seriesUpdateHandler.getCurrentSeries());
+                }
+                if (TRANSCRIPTION_ENABLED)
+                {
+                    audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getCurrentSeries(), seriesEvent.getEventId());
+                }
+                break;
             case SERIES_COMPLETE:
                 seriesEvent = new SeriesEvent(seriesUpdateHandler.getMostRecentCompletedSeries(), evaluation);
                 if (ELASTIC_ENABLED)

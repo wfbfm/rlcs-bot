@@ -14,13 +14,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LiquipediaTeamGetter
+public class LiquipediaRefDataFetcher
 {
     private static final String CLASS = "class";
     private static final String TEAMCARD_COLUMN = "teamcard-column";
     private static final String CENTER = "center";
     private static final String TEAMCARD_INNER = "teamcard-inner";
-    private final Logger logger = Logger.getLogger(LiquipediaTeamGetter.class.getName());
+    private final Logger logger = Logger.getLogger(LiquipediaRefDataFetcher.class.getName());
     private Map<String, Map<String, String>> teamToPlayerAndCoachMap = new HashMap<>();
     private Map<String, Set<String>> teamToPlayerNameMap = new HashMap<>();
     private Map<String, String> playerToTeamNameMap = new HashMap<>();
@@ -29,7 +29,7 @@ public class LiquipediaTeamGetter
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
     private String liquipediaUrl;
 
-    public LiquipediaTeamGetter()
+    public LiquipediaRefDataFetcher()
     {
         this.liquipediaUrl = null;
         initialiseDisplayNameCache();
@@ -43,6 +43,7 @@ public class LiquipediaTeamGetter
         this.uppercaseDisplayToLiquipediaName.put("RADOSINHO", "Radosin");
 
         this.uppercaseDisplayToLiquipediaName.put("GENG MOBIL1", "Gen.G Mobil1 Racing");
+        this.uppercaseDisplayToLiquipediaName.put("M8 ALPINE", "Gentle Mates Alpine");
         this.uppercaseDisplayToLiquipediaName.put("COMPLEXITY", "Complexity Gaming");
     }
 

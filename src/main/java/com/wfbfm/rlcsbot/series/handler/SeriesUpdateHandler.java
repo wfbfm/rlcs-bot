@@ -1,6 +1,6 @@
 package com.wfbfm.rlcsbot.series.handler;
 
-import com.wfbfm.rlcsbot.liquipedia.LiquipediaTeamGetter;
+import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
 import com.wfbfm.rlcsbot.series.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -15,14 +15,14 @@ public class SeriesUpdateHandler
 {
     private static final Set<Integer> allowableBestOf = new HashSet<>(Set.of(3, 5, 7));
     private final List<Series> completedSeries = new ArrayList<>();
-    private final LiquipediaTeamGetter liquipediaTeamGetter;
+    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher;
     private final LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
     private final Logger logger = Logger.getLogger(SeriesUpdateHandler.class.getName());
     private Series currentSeries = null;
 
-    public SeriesUpdateHandler(final LiquipediaTeamGetter liquipediaTeamGetter)
+    public SeriesUpdateHandler(final LiquipediaRefDataFetcher liquipediaRefDataFetcher)
     {
-        this.liquipediaTeamGetter = liquipediaTeamGetter;
+        this.liquipediaRefDataFetcher = liquipediaRefDataFetcher;
     }
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
@@ -196,10 +196,7 @@ public class SeriesUpdateHandler
         {
             return true;
         }
-        if (snapshot.getCurrentGame().getClock().getElapsedSeconds() < currentSeries.getCurrentGame().getClock().getElapsedSeconds())
-        {
-            return true;
-        }
+        // removed check on clock time
         return false;
     }
 
@@ -212,11 +209,11 @@ public class SeriesUpdateHandler
             return false;
         }
 
-        final String blueTeamName = lookupImperfectName(liquipediaTeamGetter.getUppercaseTeamNameMap(),
-                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
+        final String blueTeamName = lookupImperfectName(liquipediaRefDataFetcher.getUppercaseTeamNameMap(),
+                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
                 blueTeam.getTeamName().toUpperCase());
-        final String orangeTeamName = lookupImperfectName(liquipediaTeamGetter.getUppercaseTeamNameMap(),
-                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
+        final String orangeTeamName = lookupImperfectName(liquipediaRefDataFetcher.getUppercaseTeamNameMap(),
+                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
                 orangeTeam.getTeamName().toUpperCase());
 
         if (blueTeamName == null)
@@ -242,13 +239,13 @@ public class SeriesUpdateHandler
 
     private void enrichPlayerNamesFromTeams(final SeriesSnapshot snapshot)
     {
-        final Map<String, String> bluePlayerByPositionMap = liquipediaTeamGetter.getTeamToPlayerAndCoachMap()
+        final Map<String, String> bluePlayerByPositionMap = liquipediaRefDataFetcher.getTeamToPlayerAndCoachMap()
                 .get(snapshot.getBlueTeam().getTeamName());
         snapshot.getBlueTeam().getPlayer1().setName(bluePlayerByPositionMap.get("1"));
         snapshot.getBlueTeam().getPlayer2().setName(bluePlayerByPositionMap.get("2"));
         snapshot.getBlueTeam().getPlayer3().setName(bluePlayerByPositionMap.get("3"));
 
-        final Map<String, String> orangePlayerByPositionMap = liquipediaTeamGetter.getTeamToPlayerAndCoachMap()
+        final Map<String, String> orangePlayerByPositionMap = liquipediaRefDataFetcher.getTeamToPlayerAndCoachMap()
                 .get(snapshot.getOrangeTeam().getTeamName());
         snapshot.getOrangeTeam().getPlayer1().setName(orangePlayerByPositionMap.get("1"));
         snapshot.getOrangeTeam().getPlayer2().setName(orangePlayerByPositionMap.get("2"));
@@ -275,14 +272,14 @@ public class SeriesUpdateHandler
 
     private String resolveTeamFromImperfectPlayerNames(final Team team)
     {
-        final String resolvedPlayerName1 = lookupImperfectName(liquipediaTeamGetter.getUppercasePlayerNameMap(),
-                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
+        final String resolvedPlayerName1 = lookupImperfectName(liquipediaRefDataFetcher.getUppercasePlayerNameMap(),
+                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer1().getName().toUpperCase());
-        final String resolvedPlayerName2 = lookupImperfectName(liquipediaTeamGetter.getUppercasePlayerNameMap(),
-                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
+        final String resolvedPlayerName2 = lookupImperfectName(liquipediaRefDataFetcher.getUppercasePlayerNameMap(),
+                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer2().getName().toUpperCase());
-        final String resolvedPlayerName3 = lookupImperfectName(liquipediaTeamGetter.getUppercasePlayerNameMap(),
-                liquipediaTeamGetter.getUppercaseDisplayToLiquipediaName(),
+        final String resolvedPlayerName3 = lookupImperfectName(liquipediaRefDataFetcher.getUppercasePlayerNameMap(),
+                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer3().getName().toUpperCase());
 
         //  Only return a team name if the resolved players are all part of the same team.  At least 2 players must be resolved.
@@ -293,19 +290,19 @@ public class SeriesUpdateHandler
         {
             countResolvedPlayers++;
             resolvedPlayerNames.add(resolvedPlayerName1);
-            impliedTeamNames.add(liquipediaTeamGetter.getPlayerToTeamNameMap().get(resolvedPlayerName1));
+            impliedTeamNames.add(liquipediaRefDataFetcher.getPlayerToTeamNameMap().get(resolvedPlayerName1));
         }
         if (resolvedPlayerName2 != null)
         {
             countResolvedPlayers++;
             resolvedPlayerNames.add(resolvedPlayerName2);
-            impliedTeamNames.add(liquipediaTeamGetter.getPlayerToTeamNameMap().get(resolvedPlayerName2));
+            impliedTeamNames.add(liquipediaRefDataFetcher.getPlayerToTeamNameMap().get(resolvedPlayerName2));
         }
         if (resolvedPlayerName3 != null)
         {
             countResolvedPlayers++;
             resolvedPlayerNames.add(resolvedPlayerName3);
-            impliedTeamNames.add(liquipediaTeamGetter.getPlayerToTeamNameMap().get(resolvedPlayerName3));
+            impliedTeamNames.add(liquipediaRefDataFetcher.getPlayerToTeamNameMap().get(resolvedPlayerName3));
         }
         if (countResolvedPlayers > 1 && countResolvedPlayers == resolvedPlayerNames.size() && impliedTeamNames.size() == 1)
         {
