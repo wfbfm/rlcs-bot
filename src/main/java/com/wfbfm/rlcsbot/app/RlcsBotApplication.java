@@ -117,17 +117,21 @@ public class RlcsBotApplication
     {
         for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY))
         {
-            if (!directory.exists())
+            if (directory.exists())
             {
-                boolean success = directory.mkdirs();
-                if (success)
+                if (directory.equals(AUDIO_DIRECTORY) && !LIVE_COMMENTARY_RECORDING_ENABLED)
                 {
-                    System.out.println("Directory created: " + directory.getAbsolutePath());
+                    continue;
                 }
-                else
-                {
-                    System.err.println("Failed to create directory: " + directory.getAbsolutePath());
-                }
+                directory.delete();
+                directory.mkdirs();
+                System.out.println("Directory cleared: " + directory.getAbsolutePath());
+            }
+            else
+            {
+                directory.mkdirs();
+                System.out.println("Directory created: " + directory.getAbsolutePath());
+
             }
         }
     }
