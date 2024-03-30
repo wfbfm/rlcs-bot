@@ -17,7 +17,7 @@ public class RlcsBotApplication
 {
     public static void main(String[] args)
     {
-        initaliseTempDirectories();
+        initialiseTempDirectories();
 
         if (WEBSOCKET_ENABLED)
         {
@@ -113,9 +113,9 @@ public class RlcsBotApplication
         return commentaryRecorderThread;
     }
 
-    private static void initaliseTempDirectories()
+    private static void initialiseTempDirectories()
     {
-        for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY))
+        for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY, LOGO_DIRECTORY))
         {
             if (directory.exists())
             {
