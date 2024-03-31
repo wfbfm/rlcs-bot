@@ -18,7 +18,7 @@ const App: React.FC = () =>
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [seriesEvents, setSeriesEvents] = useState<{ [eventId: string]: SeriesEvent }>({});
   const [series, setSeries] = useState<{ [seriesId: string]: Series }>({});
-  const [currentSeries, setCurrentSeries] = useState<Series | null >(null);
+  const [currentSeries, setCurrentSeries] = useState<Series | null>(null);
   const [messages, setMessages] = useState<(String)[]>([]);
   const [showTwitch, setShowTwitch] = React.useState(false);
 
@@ -83,10 +83,12 @@ const App: React.FC = () =>
 
     return (
       <Box borderRadius='md' overflow={'hidden'} width='100%'>
+        <Center>
         <Button onClick={handleTwitchButton} leftIcon={<Icon as={IoLogoTwitch}></Icon>}
           aria-label={showTwitch ? 'Hide Twitch' : 'Show Twitch'} colorScheme='purple'>
           {showTwitch ? 'Hide Twitch' : 'Show Twitch'}
         </Button>
+        </Center>
         <Collapse in={showTwitch}>
           <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
         </Collapse>
@@ -133,11 +135,14 @@ const App: React.FC = () =>
 
       <Spacer></Spacer>
 
-      <Box width='80%' p={4}>
+      <Box width='80%' overflow='hidden' p={0}>
+        <Box p={0} position='fixed' width='80%' height='10%' zIndex={999} boxShadow='md' bg='gray.100' overflow='hidden'>
+          <Center p={4}>
+            <SeriesHeader series={currentSeries} />
+          </Center>
+        </Box>
 
-        <VStack p={4}>
-          <SeriesHeader series={currentSeries}></SeriesHeader>
-
+        <VStack p={4} marginTop='6%'>
           {collapsableTwitchStream()}
           <Box>
             {Object.values(seriesEvents)
