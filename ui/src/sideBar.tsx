@@ -15,11 +15,13 @@ import {
     Spacer
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
-import logo from './rlcs-high-resolution-logo-transparent.svg'
+import lightLogo from './rlcs-high-resolution-logo-transparent.svg'
+import darkLogo from './rlcs-high-resolution-logo-white-transparent.svg'
 
 export default function SideBar(): JSX.Element {
     const { colorMode, toggleColorMode } = useColorMode();
     const bannerColour = colorMode === 'light' ? 'linear(to-br, gray.100, gray.300)' : 'linear(to-tl, gray.700, gray.800)';
+    const logo = colorMode === 'light' ? lightLogo : darkLogo;
 
     return (
         <>

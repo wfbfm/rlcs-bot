@@ -3,7 +3,7 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
-import { Box, Button, Center, Collapse, Flex, HStack, Heading, Icon, IconButton, Image, Link, Spacer, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Center, Collapse, Flex, HStack, Heading, Icon, IconButton, Image, Link, Spacer, Text, VStack, useColorModeValue } from '@chakra-ui/react';
 import ReactTwitchEmbedVideo from "react-twitch-embed-video"
 import NavBar from './navBar';
 import blueLogo from './Karmine_Corp_lightmode.png';
@@ -98,7 +98,7 @@ const App: React.FC = () =>
 
   return (
     <Flex>
-      <Box bg='gray.100' position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
+      <Box bg={useColorModeValue('gray.100', 'gray.900')} position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
         <SideBar></SideBar>
         <Flex flexDirection={'column'} height='90%'>
           <VStack flex='1'>
@@ -136,7 +136,7 @@ const App: React.FC = () =>
       <Spacer></Spacer>
 
       <Box width='80%' overflow='hidden' p={0}>
-        <Box p={0} position='fixed' width='80%' height='10%' zIndex={999} borderBottom='1px solid gray' bg='gray.100' overflow='hidden'>
+        <Box p={0} position='fixed' width='80%' height='10%' zIndex={999} borderBottom='1px solid gray' bg={useColorModeValue('gray.100', 'gray.900')} overflow='hidden'>
           <Center p={4}>
             <SeriesHeader series={currentSeries} />
           </Center>
