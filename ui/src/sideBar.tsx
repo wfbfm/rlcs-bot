@@ -10,7 +10,9 @@ import {
     useColorMode,
     Image,
     Icon,
-    HStack
+    HStack,
+    Center,
+    Spacer
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import logo from './rlcs-high-resolution-logo-transparent.svg'
@@ -21,10 +23,10 @@ export default function SideBar(): JSX.Element {
 
     return (
         <>
-            <Box px={10} borderBottom='1px solid gray'>
+            <Center height='10%' px={10} borderBottom='1px solid gray'>
                 <Flex h={14} alignItems='center' justifyContent='space-between'>
                     <Image src={logo} boxSize={16}></Image>
-                    <Flex alignItems='center'>
+                    <Flex px={'5%'} alignItems='center'>
                         <Stack direction='row' spacing={7}>
                             <Button onClick={toggleColorMode} bg={useColorModeValue('grey.500', 'grey.900')}>
                                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
@@ -32,7 +34,7 @@ export default function SideBar(): JSX.Element {
                         </Stack>
                     </Flex>
                 </Flex>
-            </Box>
+            </Center>
         </>
     );
 }

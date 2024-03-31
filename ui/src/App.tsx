@@ -136,7 +136,7 @@ const App: React.FC = () =>
       <Spacer></Spacer>
 
       <Box width='80%' overflow='hidden' p={0}>
-        <Box p={0} position='fixed' width='80%' height='10%' zIndex={999} boxShadow='md' bg='gray.100' overflow='hidden'>
+        <Box p={0} position='fixed' width='80%' height='10%' zIndex={999} borderBottom='1px solid gray' bg='gray.100' overflow='hidden'>
           <Center p={4}>
             <SeriesHeader series={currentSeries} />
           </Center>
