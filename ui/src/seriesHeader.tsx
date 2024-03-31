@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Badge, Box, Center, Divider, HStack, Icon, Stack, Text, VStack, useColorModeValue } from '@chakra-ui/react';
+import { Badge, Box, Center, Divider, HStack, Image, Icon, Stack, Text, VStack, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import Series from './model/series';
 import { MinusIcon, TimeIcon } from '@chakra-ui/icons';
+import lightModeBlueLogo from './logos/Karmine Corp_lightmode.png'
+import darkModeBlueLogo from './logos/Karmine Corp_darkmode.png'
+import lightModeOrangeLogo from './logos/Team Falcons_default.png'
+import darkModeOrangeLogo from './logos/Team Falcons_darkmode.png'
 
 const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, colour: string, filledFirst: boolean) =>
 {
@@ -22,9 +26,67 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
     return icons;
 };
 
+const fileExists = async (filePath: string) =>
+{
+    try
+    {
+        const response = await fetch(filePath);
+        if (response.ok)
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    } catch (error)
+    {
+        return false;
+    }
+};
+
+const getLogoPath = async (teamName: string | undefined, isLightMode: boolean): Promise<string | undefined> =>
+{
+    if (!teamName)
+    {
+        return undefined;
+    }
+    const modeSuffix = isLightMode ? '_lightmode' : '_darkmode';
+    const modeSpecificFilePath = `/logos/${teamName}${modeSuffix}.png`;
+    const defaultFilePath = `/logos/${teamName}_default.png`;
+    if (await fileExists(modeSpecificFilePath))
+    {
+        console.log("file exists: ", modeSpecificFilePath)
+        return modeSpecificFilePath;
+    }
+    else if (await fileExists(defaultFilePath))
+    {
+        console.log("file exists: ", defaultFilePath)
+        return defaultFilePath;
+    }
+    return undefined;
+};
+
 export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
 {
     const backgroundColour = useColorModeValue('gray.100', 'gray.900');
+    const { colorMode, toggleColorMode } = useColorMode();
+    const isLightMode = colorMode === 'light';
+
+    const [blueLogoPath, setBlueLogoPath] = useState<string | undefined>(undefined);
+    const [orangeLogoPath, setOrangeLogoPath] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        if (series) {
+            getLogoPath(series._source.blueTeam.teamName, isLightMode)
+                .then(path => setBlueLogoPath(path))
+                .catch(error => console.error('Error fetching blue logo:', error));
+
+            getLogoPath(series._source.orangeTeam.teamName, isLightMode)
+                .then(path => setOrangeLogoPath(path))
+                .catch(error => console.error('Error fetching orange logo:', error));
+        }
+    }, [series, isLightMode]);
+
     if (series != null)
     {
         return (
@@ -33,6 +95,7 @@ export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
                 <Box>
                     <Center bg={backgroundColour} p={2}>
                         <HStack>
+                            {blueLogoPath ? <Image src={blueLogoPath} boxSize={10}></Image> : null}
                             <VStack spacing={0}>
                                 <Text as='b' fontSize='sm'>{series._source.blueTeam.teamName}</Text>
                                 <HStack>
@@ -65,6 +128,7 @@ export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
                                     {seriesScoreIcons(series._source.seriesWinningGameScore, series._source.seriesScore.orangeScore, 'orange.400', true)}
                                 </HStack>
                             </VStack>
+                            {orangeLogoPath ? <Image src={orangeLogoPath} boxSize={10}></Image> : null}
                         </HStack>
                     </Center>
                 </Box>
