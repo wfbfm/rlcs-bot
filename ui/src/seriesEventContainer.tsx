@@ -46,9 +46,9 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
     const commentaryColour = useColorModeValue('gray.100', 'gray.600')
 
     return (
-        <Box maxW='500px' borderWidth='1px' borderRadius='lg' overflow='hidden'>
-            <Box>
-                <Center bg={headerColour} p={2}>
+        <Center width='100%' borderWidth='1px' borderRadius='lg' overflow='hidden'>
+            <Box width='100%'>
+                <Center width='100%' bg={headerColour} p={2}>
                     <HStack>
                         <Center minW='20px'>
                         {evaluationResult === 'BLUE_GOAL' && <Icon boxSize={6} as={IoFootball} color={'blue.500'}></Icon>}
@@ -98,6 +98,6 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
                     </Text>
                 </Box>
             </Box>
-        </Box>
+        </Center>
     );
 };

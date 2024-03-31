@@ -84,10 +84,10 @@ const App: React.FC = () =>
     return (
       <Box borderRadius='md' overflow={'hidden'} width='100%'>
         <Center>
-        <Button onClick={handleTwitchButton} leftIcon={<Icon as={IoLogoTwitch}></Icon>}
-          aria-label={showTwitch ? 'Hide Twitch' : 'Show Twitch'} colorScheme='purple'>
-          {showTwitch ? 'Hide Twitch' : 'Show Twitch'}
-        </Button>
+          <Button onClick={handleTwitchButton} leftIcon={<Icon as={IoLogoTwitch}></Icon>}
+            aria-label={showTwitch ? 'Hide Twitch' : 'Show Twitch'} colorScheme='purple'>
+            {showTwitch ? 'Hide Twitch' : 'Show Twitch'}
+          </Button>
         </Center>
         <Collapse in={showTwitch}>
           <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
@@ -142,29 +142,32 @@ const App: React.FC = () =>
           </Center>
         </Box>
 
+
         <VStack p={4} marginTop='6%'>
           {collapsableTwitchStream()}
           <Box>
-            {Object.values(seriesEvents)
-              .sort((a, b) =>
-              {
-                const regex = /Event(\d+)-/;
-                const seriesIdA = getLastNumberFromSeriesId(a._source.seriesId);
-                const seriesIdB = getLastNumberFromSeriesId(b._source.seriesId);
-                // Compare series IDs first
-                if (seriesIdA !== seriesIdB)
+            <VStack>
+              {Object.values(seriesEvents)
+                .sort((a, b) =>
                 {
-                  return seriesIdB - seriesIdA; // Sort by decreasing series ID
-                }
-                const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
-                const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
-                return eventIdB - eventIdA;
-              })
-              .map((seriesEvent, index) => (
-                <Box key={index} p={4}>
-                  <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
-                </Box>
-              ))}
+                  const regex = /Event(\d+)-/;
+                  const seriesIdA = getLastNumberFromSeriesId(a._source.seriesId);
+                  const seriesIdB = getLastNumberFromSeriesId(b._source.seriesId);
+                  // Compare series IDs first
+                  if (seriesIdA !== seriesIdB)
+                  {
+                    return seriesIdB - seriesIdA; // Sort by decreasing series ID
+                  }
+                  const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
+                  const eventIdB = parseInt((b._source.eventId.match(regex) || [])[1], 10);
+                  return eventIdB - eventIdA;
+                })
+                .map((seriesEvent, index) => (
+                  <Box key={index} p={4} width='60%'>
+                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
+                  </Box>
+                ))}
+            </VStack>
           </Box>
         </VStack>
       </Box>
