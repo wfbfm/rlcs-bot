@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SeriesEvent from './model/seriesEvent';
-import { Badge, Box, Center, Divider, HStack, Icon, Stack, Text, VStack } from '@chakra-ui/react';
+import { Badge, Box, Center, Divider, HStack, Icon, Stack, Text, VStack, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import Series from './model/series';
 import { MinusIcon, TimeIcon } from '@chakra-ui/icons';
 import { MdOutlineSportsScore } from "react-icons/md";
@@ -24,30 +24,31 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
     return icons;
 };
 
-function getBackgroundColour(evaluationResult: string): string {
+function getBackgroundColour(evaluationResult: string, colourMode: string): string {
     if (evaluationResult === 'BLUE_GOAL') {
-        return 'blue.100';
+        return colourMode === 'light' ? 'blue.100' : 'blue.900';
     }
     if (evaluationResult === 'BLUE_GAME') {
-        return 'blue.200';
+        return colourMode === 'light' ? 'blue.200' : 'blue.800';
     }
     if (evaluationResult === 'ORANGE_GOAL') {
-        return 'orange.100';
+        return colourMode === 'light' ? 'orange.100' : 'orange.600';
     }
     if (evaluationResult === 'ORANGE_GAME') {
-        return 'orange.200';
+        return colourMode === 'light' ? 'orange.200' : 'orange.600';
     }
-    return 'gray.200';
+    return colourMode === 'light' ? 'gray.200' : 'gray.800';
 }
 
 export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: Series }> = ({ seriesEvent, series }) => {
     const evaluationResult:string = seriesEvent._source.evaluation;
-    const backgroundColour = getBackgroundColour(evaluationResult);
+    const headerColour = useColorModeValue('gray.200', 'gray.800')
+    const commentaryColour = useColorModeValue('gray.100', 'gray.600')
 
     return (
         <Box maxW='500px' borderWidth='1px' borderRadius='lg' overflow='hidden'>
             <Box>
-                <Center bg={backgroundColour} p={2}>
+                <Center bg={headerColour} p={2}>
                     <HStack>
                         <Center minW='20px'>
                         {evaluationResult === 'BLUE_GOAL' && <Icon boxSize={6} as={IoFootball} color={'blue.500'}></Icon>}
@@ -91,7 +92,7 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
                         </Center>
                     </HStack>
                 </Center>
-                <Box bg='gray.100' p={4}>
+                <Box bg={commentaryColour} p={4}>
                     <Text fontSize='sm'>
                         {seriesEvent._source.commentary}
                     </Text>
