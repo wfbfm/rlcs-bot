@@ -3,20 +3,24 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
-import { Box, Center, Flex, HStack, Heading, Image, Link, Spacer, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Center, Collapse, Flex, HStack, Heading, Icon, IconButton, Image, Link, Spacer, Text, VStack } from '@chakra-ui/react';
 import ReactTwitchEmbedVideo from "react-twitch-embed-video"
 import NavBar from './navBar';
 import blueLogo from './Karmine_Corp_lightmode.png';
 import orangeLogo from './Team_Vitality_2023_lightmode.png';
 import { SeriesContainer } from './seriesContainer';
+import { IoLogoTwitch } from "react-icons/io";
 import SideBar from './sideBar';
+import { SeriesHeader } from './seriesHeader';
 
 const App: React.FC = () =>
 {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [seriesEvents, setSeriesEvents] = useState<{ [eventId: string]: SeriesEvent }>({});
   const [series, setSeries] = useState<{ [seriesId: string]: Series }>({});
+  const [currentSeries, setCurrentSeries] = useState<Series | null >(null);
   const [messages, setMessages] = useState<(String)[]>([]);
+  const [showTwitch, setShowTwitch] = React.useState(false);
 
   useEffect(() =>
   {
@@ -53,6 +57,7 @@ const App: React.FC = () =>
         {
           const updatedSeries = { ...prevSeries };
           updatedSeries[socketData._source.seriesId] = socketData;
+          setCurrentSeries(socketData);
           return updatedSeries;
         });
       }
@@ -70,6 +75,23 @@ const App: React.FC = () =>
     const parts = seriesId.split('-');
     const lastPart = parts[parts.length - 1];
     return parseInt(lastPart, 10);
+  }
+
+  function collapsableTwitchStream()
+  {
+    const handleTwitchButton = () => setShowTwitch(!showTwitch);
+
+    return (
+      <Box borderRadius='md' overflow={'hidden'} width='100%'>
+        <Button onClick={handleTwitchButton} leftIcon={<Icon as={IoLogoTwitch}></Icon>}
+          aria-label={showTwitch ? 'Hide Twitch' : 'Show Twitch'} colorScheme='purple'>
+          {showTwitch ? 'Hide Twitch' : 'Show Twitch'}
+        </Button>
+        <Collapse in={showTwitch}>
+          <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
+        </Collapse>
+      </Box>
+    );
   }
 
   return (
@@ -114,9 +136,9 @@ const App: React.FC = () =>
       <Box width='80%' p={4}>
 
         <VStack p={4}>
-          <Box borderRadius='md' overflow={'hidden'} width='100%'>
-            <ReactTwitchEmbedVideo height='300px' width='100%' channel='rocketleague' layout='video' autoplay={false}></ReactTwitchEmbedVideo>
-          </Box>
+          <SeriesHeader series={currentSeries}></SeriesHeader>
+
+          {collapsableTwitchStream()}
           <Box>
             {Object.values(seriesEvents)
               .sort((a, b) =>
