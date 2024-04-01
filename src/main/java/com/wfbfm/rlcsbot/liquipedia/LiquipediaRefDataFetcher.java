@@ -187,21 +187,37 @@ public class LiquipediaRefDataFetcher
 
             final Element logoTable = teamCardInner.getElementsByAttributeValue(CLASS, LOGO_TABLE).get(0);
 
-            final Elements imgElements = logoTable.select("img");
-            for (final Element img : imgElements)
+            final Elements imageElements = logoTable.select("img");
+            if (!downloadLogo(imageElements, teamName, "lightmode", "lightmode.png"))
             {
-                final String imageUrl = img.attr("src");
+                downloadLogo(imageElements, teamName, "allmode", "lightmode.png");
+            }
+            if (!downloadLogo(imageElements, teamName, "darkmode", "darkmode.png"))
+            {
+                downloadLogo(imageElements, teamName, "allmode", "darkmode.png");
+            }
+        }
+    }
+
+    private boolean downloadLogo(final Elements images, final String teamName, final String logoType, final String fileSuffix)
+    {
+        for (final Element image : images)
+        {
+            final String imageUrl = image.attr("src");
+            if (imageUrl.contains(logoType))
+            {
                 try
                 {
-                    downloadImage(LIQUIPEDIA_BASE_URL + imageUrl, teamName);
+                    downloadImage(LIQUIPEDIA_BASE_URL + imageUrl, teamName + "_" + fileSuffix);
+                    return true;
                 } catch (IOException e)
                 {
                     logger.log(Level.INFO, "Unable to download team logo for " + teamName, e);
+                    return false;
                 }
             }
-
-            // download logos
         }
+        return false;
     }
 
     private static Document getDocumentFromLiquipediaUrl(String url)
@@ -219,25 +235,12 @@ public class LiquipediaRefDataFetcher
         }
     }
 
-    private static void downloadImage(final String imageUrl, final String teamName) throws IOException
+    private static void downloadImage(final String imageUrl, final String outputName) throws IOException
     {
         final URL url = new URL(imageUrl);
         final InputStream in = url.openStream();
 
-        final String fileName;
-        if (imageUrl.contains("lightmode"))
-        {
-            fileName = teamName + "_lightmode.png";
-        }
-        else if (imageUrl.contains("darkmode"))
-        {
-            fileName = teamName + "_darkmode.png";
-        }
-        else
-        {
-            fileName = teamName + "_default.png";
-        }
-        final FileOutputStream out = new FileOutputStream(LOGO_DIRECTORY + File.separator + fileName);
+        final FileOutputStream out = new FileOutputStream(LOGO_DIRECTORY + File.separator + outputName);
 
         // Copy the image from the input stream to the output stream
         final byte[] buffer = new byte[1024];

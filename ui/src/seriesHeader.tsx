@@ -26,44 +26,14 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
     return icons;
 };
 
-const fileExists = async (filePath: string) =>
-{
-    try
-    {
-        const response = await fetch(filePath);
-        if (response.ok)
-        {
-            return true;
-        } else
-        {
-            return false;
-        }
-    } catch (error)
-    {
-        return false;
-    }
-};
-
-const getLogoPath = async (teamName: string | undefined, isLightMode: boolean): Promise<string | undefined> =>
+const getLogoPath = (teamName: string | undefined, isLightMode: boolean): string | undefined =>
 {
     if (!teamName)
     {
         return undefined;
     }
     const modeSuffix = isLightMode ? '_lightmode' : '_darkmode';
-    const modeSpecificFilePath = `/logos/${teamName}${modeSuffix}.png`;
-    const defaultFilePath = `/logos/${teamName}_default.png`;
-    if (await fileExists(modeSpecificFilePath))
-    {
-        console.log("file exists: ", modeSpecificFilePath)
-        return modeSpecificFilePath;
-    }
-    else if (await fileExists(defaultFilePath))
-    {
-        console.log("file exists: ", defaultFilePath)
-        return defaultFilePath;
-    }
-    return undefined;
+    return `/logos/${teamName}${modeSuffix}.png`
 };
 
 export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
@@ -71,21 +41,8 @@ export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
     const backgroundColour = useColorModeValue('gray.100', 'gray.900');
     const { colorMode, toggleColorMode } = useColorMode();
     const isLightMode = colorMode === 'light';
-
-    const [blueLogoPath, setBlueLogoPath] = useState<string | undefined>(undefined);
-    const [orangeLogoPath, setOrangeLogoPath] = useState<string | undefined>(undefined);
-
-    useEffect(() => {
-        if (series) {
-            getLogoPath(series._source.blueTeam.teamName, isLightMode)
-                .then(path => setBlueLogoPath(path))
-                .catch(error => console.error('Error fetching blue logo:', error));
-
-            getLogoPath(series._source.orangeTeam.teamName, isLightMode)
-                .then(path => setOrangeLogoPath(path))
-                .catch(error => console.error('Error fetching orange logo:', error));
-        }
-    }, [series, isLightMode]);
+    const blueLogoPath = getLogoPath(series?._source.blueTeam.teamName, isLightMode);
+    const orangeLogoPath = getLogoPath(series?._source.orangeTeam.teamName, isLightMode);
 
     if (series != null)
     {
