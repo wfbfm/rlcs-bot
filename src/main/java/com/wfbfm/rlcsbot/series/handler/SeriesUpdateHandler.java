@@ -112,26 +112,39 @@ public class SeriesUpdateHandler
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)
     {
         senseCheckSeriesScore(snapshot);
-        currentSeries.getCurrentGame().setClock(snapshot.getCurrentGame().getClock());
+        updateClockTime(snapshot);
 
         final Score snapshotGameScore = snapshot.getCurrentGame().getScore();
         final Score existingGameScore = currentSeries.getCurrentGame().getScore();
 
         // TODO - recovery logic here, in case we miss a goal
-        final boolean hasBlueScoreChanged = snapshotGameScore.getBlueScore() > existingGameScore.getBlueScore();
-        final boolean hasOrangeScoreChanged = snapshotGameScore.getOrangeScore() > existingGameScore.getOrangeScore();
-        if (hasBlueScoreChanged)
+        // only allows single goal upticks - i.e. assumes any goal always captured within the sampling timeframe
+        if (snapshotGameScore.getBlueScore() - existingGameScore.getBlueScore() == 1)
         {
             existingGameScore.setBlueScore(snapshotGameScore.getBlueScore());
             return SeriesSnapshotEvaluation.BLUE_GOAL;
         }
-        if (hasOrangeScoreChanged)
+        if (snapshotGameScore.getOrangeScore() - existingGameScore.getOrangeScore() == 1)
         {
             existingGameScore.setOrangeScore(snapshotGameScore.getOrangeScore());
             return SeriesSnapshotEvaluation.ORANGE_GOAL;
         }
 
         return SeriesSnapshotEvaluation.SCORE_UNCHANGED;
+    }
+
+    private void updateClockTime(final SeriesSnapshot snapshot)
+    {
+        // The image parsing cannot be trusted to give an accurate time.  Sometimes, the model gives a time in the past
+        final Clock currentClock = currentSeries.getCurrentGame().getClock();
+        if (currentClock.getElapsedSeconds() > snapshot.getCurrentGame().getClock().getElapsedSeconds())
+        {
+            final int approxElapsedSeconds = currentClock.getElapsedSeconds() + (SCREENSHOT_INTERVAL_MS / 1_000);
+            final Clock newClock = new Clock(approxElapsedSeconds, currentClock.isOvertime());
+            currentSeries.getCurrentGame().setClock(newClock);
+            return;
+        }
+        currentSeries.getCurrentGame().setClock(snapshot.getCurrentGame().getClock());
     }
 
     private void senseCheckSeriesScore(final SeriesSnapshot snapshot)

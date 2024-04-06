@@ -1,5 +1,7 @@
 package com.wfbfm.rlcsbot.series;
 
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.GAME_TIME_SECONDS;
+
 public class Clock
 {
     private String displayedTime;
@@ -17,6 +19,13 @@ public class Clock
     public Clock(final String displayedTime, final int elapsedSeconds, final boolean isOvertime)
     {
         this.displayedTime = displayedTime;
+        this.elapsedSeconds = elapsedSeconds;
+        this.isOvertime = isOvertime;
+    }
+
+    public Clock(final int elapsedSeconds, final boolean isOvertime)
+    {
+        this.displayedTime = calculateDisplayedTime(elapsedSeconds, isOvertime);
         this.elapsedSeconds = elapsedSeconds;
         this.isOvertime = isOvertime;
     }
@@ -49,5 +58,30 @@ public class Clock
     public void setOvertime(final boolean overtime)
     {
         isOvertime = overtime;
+    }
+
+    private String calculateDisplayedTime(final int elapsedSeconds, final boolean isOvertime)
+    {
+        if (isOvertime)
+        {
+            final int gameTime = elapsedSeconds - GAME_TIME_SECONDS;
+            final int minutes = gameTime / 60;
+            final int seconds = gameTime % 60;
+            return "+" + String.valueOf(minutes) + ":" + String.format("%02d", seconds);
+        }
+        else
+        {
+            if (elapsedSeconds >= GAME_TIME_SECONDS)
+            {
+                return "0:00";
+            }
+            else
+            {
+                final int gameTime = GAME_TIME_SECONDS - elapsedSeconds;
+                final int minutes = gameTime / 60;
+                final int seconds = gameTime % 60;
+                return String.valueOf(minutes) + ":" + String.format("%02d", seconds);
+            }
+        }
     }
 }

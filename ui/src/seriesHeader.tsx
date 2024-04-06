@@ -26,6 +26,32 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
     return icons;
 };
 
+const gameScoreDisplay = (series: Series) =>
+{
+    if (series._source.currentGame.score != null)
+    {
+        return (
+            <HStack>
+                <Box p={1.5} bg='blue.500' borderRadius='lg'>
+                    <Text as='b' fontSize='m' color={'white'}>
+                        {series._source.currentGame.score.blueScore}
+                    </Text>
+                </Box>
+                <VStack p={2} spacing={0}>
+                    <TimeIcon boxSize={3.5} m={0}></TimeIcon>
+                    <Text as='b' fontSize='sm' m={0}>{series._source.currentGame.clock.displayedTime}</Text>
+                </VStack>
+                <Box p={1.5} bg='orange.400' borderRadius='lg'>
+                    <Text as='b' fontSize='m' color={'white'}>
+                        {series._source.currentGame.score.orangeScore}
+                    </Text>
+                </Box>
+            </HStack>
+        )
+    }
+    return (<></>);
+}
+
 const getLogoPath = (teamName: string | undefined, isLightMode: boolean): string | undefined =>
 {
     if (!teamName)
@@ -59,26 +85,7 @@ export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
                                     {seriesScoreIcons(series._source.seriesWinningGameScore, series._source.seriesScore.blueScore, 'blue.500', false)}
                                 </HStack>
                             </VStack>
-                            <VStack>
-                                <HStack>
-                                    <Box p={1.5} bg='blue.500' borderRadius='lg'>
-                                        <Text as='b' fontSize='m' color={'white'}>
-                                            {series._source.currentGame.score.blueScore}
-                                        </Text>
-                                    </Box>
-                                    <VStack p={2} spacing={0}>
-                                        <TimeIcon boxSize={3.5} m={0}></TimeIcon>
-                                        <Text as='b' fontSize='sm' m={0}>{series._source.currentGame.clock.displayedTime}</Text>
-                                    </VStack>
-                                    <Box p={1.5} bg='orange.400' borderRadius='lg'>
-                                        <Text as='b' fontSize='m' color={'white'}>
-                                            {series._source.currentGame.score.orangeScore}
-                                        </Text>
-                                    </Box>
-                                </HStack>
-                                <HStack>
-                                </HStack>
-                            </VStack>
+                            {gameScoreDisplay(series)}
                             <VStack spacing={0}>
                                 <Text as='b' fontSize='sm'>{series._source.orangeTeam.teamName}</Text>
                                 <HStack>
