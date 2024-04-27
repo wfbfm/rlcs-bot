@@ -19,12 +19,6 @@ public class RlcsBotApplication
     {
         initialiseTempDirectories();
 
-        if (WEBSOCKET_ENABLED)
-        {
-            final ElasticSeriesWebSocketServer webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT);
-            webSocketServer.start();
-        }
-
         final ExecutorService executorService = Executors.newFixedThreadPool(getTotalNumberOfThreads());
 
         if (BROADCAST_ENABLED)
@@ -48,6 +42,12 @@ public class RlcsBotApplication
 
         final GameScreenshotProcessor snapshotParser = initialiseSnapshotParser();
         executorService.submit(snapshotParser::run);
+
+        if (WEBSOCKET_ENABLED)
+        {
+            final ElasticSeriesWebSocketServer webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT);
+            webSocketServer.start();
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
     }

@@ -2,10 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Badge, Box, Center, Divider, HStack, Image, Icon, Stack, Text, VStack, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import Series from './model/series';
 import { MinusIcon, TimeIcon } from '@chakra-ui/icons';
-import lightModeBlueLogo from './logos/Karmine Corp_lightmode.png'
-import darkModeBlueLogo from './logos/Karmine Corp_darkmode.png'
-import lightModeOrangeLogo from './logos/Team Falcons_default.png'
-import darkModeOrangeLogo from './logos/Team Falcons_darkmode.png'
 
 const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, colour: string, filledFirst: boolean) =>
 {
@@ -52,23 +48,25 @@ const gameScoreDisplay = (series: Series) =>
     return (<></>);
 }
 
-const getLogoPath = (teamName: string | undefined, isLightMode: boolean): string | undefined =>
+const getLogoName = (teamName: string | undefined, isLightMode: boolean): string | undefined =>
 {
     if (!teamName)
     {
         return undefined;
     }
     const modeSuffix = isLightMode ? '_lightmode' : '_darkmode';
-    return `/logos/${teamName}${modeSuffix}.png`
+    return `${teamName}${modeSuffix}.png`
 };
 
-export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
+export const SeriesHeader: React.FC<{ series: Series | null, logos: { [logoName: string]: string } }> = ({ series, logos }) =>
 {
     const backgroundColour = useColorModeValue('gray.100', 'gray.900');
     const { colorMode, toggleColorMode } = useColorMode();
     const isLightMode = colorMode === 'light';
-    const blueLogoPath = getLogoPath(series?._source.blueTeam.teamName, isLightMode);
-    const orangeLogoPath = getLogoPath(series?._source.orangeTeam.teamName, isLightMode);
+    const blueLogoName = getLogoName(series?._source.blueTeam.teamName, isLightMode);
+    const orangeLogoName = getLogoName(series?._source.orangeTeam.teamName, isLightMode);
+    const blueLogo = blueLogoName ? logos[blueLogoName] : undefined;
+    const orangeLogo = orangeLogoName ? logos[orangeLogoName] : undefined;
 
     if (series != null)
     {
@@ -78,7 +76,7 @@ export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
                 <Box>
                     <Center bg={backgroundColour} p={2}>
                         <HStack>
-                            {blueLogoPath ? <Image src={blueLogoPath} boxSize={10}></Image> : null}
+                            {blueLogo ? <Image src={`${blueLogo}`} boxSize={10}></Image> : null}
                             <VStack spacing={0}>
                                 <Text as='b' fontSize='sm'>{series._source.blueTeam.teamName}</Text>
                                 <HStack>
@@ -92,7 +90,7 @@ export const SeriesHeader: React.FC<{ series: Series | null }> = ({ series }) =>
                                     {seriesScoreIcons(series._source.seriesWinningGameScore, series._source.seriesScore.orangeScore, 'orange.400', true)}
                                 </HStack>
                             </VStack>
-                            {orangeLogoPath ? <Image src={orangeLogoPath} boxSize={10}></Image> : null}
+                            {orangeLogo ? <Image src={`${orangeLogo}`} boxSize={10}></Image> : null}
                         </HStack>
                     </Center>
                 </Box>

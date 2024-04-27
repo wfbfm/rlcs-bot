@@ -20,6 +20,7 @@ const App: React.FC = () =>
   const [series, setSeries] = useState<{ [seriesId: string]: Series }>({});
   const [currentSeries, setCurrentSeries] = useState<Series | null>(null);
   const [messages, setMessages] = useState<(String)[]>([]);
+  const [logos, setLogos] = useState<{ [logoName: string]: string }>({});
   const [showTwitch, setShowTwitch] = React.useState(false);
 
   useEffect(() =>
@@ -43,21 +44,35 @@ const App: React.FC = () =>
     socket.onmessage = (event) =>
     {
       const socketData = JSON.parse(event.data);
-      if (socketData._index === 'seriesevent')
+
+      if (socketData.payloadType === 'image')
+      {
+        setLogos((prevLogos) =>
+        {
+          const updatedLogos = { ...prevLogos };
+          updatedLogos[socketData.imageName] = socketData.base64Image;
+          return updatedLogos;
+        });
+        return;
+      }
+
+      const rlcsData = socketData.payload;
+
+      if (rlcsData._index === 'seriesevent')
       {
         setSeriesEvents((prevSeriesEvents) =>
         {
           const updatedSeriesEvents = { ...prevSeriesEvents };
-          updatedSeriesEvents[socketData._source.eventId] = socketData;
+          updatedSeriesEvents[rlcsData._source.eventId] = rlcsData;
           return updatedSeriesEvents;
         });
-      } else if (socketData._index === 'series')
+      } else if (rlcsData._index === 'series')
       {
         setSeries((prevSeries) =>
         {
           const updatedSeries = { ...prevSeries };
-          updatedSeries[socketData._source.seriesId] = socketData;
-          setCurrentSeries(socketData);
+          updatedSeries[rlcsData._source.seriesId] = rlcsData;
+          setCurrentSeries(rlcsData);
           return updatedSeries;
         });
       }
@@ -138,7 +153,7 @@ const App: React.FC = () =>
       <Box width='80%' overflow='hidden' p={0}>
         <Box p={0} position='fixed' width='80%' height='10%' zIndex={999} borderBottom='1px solid gray' bg={useColorModeValue('gray.100', 'gray.900')} overflow='hidden'>
           <Center p={4}>
-            <SeriesHeader series={currentSeries} />
+            <SeriesHeader series={currentSeries} logos={logos} />
           </Center>
         </Box>
 
