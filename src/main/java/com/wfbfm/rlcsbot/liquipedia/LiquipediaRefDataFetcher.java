@@ -6,7 +6,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,13 +18,17 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LiquipediaTeamGetter
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.LOGO_DIRECTORY;
+
+public class LiquipediaRefDataFetcher
 {
+    private static final String LIQUIPEDIA_BASE_URL = "https://liquipedia.net";
     private static final String CLASS = "class";
     private static final String TEAMCARD_COLUMN = "teamcard-column";
     private static final String CENTER = "center";
     private static final String TEAMCARD_INNER = "teamcard-inner";
-    private final Logger logger = Logger.getLogger(LiquipediaTeamGetter.class.getName());
+    private static final String LOGO_TABLE = "wikitable wikitable-bordered logo";
+    private final Logger logger = Logger.getLogger(LiquipediaRefDataFetcher.class.getName());
     private Map<String, Map<String, String>> teamToPlayerAndCoachMap = new HashMap<>();
     private Map<String, Set<String>> teamToPlayerNameMap = new HashMap<>();
     private Map<String, String> playerToTeamNameMap = new HashMap<>();
@@ -29,7 +37,7 @@ public class LiquipediaTeamGetter
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
     private String liquipediaUrl;
 
-    public LiquipediaTeamGetter()
+    public LiquipediaRefDataFetcher()
     {
         this.liquipediaUrl = null;
         initialiseDisplayNameCache();
@@ -43,6 +51,7 @@ public class LiquipediaTeamGetter
         this.uppercaseDisplayToLiquipediaName.put("RADOSINHO", "Radosin");
 
         this.uppercaseDisplayToLiquipediaName.put("GENG MOBIL1", "Gen.G Mobil1 Racing");
+        this.uppercaseDisplayToLiquipediaName.put("M8 ALPINE", "Gentle Mates Alpine");
         this.uppercaseDisplayToLiquipediaName.put("COMPLEXITY", "Complexity Gaming");
     }
 
@@ -103,14 +112,14 @@ public class LiquipediaTeamGetter
         }
         else
         {
-            parseTeamToPlayerMap(teamCards.get(0));
+            parseTeamCardData(teamCards.get(0));
             logger.log(Level.INFO, "Fetched " + uppercasePlayerNameMap.size() + " players from Liquipedia.");
             logger.log(Level.INFO, "Fetched " + uppercaseTeamNameMap.size() + " teams from Liquipedia.");
             return true;
         }
     }
 
-    private void parseTeamToPlayerMap(Element teamCard)
+    private void parseTeamCardData(final Element teamCard)
     {
         teamToPlayerAndCoachMap.clear();
 
@@ -175,7 +184,40 @@ public class LiquipediaTeamGetter
             {
                 playerToTeamNameMap.put(player, teamName);
             }
+
+            final Element logoTable = teamCardInner.getElementsByAttributeValue(CLASS, LOGO_TABLE).get(0);
+
+            final Elements imageElements = logoTable.select("img");
+            if (!downloadLogo(imageElements, teamName, "lightmode", "lightmode.png"))
+            {
+                downloadLogo(imageElements, teamName, "allmode", "lightmode.png");
+            }
+            if (!downloadLogo(imageElements, teamName, "darkmode", "darkmode.png"))
+            {
+                downloadLogo(imageElements, teamName, "allmode", "darkmode.png");
+            }
         }
+    }
+
+    private boolean downloadLogo(final Elements images, final String teamName, final String logoType, final String fileSuffix)
+    {
+        for (final Element image : images)
+        {
+            final String imageUrl = image.attr("src");
+            if (imageUrl.contains(logoType))
+            {
+                try
+                {
+                    downloadImage(LIQUIPEDIA_BASE_URL + imageUrl, teamName + "_" + fileSuffix);
+                    return true;
+                } catch (IOException e)
+                {
+                    logger.log(Level.INFO, "Unable to download team logo for " + teamName, e);
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     private static Document getDocumentFromLiquipediaUrl(String url)
@@ -191,5 +233,25 @@ public class LiquipediaTeamGetter
         {
             return null;
         }
+    }
+
+    private static void downloadImage(final String imageUrl, final String outputName) throws IOException
+    {
+        final URL url = new URL(imageUrl);
+        final InputStream in = url.openStream();
+
+        final FileOutputStream out = new FileOutputStream(LOGO_DIRECTORY + File.separator + outputName);
+
+        // Copy the image from the input stream to the output stream
+        final byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = in.read(buffer)) != -1)
+        {
+            out.write(buffer, 0, bytesRead);
+        }
+
+        // Close streams
+        out.close();
+        in.close();
     }
 }

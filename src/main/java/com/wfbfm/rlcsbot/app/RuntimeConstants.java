@@ -9,10 +9,10 @@ public class RuntimeConstants
 {
     public final static boolean BROADCAST_ENABLED = true;
     public final static boolean TRANSCRIPTION_ENABLED = true;
-    public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = true;
+    public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = false;
     public final static boolean WEBSOCKET_ENABLED = true;
     public final static boolean ELASTIC_ENABLED = true;
-    public static final String BROADCAST_URL = "https://www.twitch.tv/rocketleague/";
+    public static final String BROADCAST_URL = "https://www.twitch.tv/videos/2104780126?t=00h49m08s";
     public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1";
     public static boolean DEBUGGING_ENABLED = true;
     public static boolean RETAIN_PROCESSING_FILES = false;
@@ -25,6 +25,7 @@ public class RuntimeConstants
     public static final File PROCESSING_DIRECTORY = new File("src/main/temp/processing/");
     public static final File COMPLETE_DIRECTORY = new File("src/main/temp/complete/");
     public static final File AUDIO_DIRECTORY = new File("src/main/temp/audio/");
+    public static final File LOGO_DIRECTORY = new File("src/main/temp/logos/");
     public static final int INCOMING_POLLING_SLEEP_TIME_MS = 200;
     public static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
     public static final String PYTHON_VENV_PATH = "venv" + File.separator + "Scripts" + File.separator + "python.exe";

@@ -1,6 +1,6 @@
 package com.wfbfm.rlcsbot.series.handler;
 
-import com.wfbfm.rlcsbot.liquipedia.LiquipediaTeamGetter;
+import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
 import com.wfbfm.rlcsbot.screenshotparser.GameScreenshotProcessorUtils;
 import com.wfbfm.rlcsbot.series.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ public class SeriesUpdateHandlerTest
     private Team teamBds;
 
     @Mock
-    private LiquipediaTeamGetter liquipediaTeamGetter;
+    private LiquipediaRefDataFetcher liquipediaRefDataFetcher;
 
     private SeriesUpdateHandler seriesUpdateHandler;
 
@@ -70,13 +70,13 @@ public class SeriesUpdateHandlerTest
         uppercaseTeamNameMap.put(TEAM_VITALITY.toUpperCase(), TEAM_VITALITY);
         uppercaseTeamNameMap.put(TEAM_BDS.toUpperCase(), TEAM_BDS);
 
-        lenient().when(liquipediaTeamGetter.getTeamToPlayerAndCoachMap()).thenReturn(teamToPlayerAndCoachMap);
-        lenient().when(liquipediaTeamGetter.getTeamToPlayerNameMap()).thenReturn(teamToPlayerNameMap);
-        lenient().when(liquipediaTeamGetter.getPlayerToTeamNameMap()).thenReturn(playerToTeamNameMap);
-        lenient().when(liquipediaTeamGetter.getUppercasePlayerNameMap()).thenReturn(uppercasePlayerNameMap);
-        lenient().when(liquipediaTeamGetter.getUppercaseTeamNameMap()).thenReturn(uppercaseTeamNameMap);
+        lenient().when(liquipediaRefDataFetcher.getTeamToPlayerAndCoachMap()).thenReturn(teamToPlayerAndCoachMap);
+        lenient().when(liquipediaRefDataFetcher.getTeamToPlayerNameMap()).thenReturn(teamToPlayerNameMap);
+        lenient().when(liquipediaRefDataFetcher.getPlayerToTeamNameMap()).thenReturn(playerToTeamNameMap);
+        lenient().when(liquipediaRefDataFetcher.getUppercasePlayerNameMap()).thenReturn(uppercasePlayerNameMap);
+        lenient().when(liquipediaRefDataFetcher.getUppercaseTeamNameMap()).thenReturn(uppercaseTeamNameMap);
 
-        seriesUpdateHandler = new SeriesUpdateHandler(liquipediaTeamGetter);
+        seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
         teamVitality = new Team(TEAM_VITALITY, new Player(PLAYER_ALPHA54), new Player(PLAYER_RADOSIN), new Player(PLAYER_ZEN), TeamColour.BLUE);
         teamBds = new Team(TEAM_BDS, new Player(PLAYER_M0NKEY_M00N), new Player(PLAYER_DRALII), new Player(PLAYER_EXOTIIK), TeamColour.ORANGE);
     }

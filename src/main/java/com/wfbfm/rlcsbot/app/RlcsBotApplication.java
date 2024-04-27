@@ -17,13 +17,7 @@ public class RlcsBotApplication
 {
     public static void main(String[] args)
     {
-        initaliseTempDirectories();
-
-        if (WEBSOCKET_ENABLED)
-        {
-            final ElasticSeriesWebSocketServer webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT);
-            webSocketServer.start();
-        }
+        initialiseTempDirectories();
 
         final ExecutorService executorService = Executors.newFixedThreadPool(getTotalNumberOfThreads());
 
@@ -48,6 +42,12 @@ public class RlcsBotApplication
 
         final GameScreenshotProcessor snapshotParser = initialiseSnapshotParser();
         executorService.submit(snapshotParser::run);
+
+        if (WEBSOCKET_ENABLED)
+        {
+            final ElasticSeriesWebSocketServer webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT);
+            webSocketServer.start();
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
     }
@@ -113,9 +113,9 @@ public class RlcsBotApplication
         return commentaryRecorderThread;
     }
 
-    private static void initaliseTempDirectories()
+    private static void initialiseTempDirectories()
     {
-        for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY))
+        for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY, LOGO_DIRECTORY))
         {
             if (directory.exists())
             {

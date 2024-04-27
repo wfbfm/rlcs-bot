@@ -9,10 +9,10 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LiquipediaTeamGetterTest
+public class LiquipediaRefDataFetcherTest
 {
     private static final String LIQUIPEDIA_URL = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1";
-    private final LiquipediaTeamGetter liquipediaTeamGetter = new LiquipediaTeamGetter();
+    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher = new LiquipediaRefDataFetcher();
     private Map<String, Map<String, String>> teamToPlayerAndCoachMap;
     private Map<String, Set<String>> teamToPlayerNameMap;
     private Map<String, String> playerToTeamNameMap;
@@ -22,13 +22,13 @@ public class LiquipediaTeamGetterTest
     @BeforeEach
     public void setUp()
     {
-        liquipediaTeamGetter.setLiquipediaUrl(LIQUIPEDIA_URL);
-        assertTrue(liquipediaTeamGetter.updateLiquipediaRefData());
-        teamToPlayerAndCoachMap = liquipediaTeamGetter.getTeamToPlayerAndCoachMap();
-        teamToPlayerNameMap = liquipediaTeamGetter.getTeamToPlayerNameMap();
-        playerToTeamNameMap = liquipediaTeamGetter.getPlayerToTeamNameMap();
-        uppercasePlayerNameMap = liquipediaTeamGetter.getUppercasePlayerNameMap();
-        uppercaseTeamNameMap = liquipediaTeamGetter.getUppercaseTeamNameMap();
+        liquipediaRefDataFetcher.setLiquipediaUrl(LIQUIPEDIA_URL);
+        assertTrue(liquipediaRefDataFetcher.updateLiquipediaRefData());
+        teamToPlayerAndCoachMap = liquipediaRefDataFetcher.getTeamToPlayerAndCoachMap();
+        teamToPlayerNameMap = liquipediaRefDataFetcher.getTeamToPlayerNameMap();
+        playerToTeamNameMap = liquipediaRefDataFetcher.getPlayerToTeamNameMap();
+        uppercasePlayerNameMap = liquipediaRefDataFetcher.getUppercasePlayerNameMap();
+        uppercaseTeamNameMap = liquipediaRefDataFetcher.getUppercaseTeamNameMap();
     }
 
     @Test
