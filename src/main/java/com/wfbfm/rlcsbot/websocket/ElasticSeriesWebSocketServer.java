@@ -11,11 +11,18 @@ import com.wfbfm.rlcsbot.series.SeriesEvent;
 import org.apache.commons.io.FileUtils;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import org.java_websocket.server.WebSocketServer;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Paths;
+import java.security.KeyStore;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,13 +52,45 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
     private final Map<String, String> allBroadcastSeries = new HashMap<>();
     private final Map<String, String> allBroadcastSeriesEvents = new HashMap<>();
     private final Map<String, String> allTeamLogos = new HashMap<>();
+    private SSLContext sslContext;
 
     public ElasticSeriesWebSocketServer(final int port, final ApplicationContext applicationContext)
     {
         super(new InetSocketAddress(port));
 
         this.applicationContext = applicationContext;
+        setUpSsl();
         startPollingForNewDocuments();
+    }
+    
+    private void setUpSsl()
+    {
+        try
+        {
+            // keytool -genkey -keyalg RSA -validity 3650 -keystore "keystore.jks" -storepass "rlcs_bot_local" -keypass "rlcs_bot_local" -alias "rlcs_bot_local" -dname "CN=127.0.0.1, OU=MyOrgUnit, O=MyOrg, L=MyCity, S=MyRegion, C=MyCountry"
+            // keytool -exportcert -alias rlcs_bot_local -keystore keystore.jks -file rlcs_bot_local.cer
+            String STORETYPE = "JKS";
+            String KEYSTORE = Paths.get("appconfig" ,"keystore.jks").toString();
+            String STOREPASSWORD = "rlcs_bot_local";
+            String KEYPASSWORD = "rlcs_bot_local";
+
+            KeyStore ks = KeyStore.getInstance(STORETYPE);
+            File kf = new File(KEYSTORE);
+            ks.load(new FileInputStream(kf), STOREPASSWORD.toCharArray());
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            kmf.init(ks, KEYPASSWORD.toCharArray());
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(ks);
+
+            sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+            setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sslContext));
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void startPollingForNewDocuments()

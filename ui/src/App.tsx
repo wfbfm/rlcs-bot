@@ -27,7 +27,7 @@ const App: React.FC = () =>
   useEffect(() =>
   {
   // FIXME: not localhost
-    const ws = new WebSocket('ws://localhost:' + appPort);
+    const ws = new WebSocket('wss://localhost:' + appPort);
     setSocket(ws);
 
     return () =>
