@@ -45,36 +45,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
     {
         super(new InetSocketAddress(port));
 
-        // FIXME: logos need to be dynamically handled, as they can be added/removed while the server is running
-
-        try
-        {
-            initialiseTeamLogos();
-        }
-        catch (IOException e)
-        {
-            logger.log(Level.SEVERE, "Unable to encode team logo images", e);
-        }
         startPollingForNewDocuments();
-    }
-
-    private void initialiseTeamLogos() throws IOException
-    {
-        final File[] logoFiles = LOGO_DIRECTORY.listFiles();
-        if (logoFiles != null)
-        {
-            for (final File logoFile : logoFiles)
-            {
-                allTeamLogos.put(logoFile.getName(), encodeImageToBase64(logoFile));
-            }
-        }
-    }
-
-    private String encodeImageToBase64(final File imageFile) throws IOException
-    {
-        final byte[] fileContent = FileUtils.readFileToByteArray(imageFile);
-        final String base64String = base64Encoder.encodeToString(fileContent);
-        return BASE_64_TEMPLATE + base64String;
     }
 
     public void startPollingForNewDocuments()
@@ -140,9 +111,11 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         {
             broadcastLatestDocuments(ELASTIC_INDEX_SERIES, allBroadcastSeries, Series.class);
             broadcastLatestDocuments(ELASTIC_INDEX_SERIES_EVENT, allBroadcastSeriesEvents, SeriesEvent.class);
+            broadcastLatestLogos();
         }
         catch (IOException e)
         {
+            logger.log(Level.SEVERE, "Error broadcasting over websocket", e);
             throw new RuntimeException(e);
         }
     }
@@ -164,4 +137,31 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             }
         }
     }
+
+    private void broadcastLatestLogos() throws IOException
+    {
+        final File[] logoFiles = LOGO_DIRECTORY.listFiles();
+        if (logoFiles != null)
+        {
+            for (final File logoFile : logoFiles)
+            {
+                final String fileName = logoFile.getName();
+                if (!allTeamLogos.containsKey(fileName))
+                {
+                    final String encodedImage = encodeImageToBase64(logoFile);
+                    logger.info("Found new logo - broadcasting to all clients: " + fileName);
+                    allTeamLogos.put(logoFile.getName(), encodedImage);
+                    broadcast(String.format(IMAGE_JSON_TEMPLATE, fileName, encodedImage));
+                }
+            }
+        }
+    }
+
+    private String encodeImageToBase64(final File imageFile) throws IOException
+    {
+        final byte[] fileContent = FileUtils.readFileToByteArray(imageFile);
+        final String base64String = base64Encoder.encodeToString(fileContent);
+        return BASE_64_TEMPLATE + base64String;
+    }
+
 }
