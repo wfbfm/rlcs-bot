@@ -10,5 +10,7 @@ public class TranscriptionPollerTest
     {
         final TranscriptionPoller transcriptionPoller = new TranscriptionPoller();
         transcriptionPoller.run();
+
+        transcriptionPoller.stop();
     }
 }

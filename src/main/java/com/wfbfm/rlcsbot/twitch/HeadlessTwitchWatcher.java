@@ -20,6 +20,7 @@ public class HeadlessTwitchWatcher
     private final WebDriver webDriver;
     private final Actions actions;
     private final TakesScreenshot screenshotDriver;
+    private boolean isRunning = true;
 
     public HeadlessTwitchWatcher()
     {
@@ -31,6 +32,36 @@ public class HeadlessTwitchWatcher
         webDriver = new ChromeDriver(options);
         actions = new Actions(webDriver);
         screenshotDriver = (TakesScreenshot) webDriver;
+    }
+
+    public void run()
+    {
+        Runtime.getRuntime().addShutdownHook(new Thread(webDriver::quit));
+
+        logger.log(Level.INFO, "Starting worker thread");
+        getStreamInFullScreen();
+
+        while (isRunning)
+        {
+            try
+            {
+                captureAndSaveScreenshot("screenshot-" + Instant.now().toEpochMilli() + ".png");
+            }
+            catch (IOException e)
+            {
+                logger.log(Level.SEVERE, "Unable to take screenshot - stopping feed.", e);
+                break;
+            }
+            sleepForMs(SCREENSHOT_INTERVAL_MS);
+        }
+
+        logger.log(Level.INFO, "Stopping worker thread");
+        webDriver.quit();
+    }
+
+    public void stop()
+    {
+        this.isRunning = false;
     }
 
     private void getStreamInFullScreen()
@@ -63,28 +94,6 @@ public class HeadlessTwitchWatcher
         {
             e.printStackTrace();
         }
-    }
-
-    public void run()
-    {
-        Runtime.getRuntime().addShutdownHook(new Thread(webDriver::quit));
-
-        getStreamInFullScreen();
-
-        while (true)
-        {
-            try
-            {
-                captureAndSaveScreenshot("screenshot-" + Instant.now().toEpochMilli() + ".png");
-            }
-            catch (IOException e)
-            {
-                logger.log(Level.SEVERE, "Unable to take screenshot - stopping feed.", e);
-                break;
-            }
-            sleepForMs(SCREENSHOT_INTERVAL_MS);
-        }
-        webDriver.quit();
     }
 
     private void captureAndSaveScreenshot(final String fileName) throws IOException

@@ -31,6 +31,7 @@ public class GameScreenshotProcessor
     private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
     private final AudioTranscriptionDelegator audioTranscriptionDelegator = new AudioTranscriptionDelegator();
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
+    private boolean isRunning = true;
 
     public GameScreenshotProcessor()
     {
@@ -40,7 +41,8 @@ public class GameScreenshotProcessor
 
     public void run()
     {
-        while (true)
+        logger.log(Level.INFO, "Starting worker thread");
+        while (isRunning)
         {
             try
             {
@@ -52,6 +54,12 @@ public class GameScreenshotProcessor
                 break;
             }
         }
+        logger.log(Level.INFO, "Stopping worker thread");
+    }
+
+    public void stop()
+    {
+        this.isRunning = false;
     }
 
     private void pollAndHandleIncomingFiles()

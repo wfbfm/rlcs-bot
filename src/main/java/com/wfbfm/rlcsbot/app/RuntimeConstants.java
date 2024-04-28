@@ -10,7 +10,9 @@ public class RuntimeConstants
     public final static boolean BROADCAST_ENABLED = true;
     public final static boolean TRANSCRIPTION_ENABLED = true;
     public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = false;
+    public final static boolean SCREENSHOT_PROCESSING_ENABLED = true;
     public final static boolean WEBSOCKET_ENABLED = true;
+    public final static boolean ADMIN_WEBSOCKET_ENABLED = true;
     public final static boolean ELASTIC_ENABLED = true;
     public static final String BROADCAST_URL = "https://www.twitch.tv/videos/2104780126?t=00h49m08s";
     public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1";
@@ -38,6 +40,7 @@ public class RuntimeConstants
     public static final String ELASTIC_INDEX_SERIES = "series";
     public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
     public static final int WEBSOCKET_PORT = 8887;
+    public static final int SECRET_ADMIN_PORT;
     public static final int DEFAULT_BEST_OF = 5;
 
     static
@@ -55,5 +58,22 @@ public class RuntimeConstants
     private static String readApiKeyFromFile(final String filePath) throws IOException
     {
         return Files.readString(Paths.get(filePath)).trim();
+    }
+
+    static
+    {
+        try
+        {
+            SECRET_ADMIN_PORT = readAdminPort("appconfig/secret_admin_port.txt");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int readAdminPort(final String filePath) throws IOException
+    {
+        return Integer.parseInt(Files.readString(Paths.get(filePath)).trim());
     }
 }

@@ -20,13 +20,21 @@ public class TranscriptionPoller
 {
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
     private final Logger logger = Logger.getLogger(TranscriptionPoller.class.getName());
+    private boolean isRunning = true;
 
     public void run()
     {
-        while (true)
+        logger.log(Level.INFO, "Starting worker thread");
+        while (isRunning)
         {
             pollAndHandleTranscriptionFiles();
         }
+        logger.log(Level.INFO, "Stopping worker thread");
+    }
+
+    public void stop()
+    {
+        isRunning = false;
     }
 
     private void pollAndHandleTranscriptionFiles()

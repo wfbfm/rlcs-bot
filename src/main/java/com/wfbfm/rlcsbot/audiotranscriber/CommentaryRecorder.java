@@ -51,6 +51,19 @@ public class CommentaryRecorder
         }));
     }
 
+    public void stop()
+    {
+        if (process != null)
+        {
+            logger.log(Level.INFO, "Destroying CommentaryRecorder process");
+            process.destroy();
+        }
+        else
+        {
+            logger.log(Level.INFO, "CommentaryRecorder process is already stopped");
+        }
+    }
+
     private ProcessBuilder createStreamlinkProcess(final String streamUrl)
     {
         return new ProcessBuilder(
