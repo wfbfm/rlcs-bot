@@ -34,7 +34,7 @@ public class RlcsBotApplication
 
         if (WEBSOCKET_ENABLED)
         {
-            webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT);
+            webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT, applicationContext);
             webSocketServer.start();
         }
 

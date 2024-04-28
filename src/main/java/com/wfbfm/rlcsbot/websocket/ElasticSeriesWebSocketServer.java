@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonpUtils;
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.elastic.ElasticSearchClientBuilder;
 import com.wfbfm.rlcsbot.series.Series;
 import com.wfbfm.rlcsbot.series.SeriesEvent;
@@ -32,8 +33,10 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
     private static final String BROADCAST_JSON_TEMPLATE = "{\"payloadType\": \"rlcs_data\", \"payload\": %s}";
     private static final String IMAGE_JSON_TEMPLATE = "{\"payloadType\": \"image\", \"imageName\": \"%s\", \"base64Image\": \"%s\"}";
     private static final String BASE_64_TEMPLATE = "data:image/png;base64,";
+    private static final String EXACT_ELASTIC_SEARCH_STRING = "\"%s\"";
     private final Base64.Encoder base64Encoder = Base64.getEncoder();
     private final Logger logger = Logger.getLogger(ElasticSeriesWebSocketServer.class.getName());
+    private final ApplicationContext applicationContext;
     private final ElasticsearchClient client = ElasticSearchClientBuilder.getElasticsearchClient();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Semaphore semaphore = new Semaphore(1);
@@ -41,10 +44,11 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
     private final Map<String, String> allBroadcastSeriesEvents = new HashMap<>();
     private final Map<String, String> allTeamLogos = new HashMap<>();
 
-    public ElasticSeriesWebSocketServer(final int port)
+    public ElasticSeriesWebSocketServer(final int port, final ApplicationContext applicationContext)
     {
         super(new InetSocketAddress(port));
 
+        this.applicationContext = applicationContext;
         startPollingForNewDocuments();
     }
 
@@ -122,7 +126,11 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
 
     private void broadcastLatestDocuments(final String indexName, final Map<String, String> documentMap, final Class<?> objectType) throws IOException
     {
-        final SearchResponse<?> response = client.search(s -> s.index(indexName).size(1000), objectType);
+        final String queryString = String.format(EXACT_ELASTIC_SEARCH_STRING, applicationContext.getLiquipediaUrl());
+        final SearchResponse<?> response = client
+                .search(s -> s
+                        .index(indexName)
+                        .query(q -> q.queryString(qs -> qs.query(queryString))), objectType);
 
         for (final Hit<?> hit : response.hits().hits())
         {

@@ -11,6 +11,7 @@ public class SeriesEvent
     private final int bestOf;
     private final int currentGameNumber;
     private final SeriesSnapshotEvaluation evaluation;
+    private final String liquipediaPage;
     private String commentary = null;
 
     public SeriesEvent()
@@ -23,6 +24,7 @@ public class SeriesEvent
         this.bestOf = 0;
         this.currentGameNumber = 0;
         this.evaluation = null;
+        this.liquipediaPage = null;
     }
 
     public SeriesEvent(final Series series, final SeriesSnapshotEvaluation evaluation)
@@ -35,6 +37,7 @@ public class SeriesEvent
         this.bestOf = series.getBestOf();
         this.currentGameNumber = series.getCurrentGameNumber();
         this.evaluation = evaluation;
+        this.liquipediaPage = series.getSeriesMetaData().getLiquipediaPage();
     }
 
     public Game getCurrentGame()
@@ -80,5 +83,10 @@ public class SeriesEvent
     public void setCommentary(final String commentary)
     {
         this.commentary = commentary;
+    }
+
+    public String getLiquipediaPage()
+    {
+        return liquipediaPage;
     }
 }
