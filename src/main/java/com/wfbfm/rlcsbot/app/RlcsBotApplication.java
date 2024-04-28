@@ -18,9 +18,6 @@ public class RlcsBotApplication
 {
     private final ApplicationContext applicationContext = new ApplicationContext(BROADCAST_URL, LIQUIPEDIA_PAGE, true);
     private ExecutorService executorService;
-    private Thread twitchWatcherThread;
-    private Thread transcriptionThread;
-    private Thread commentaryThread;
     private HeadlessTwitchWatcher twitchWatcher;
     private TranscriptionPoller transcriptionPoller;
     private CommentaryRecorder commentaryRecorder;
@@ -30,33 +27,10 @@ public class RlcsBotApplication
 
     public void start()
     {
-        initialiseTempDirectories();
-
         executorService = Executors.newCachedThreadPool();
+        Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
 
-        if (BROADCAST_ENABLED)
-        {
-            twitchWatcherThread = initialiseTwitchWatcher();
-            executorService.submit(twitchWatcherThread);
-        }
-
-        if (TRANSCRIPTION_ENABLED)
-        {
-            transcriptionThread = initialiseTranscriptionPollerThread();
-            executorService.submit(transcriptionThread);
-        }
-
-        if (LIVE_COMMENTARY_RECORDING_ENABLED)
-        {
-            commentaryThread = initialiseCommentaryRecorderThread();
-            executorService.submit(commentaryThread);
-        }
-
-        if (SCREENSHOT_PROCESSING_ENABLED)
-        {
-            gameScreenshotProcessor = initialiseScreenshotProcessor();
-            executorService.submit(gameScreenshotProcessor::run);
-        }
+        startBroadcast();
 
         if (WEBSOCKET_ENABLED)
         {
@@ -69,8 +43,6 @@ public class RlcsBotApplication
             adminControlWebSocketServer = new AdminControlWebSocketServer(SECRET_ADMIN_PORT);
             adminControlWebSocketServer.start();
         }
-
-        Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
     }
 
     private GameScreenshotProcessor initialiseScreenshotProcessor()
@@ -166,7 +138,33 @@ public class RlcsBotApplication
 
     public void startBroadcast()
     {
+        initialiseTempDirectories();
 
+        applicationContext.setBroadcastLive(true);
+
+        if (BROADCAST_ENABLED)
+        {
+            final Thread twitchWatcherThread = initialiseTwitchWatcher();
+            executorService.submit(twitchWatcherThread);
+        }
+
+        if (TRANSCRIPTION_ENABLED)
+        {
+            final Thread transcriptionThread = initialiseTranscriptionPollerThread();
+            executorService.submit(transcriptionThread);
+        }
+
+        if (LIVE_COMMENTARY_RECORDING_ENABLED)
+        {
+            final Thread commentaryThread = initialiseCommentaryRecorderThread();
+            executorService.submit(commentaryThread);
+        }
+
+        if (SCREENSHOT_PROCESSING_ENABLED)
+        {
+            gameScreenshotProcessor = initialiseScreenshotProcessor();
+            executorService.submit(gameScreenshotProcessor::run);
+        }
     }
 
     public void updateLiquipediaPage()

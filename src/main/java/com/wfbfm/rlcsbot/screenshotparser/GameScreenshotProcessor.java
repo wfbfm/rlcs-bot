@@ -28,17 +28,19 @@ public class GameScreenshotProcessor
     private final ApplicationContext applicationContext;
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
     private final ScreenshotToSubImageTransformer screenshotToSubImageTransformer = new ScreenshotToSubImageTransformer();
-    private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer();
-    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher = new LiquipediaRefDataFetcher();
-    private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
+    private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer;
+    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher;
+    private final SeriesUpdateHandler seriesUpdateHandler;
     private final AudioTranscriptionDelegator audioTranscriptionDelegator = new AudioTranscriptionDelegator();
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
 
     public GameScreenshotProcessor(final ApplicationContext applicationContext)
     {
         this.applicationContext = applicationContext;
-        this.liquipediaRefDataFetcher.setLiquipediaUrl(LIQUIPEDIA_PAGE);
+        this.subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer(applicationContext);
+        this.liquipediaRefDataFetcher = new LiquipediaRefDataFetcher(applicationContext);
         this.liquipediaRefDataFetcher.updateLiquipediaRefData();
+        this.seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
     }
 
     public void run()

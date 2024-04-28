@@ -63,7 +63,7 @@ public class HeadlessTwitchWatcher
 
     private void getStreamInFullScreen()
     {
-        webDriver.get(BROADCAST_URL);
+        webDriver.get(applicationContext.getBroadcastUrl());
         sleepForMs(5000);
         actions.sendKeys(Keys.chord("f")).perform();
 

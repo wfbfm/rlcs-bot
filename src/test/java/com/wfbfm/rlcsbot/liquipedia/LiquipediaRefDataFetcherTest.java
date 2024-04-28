@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.liquipedia;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class LiquipediaRefDataFetcherTest
 {
     private static final String LIQUIPEDIA_URL = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_1";
-    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher = new LiquipediaRefDataFetcher();
+    private final ApplicationContext applicationContext = new ApplicationContext("", LIQUIPEDIA_URL, true);
+    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher = new LiquipediaRefDataFetcher(applicationContext);
     private Map<String, Map<String, String>> teamToPlayerAndCoachMap;
     private Map<String, Set<String>> teamToPlayerNameMap;
     private Map<String, String> playerToTeamNameMap;
@@ -22,7 +24,6 @@ public class LiquipediaRefDataFetcherTest
     @BeforeEach
     public void setUp()
     {
-        liquipediaRefDataFetcher.setLiquipediaUrl(LIQUIPEDIA_URL);
         assertTrue(liquipediaRefDataFetcher.updateLiquipediaRefData());
         teamToPlayerAndCoachMap = liquipediaRefDataFetcher.getTeamToPlayerAndCoachMap();
         teamToPlayerNameMap = liquipediaRefDataFetcher.getTeamToPlayerNameMap();

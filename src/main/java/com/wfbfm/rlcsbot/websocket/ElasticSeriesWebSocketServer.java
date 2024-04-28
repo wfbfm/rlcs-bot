@@ -44,6 +44,9 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
     public ElasticSeriesWebSocketServer(final int port)
     {
         super(new InetSocketAddress(port));
+
+        // FIXME: logos need to be dynamically handled, as they can be added/removed while the server is running
+
         try
         {
             initialiseTeamLogos();

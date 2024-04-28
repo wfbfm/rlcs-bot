@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.screenshotparser;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.series.*;
 import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.Tesseract;
@@ -30,6 +31,7 @@ public class SubImageToSeriesSnapshotTransformer
             SubImageType.ORANGE_SERIES_TICK4};
     private static final int TICK_COLOUR_DIFFERENTIATION_BUFFER = 50;
     private static final int TICK_FILLED_THRESHOLD = 150;
+    private final ApplicationContext applicationContext;
     private final Logger logger = Logger.getLogger(SubImageToSeriesSnapshotTransformer.class.getName());
     private final SeriesSnapshotBuilder seriesSnapshotBuilder = new SeriesSnapshotBuilder();
     private final Tesseract textTesseract = new Tesseract();
@@ -38,8 +40,9 @@ public class SubImageToSeriesSnapshotTransformer
     private final Tesseract bestOfTesseract = new Tesseract();
     private GameScreenshotSubImageWrapper subImageWrapper;
 
-    public SubImageToSeriesSnapshotTransformer()
+    public SubImageToSeriesSnapshotTransformer(final ApplicationContext applicationContext)
     {
+        this.applicationContext = applicationContext;
         initialiseTesseractParsers();
     }
 
@@ -103,7 +106,7 @@ public class SubImageToSeriesSnapshotTransformer
     private void parseSeriesMetadata()
     {
         final String description = parseImage(textTesseract, SubImageType.DESCRIPTION);
-        final SeriesMetaData seriesMetaData = new SeriesMetaData(LocalDate.now(), description, LIQUIPEDIA_PAGE);
+        final SeriesMetaData seriesMetaData = new SeriesMetaData(LocalDate.now(), description, applicationContext.getLiquipediaUrl());
         this.seriesSnapshotBuilder.withSeriesMetaData(seriesMetaData);
     }
 
