@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
@@ -149,7 +149,7 @@ public class SeriesUpdateHandlerTest
         final Series lateGameSeries = seriesUpdateHandler.getCurrentSeries();
         assertSeriesValues(lateGameSnapshot, lateGameSeries);
 
-        final SeriesSnapshot firstHighlightSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "0:30");
+        final SeriesSnapshot firstHighlightSnapshot = mockSeriesSnapshot(0, 0, 0, 0, 7, "1:30");
         assertEquals(SeriesSnapshotEvaluation.BLUE_GAME, seriesUpdateHandler.evaluateSeries(firstHighlightSnapshot));
         final Series postFirstHighlightSeries = seriesUpdateHandler.getCurrentSeries();
         final SeriesSnapshot expectedPostGameSnapshot = mockSeriesSnapshot(0, 0, 1, 0, 7, "5:00");
@@ -159,6 +159,70 @@ public class SeriesUpdateHandlerTest
         assertEquals(SeriesSnapshotEvaluation.HIGHLIGHT, seriesUpdateHandler.evaluateSeries(secondHighlightSnapshot));
         final Series postSecondHighlightSeries = seriesUpdateHandler.getCurrentSeries();
         assertSeriesValues(expectedPostGameSnapshot, postSecondHighlightSeries);
+    }
+
+    @Test
+    public void testRecoverFromBadSeriesScoreState()
+    {
+        final SeriesSnapshot startSnapshot = mockSeriesSnapshot(0, 0, 0, 0, 7, "5:00");
+        assertEquals(SeriesSnapshotEvaluation.NEW_SERIES, seriesUpdateHandler.evaluateSeries(startSnapshot));
+        Series currentSeries = seriesUpdateHandler.getCurrentSeries();
+        assertSeriesValues(startSnapshot, currentSeries);
+
+        final SeriesSnapshot blueGoalSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "1:00");
+        assertEquals(SeriesSnapshotEvaluation.BLUE_GOAL, seriesUpdateHandler.evaluateSeries(blueGoalSnapshot));
+        assertSeriesValues(blueGoalSnapshot, currentSeries);
+
+        final SeriesSnapshot lateGameSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "0:01");
+        assertEquals(SeriesSnapshotEvaluation.SCORE_UNCHANGED, seriesUpdateHandler.evaluateSeries(lateGameSnapshot));
+        assertSeriesValues(lateGameSnapshot, currentSeries);
+
+        final SeriesSnapshot firstHighlightSnapshot = mockSeriesSnapshot(0, 0, 0, 0, 7, "1:30");
+        assertEquals(SeriesSnapshotEvaluation.BLUE_GAME, seriesUpdateHandler.evaluateSeries(firstHighlightSnapshot));
+        final SeriesSnapshot expectedPostGameSnapshot = mockSeriesSnapshot(0, 0, 1, 0, 7, "5:00");
+        assertSeriesValues(expectedPostGameSnapshot, currentSeries);
+
+        // it transpires that Orange actually won - now we go onto the next game
+        final SeriesSnapshot secondGameFirstSnapshot = mockSeriesSnapshot(0, 0, 0, 1, 7, "5:00");
+        assertEquals(SeriesSnapshotEvaluation.SCORE_UNCHANGED, seriesUpdateHandler.evaluateSeries(secondGameFirstSnapshot));
+        assertNotNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
+        assertSeriesValues(expectedPostGameSnapshot, currentSeries);
+
+        final SeriesSnapshot secondGameSecondSnapshot = mockSeriesSnapshot(0, 0, 0, 1, 7, "4:50");
+        assertEquals(SeriesSnapshotEvaluation.CORRECTION, seriesUpdateHandler.evaluateSeries(secondGameSecondSnapshot));
+        assertNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
+        final SeriesSnapshot expectedCorrectedSnapshot = mockSeriesSnapshot(0, 0, 0, 1, 7, "4:50");
+        assertSeriesValues(expectedCorrectedSnapshot, currentSeries);
+    }
+
+    @Test
+    public void testRecoverFromBadGameScoreState()
+    {
+        final SeriesSnapshot startSnapshot = mockSeriesSnapshot(0, 0, 0, 0, 7, "5:00");
+        assertEquals(SeriesSnapshotEvaluation.NEW_SERIES, seriesUpdateHandler.evaluateSeries(startSnapshot));
+        Series currentSeries = seriesUpdateHandler.getCurrentSeries();
+        assertSeriesValues(startSnapshot, currentSeries);
+
+        final SeriesSnapshot severalBlueGoalsSnapshot = mockSeriesSnapshot(7, 0, 0, 0, 7, "4:40");
+        assertEquals(SeriesSnapshotEvaluation.SCORE_UNCHANGED, seriesUpdateHandler.evaluateSeries(severalBlueGoalsSnapshot));
+        assertNotNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
+        assertSeriesValues(startSnapshot, currentSeries);
+
+        final SeriesSnapshot backToNormalSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "4:30");
+        assertEquals(SeriesSnapshotEvaluation.BLUE_GOAL, seriesUpdateHandler.evaluateSeries(backToNormalSnapshot));
+        assertNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
+        assertSeriesValues(backToNormalSnapshot, currentSeries);
+
+        final SeriesSnapshot severalOrangeGoalsSnapshot = mockSeriesSnapshot(1, 2, 0, 0, 7, "4:20");
+        assertEquals(SeriesSnapshotEvaluation.SCORE_UNCHANGED, seriesUpdateHandler.evaluateSeries(severalOrangeGoalsSnapshot));
+        assertNotNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
+        final SeriesSnapshot backToNormalSnapshotNewTime = mockSeriesSnapshot(1, 0, 0, 0, 7, "4:20");
+        assertSeriesValues(backToNormalSnapshotNewTime, currentSeries);
+
+        final SeriesSnapshot severalOrangeGoalsSnapshotAgain = mockSeriesSnapshot(1, 2, 0, 0, 7, "4:10");
+        assertEquals(SeriesSnapshotEvaluation.CORRECTION, seriesUpdateHandler.evaluateSeries(severalOrangeGoalsSnapshotAgain));
+        assertNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
+        assertSeriesValues(severalOrangeGoalsSnapshotAgain, currentSeries);
     }
 
     private void assertSeriesValues(SeriesSnapshot snapshot, Series series)

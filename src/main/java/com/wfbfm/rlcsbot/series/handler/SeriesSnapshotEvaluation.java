@@ -12,5 +12,6 @@ public enum SeriesSnapshotEvaluation
     ORANGE_GAME,
     SERIES_COMPLETE,
     NEW_SERIES,
+    CORRECTION,
     INVALID_NEW_SERIES
 }
