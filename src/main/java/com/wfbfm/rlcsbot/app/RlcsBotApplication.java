@@ -16,6 +16,7 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class RlcsBotApplication
 {
+    private final ApplicationContext applicationContext = new ApplicationContext(BROADCAST_URL, LIQUIPEDIA_PAGE, true);
     private ExecutorService executorService;
     private Thread twitchWatcherThread;
     private Thread transcriptionThread;
@@ -74,7 +75,7 @@ public class RlcsBotApplication
 
     private GameScreenshotProcessor initialiseScreenshotProcessor()
     {
-        gameScreenshotProcessor = new GameScreenshotProcessor();
+        gameScreenshotProcessor = new GameScreenshotProcessor(applicationContext);
         final Thread snapshotParserThread = new Thread(gameScreenshotProcessor::run);
         snapshotParserThread.setUncaughtExceptionHandler((thread, throwable) ->
         {
@@ -85,7 +86,7 @@ public class RlcsBotApplication
 
     private Thread initialiseTwitchWatcher()
     {
-        twitchWatcher = new HeadlessTwitchWatcher();
+        twitchWatcher = new HeadlessTwitchWatcher(applicationContext);
         final Thread twitchWatcherThread = new Thread(twitchWatcher::run);
         twitchWatcherThread.setUncaughtExceptionHandler((thread, throwable) ->
         {
@@ -96,7 +97,7 @@ public class RlcsBotApplication
 
     private Thread initialiseTranscriptionPollerThread()
     {
-        transcriptionPoller = new TranscriptionPoller();
+        transcriptionPoller = new TranscriptionPoller(applicationContext);
         final Thread transcriptionThread = new Thread(transcriptionPoller::run);
         transcriptionThread.setUncaughtExceptionHandler((thread, throwable) ->
         {
@@ -107,7 +108,7 @@ public class RlcsBotApplication
 
     private Thread initialiseCommentaryRecorderThread()
     {
-        commentaryRecorder = new CommentaryRecorder();
+        commentaryRecorder = new CommentaryRecorder(applicationContext);
         final Thread commentaryRecorderThread = new Thread(commentaryRecorder::run);
         commentaryRecorderThread.setUncaughtExceptionHandler((thread, throwable) ->
         {
@@ -140,27 +141,25 @@ public class RlcsBotApplication
 
     public void stopBroadcast()
     {
+        applicationContext.setBroadcastLive(false);
+
         if (twitchWatcher != null)
         {
-            twitchWatcher.stop();
             twitchWatcher = null;
         }
 
         if (gameScreenshotProcessor != null)
         {
-            gameScreenshotProcessor.stop();
             gameScreenshotProcessor = null;
         }
 
         if (commentaryRecorder != null)
         {
-            commentaryRecorder.stop();
             commentaryRecorder = null;
         }
 
         if (transcriptionPoller != null)
         {
-            transcriptionPoller.stop();
             transcriptionPoller = null;
         }
     }

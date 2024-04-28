@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.twitch;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,14 +17,15 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class HeadlessTwitchWatcher
 {
+    private final ApplicationContext applicationContext;
     private final Logger logger = Logger.getLogger(HeadlessTwitchWatcher.class.getName());
     private final WebDriver webDriver;
     private final Actions actions;
     private final TakesScreenshot screenshotDriver;
-    private boolean isRunning = true;
 
-    public HeadlessTwitchWatcher()
+    public HeadlessTwitchWatcher(final ApplicationContext applicationContext)
     {
+        this.applicationContext = applicationContext;
         // Set up the ChromeDriver
         final ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
@@ -41,7 +43,7 @@ public class HeadlessTwitchWatcher
         logger.log(Level.INFO, "Starting worker thread");
         getStreamInFullScreen();
 
-        while (isRunning)
+        while (applicationContext.isBroadcastLive())
         {
             try
             {
@@ -57,11 +59,6 @@ public class HeadlessTwitchWatcher
 
         logger.log(Level.INFO, "Stopping worker thread");
         webDriver.quit();
-    }
-
-    public void stop()
-    {
-        this.isRunning = false;
     }
 
     private void getStreamInFullScreen()

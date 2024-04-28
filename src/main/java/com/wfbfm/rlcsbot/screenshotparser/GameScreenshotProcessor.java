@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.screenshotparser;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.audiotranscriber.AudioTranscriptionDelegator;
 import com.wfbfm.rlcsbot.elastic.ElasticSearchPublisher;
 import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
@@ -24,6 +25,7 @@ public class GameScreenshotProcessor
 {
     // Crops and transforms sub-images of raw 1920x1080p screenshots of Twitch feed
     // Process sub-images using Tesseract to extract series information
+    private final ApplicationContext applicationContext;
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
     private final ScreenshotToSubImageTransformer screenshotToSubImageTransformer = new ScreenshotToSubImageTransformer();
     private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer();
@@ -31,10 +33,10 @@ public class GameScreenshotProcessor
     private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
     private final AudioTranscriptionDelegator audioTranscriptionDelegator = new AudioTranscriptionDelegator();
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
-    private boolean isRunning = true;
 
-    public GameScreenshotProcessor()
+    public GameScreenshotProcessor(final ApplicationContext applicationContext)
     {
+        this.applicationContext = applicationContext;
         this.liquipediaRefDataFetcher.setLiquipediaUrl(LIQUIPEDIA_PAGE);
         this.liquipediaRefDataFetcher.updateLiquipediaRefData();
     }
@@ -42,7 +44,7 @@ public class GameScreenshotProcessor
     public void run()
     {
         logger.log(Level.INFO, "Starting worker thread");
-        while (isRunning)
+        while (applicationContext.isBroadcastLive())
         {
             try
             {
@@ -55,11 +57,6 @@ public class GameScreenshotProcessor
             }
         }
         logger.log(Level.INFO, "Stopping worker thread");
-    }
-
-    public void stop()
-    {
-        this.isRunning = false;
     }
 
     private void pollAndHandleIncomingFiles()

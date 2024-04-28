@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.audiotranscriber;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import org.junit.jupiter.api.Test;
 
 public class CommentaryRecorderTest
@@ -8,7 +9,8 @@ public class CommentaryRecorderTest
     public void testCommentaryRecorder() throws InterruptedException
     {
         final String streamUrl = "https://www.twitch.tv/rocketleague";
-        final CommentaryRecorder commentaryRecorder = new CommentaryRecorder(streamUrl);
+        final ApplicationContext applicationContext = new ApplicationContext(streamUrl, "test", true);
+        final CommentaryRecorder commentaryRecorder = new CommentaryRecorder(applicationContext);
         commentaryRecorder.run();
         Thread.sleep(10_000);
     }
