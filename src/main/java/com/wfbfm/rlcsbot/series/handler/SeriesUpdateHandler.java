@@ -19,6 +19,7 @@ public class SeriesUpdateHandler
     private final LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
     private final Logger logger = Logger.getLogger(SeriesUpdateHandler.class.getName());
     private Series currentSeries = null;
+    private SeriesSnapshot snapshotWithIllogicalScore = null;
 
     public SeriesUpdateHandler(final LiquipediaRefDataFetcher liquipediaRefDataFetcher)
     {
@@ -33,6 +34,7 @@ public class SeriesUpdateHandler
         {
             if (!enrichAllNamesFromPlayers(snapshot))
             {
+                snapshotWithIllogicalScore = null;
                 return handleNonGameScreenshot();
             }
         }
@@ -92,6 +94,7 @@ public class SeriesUpdateHandler
         enrichBestOf(snapshot);
         if (isHighlight(snapshot))
         {
+            snapshotWithIllogicalScore = null;
             if (isGameCompletable())
             {
                 return handleCompletedGame();
@@ -111,8 +114,22 @@ public class SeriesUpdateHandler
 
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)
     {
-        senseCheckSeriesScore(snapshot);
         updateClockTime(snapshot);
+        if (!senseCheckSeriesScore(snapshot, currentSeries.getSeriesScore(), currentSeries.getCurrentGame().getScore(),
+                currentSeries.getCurrentGameNumber()))
+        {
+            if (snapshotWithIllogicalScore != null)
+            {
+                return evaluateCorrection(snapshot);
+            }
+            else
+            {
+                snapshotWithIllogicalScore = snapshot;
+                return SeriesSnapshotEvaluation.SCORE_UNCHANGED;
+            }
+        }
+
+        snapshotWithIllogicalScore = null;
 
         final Score snapshotGameScore = snapshot.getCurrentGame().getScore();
         final Score existingGameScore = currentSeries.getCurrentGame().getScore();
@@ -133,6 +150,25 @@ public class SeriesUpdateHandler
         return SeriesSnapshotEvaluation.SCORE_UNCHANGED;
     }
 
+    private SeriesSnapshotEvaluation evaluateCorrection(final SeriesSnapshot latestSnapshot)
+    {
+        if (senseCheckSeriesScore(latestSnapshot,
+                snapshotWithIllogicalScore.getSeriesScore(), snapshotWithIllogicalScore.getCurrentGame().getScore(),
+                snapshotWithIllogicalScore.getCurrentGameNumber()))
+        {
+            final Score currentGameScore = currentSeries.getCurrentGame().getScore();
+            currentGameScore.setBlueScore(latestSnapshot.getCurrentGame().getScore().getBlueScore());
+            currentGameScore.setOrangeScore(latestSnapshot.getCurrentGame().getScore().getOrangeScore());
+            final Score currentSeriesScore = currentSeries.getSeriesScore();
+            currentSeriesScore.setBlueScore(latestSnapshot.getSeriesScore().getBlueScore());
+            currentSeriesScore.setOrangeScore(latestSnapshot.getSeriesScore().getOrangeScore());
+            snapshotWithIllogicalScore = null;
+            return SeriesSnapshotEvaluation.CORRECTION;
+        }
+        snapshotWithIllogicalScore = null;
+        return SeriesSnapshotEvaluation.SCORE_UNCHANGED;
+    }
+
     private void updateClockTime(final SeriesSnapshot snapshot)
     {
         // The image parsing cannot be trusted to give an accurate time.  Sometimes, the model gives a time in the past
@@ -147,30 +183,49 @@ public class SeriesUpdateHandler
         currentSeries.getCurrentGame().setClock(snapshot.getCurrentGame().getClock());
     }
 
-    private void senseCheckSeriesScore(final SeriesSnapshot snapshot)
+    private boolean senseCheckSeriesScore(final SeriesSnapshot snapshot,
+                                          final Score existingSeriesScore,
+                                          final Score existingGameScore,
+                                          final int existingGameNumber)
     {
         // FIXME: When the screenshot feed is interrupted - i.e. we miss a game, we need a recovery mechanism.
         // This is identifying the problematic series, but it's not handling them in any special way
         final Score snapshotSeriesScore = snapshot.getSeriesScore();
-        final Score currentSeriesScore = currentSeries.getSeriesScore();
 
-        if (snapshotSeriesScore.getBlueScore() != currentSeriesScore.getBlueScore())
+        if (snapshotSeriesScore.getBlueScore() != existingSeriesScore.getBlueScore())
         {
-            logger.log(Level.WARNING, "Conflict between cached vs. snapshot blueSeriesScore: " + currentSeriesScore.getBlueScore() +
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot blueSeriesScore: " + existingSeriesScore.getBlueScore() +
                     " vs. " + snapshotSeriesScore.getBlueScore());
+            return false;
         }
 
-        if (snapshotSeriesScore.getOrangeScore() != currentSeriesScore.getOrangeScore())
+        if (snapshotSeriesScore.getOrangeScore() != existingSeriesScore.getOrangeScore())
         {
-            logger.log(Level.WARNING, "Conflict between cached vs. snapshot orangeSeriesScore: " + currentSeriesScore.getOrangeScore() +
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot orangeSeriesScore: " + existingSeriesScore.getOrangeScore() +
                     " vs. " + snapshotSeriesScore.getOrangeScore());
+            return false;
         }
 
-        if (snapshot.getCurrentGameNumber() != currentSeries.getCurrentGameNumber())
+        if (snapshot.getCurrentGameNumber() != existingGameNumber)
         {
             logger.log(Level.WARNING, "Conflict between cached vs. snapshot gameNumber: " + currentSeries.getCurrentGameNumber() +
                     " vs. " + snapshot.getCurrentGameNumber());
+            return false;
         }
+
+        if (snapshot.getCurrentGame().getScore().getBlueScore() - existingGameScore.getBlueScore() > 1)
+        {
+            logger.log(Level.WARNING, ">1 Game Score diff (Blue)");
+            return false;
+        }
+
+        if (snapshot.getCurrentGame().getScore().getOrangeScore() - existingGameScore.getOrangeScore() > 1)
+        {
+            logger.log(Level.WARNING, ">1 Game Score diff (Orange)");
+            return false;
+        }
+
+        return true;
     }
 
     private boolean isGameCompletable()
@@ -393,5 +448,10 @@ public class SeriesUpdateHandler
     public Series getCurrentSeries()
     {
         return currentSeries;
+    }
+
+    public SeriesSnapshot getSnapshotWithIllogicalScore()
+    {
+        return snapshotWithIllogicalScore;
     }
 }

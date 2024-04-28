@@ -127,6 +127,7 @@ public class GameScreenshotProcessor
                     audioTranscriptionDelegator.delegateAudioTranscription(seriesUpdateHandler.getMostRecentCompletedSeries(), seriesEvent.getEventId());
                 }
                 break;
+            case CORRECTION:
             case SCORE_UNCHANGED:
                 if (ELASTIC_ENABLED)
                 {
