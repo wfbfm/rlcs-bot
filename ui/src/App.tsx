@@ -160,7 +160,7 @@ const App: React.FC = () =>
 
         <VStack p={4} marginTop='6%'>
           {collapsableTwitchStream()}
-          <Box>
+          <Box minW='50%'>
             <VStack>
               {Object.values(seriesEvents)
                 .sort((a, b) =>

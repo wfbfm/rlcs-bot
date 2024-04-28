@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.liquipedia;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,41 +29,19 @@ public class LiquipediaRefDataFetcher
     private static final String CENTER = "center";
     private static final String TEAMCARD_INNER = "teamcard-inner";
     private static final String LOGO_TABLE = "wikitable wikitable-bordered logo";
+    private final ApplicationContext applicationContext;
     private final Logger logger = Logger.getLogger(LiquipediaRefDataFetcher.class.getName());
     private Map<String, Map<String, String>> teamToPlayerAndCoachMap = new HashMap<>();
     private Map<String, Set<String>> teamToPlayerNameMap = new HashMap<>();
     private Map<String, String> playerToTeamNameMap = new HashMap<>();
     private Map<String, String> uppercasePlayerNameMap = new HashMap<>();
     private Map<String, String> uppercaseTeamNameMap = new HashMap<>();
-    private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
     private String liquipediaUrl;
 
-    public LiquipediaRefDataFetcher()
+    public LiquipediaRefDataFetcher(final ApplicationContext applicationContext)
     {
-        this.liquipediaUrl = null;
-        initialiseDisplayNameCache();
-    }
-
-    private void initialiseDisplayNameCache()
-    {
-        // TODO: flesh this out, derive from config file
-        this.uppercaseDisplayToLiquipediaName.put("FURIA", "FURIA Esports");
-        this.uppercaseDisplayToLiquipediaName.put("YANXNZ^^", "yANXNZ");
-        this.uppercaseDisplayToLiquipediaName.put("RADOSINHO", "Radosin");
-
-        this.uppercaseDisplayToLiquipediaName.put("GENG MOBIL1", "Gen.G Mobil1 Racing");
-        this.uppercaseDisplayToLiquipediaName.put("M8 ALPINE", "Gentle Mates Alpine");
-        this.uppercaseDisplayToLiquipediaName.put("COMPLEXITY", "Complexity Gaming");
-    }
-
-    public String getLiquipediaUrl()
-    {
-        return liquipediaUrl;
-    }
-
-    public void setLiquipediaUrl(String liquipediaUrl)
-    {
-        this.liquipediaUrl = liquipediaUrl;
+        this.applicationContext = applicationContext;
+        this.liquipediaUrl = applicationContext.getLiquipediaUrl();
     }
 
     public Map<String, Map<String, String>> getTeamToPlayerAndCoachMap()
@@ -88,11 +67,6 @@ public class LiquipediaRefDataFetcher
     public Map<String, String> getUppercaseTeamNameMap()
     {
         return uppercaseTeamNameMap;
-    }
-
-    public Map<String, String> getUppercaseDisplayToLiquipediaName()
-    {
-        return uppercaseDisplayToLiquipediaName;
     }
 
     public boolean updateLiquipediaRefData()

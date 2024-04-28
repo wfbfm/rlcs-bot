@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.screenshotparser;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.audiotranscriber.AudioTranscriptionDelegator;
 import com.wfbfm.rlcsbot.elastic.ElasticSearchPublisher;
 import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
@@ -24,23 +25,28 @@ public class GameScreenshotProcessor
 {
     // Crops and transforms sub-images of raw 1920x1080p screenshots of Twitch feed
     // Process sub-images using Tesseract to extract series information
+    private final ApplicationContext applicationContext;
     private final Logger logger = Logger.getLogger(GameScreenshotProcessor.class.getName());
     private final ScreenshotToSubImageTransformer screenshotToSubImageTransformer = new ScreenshotToSubImageTransformer();
-    private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer();
-    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher = new LiquipediaRefDataFetcher();
-    private final SeriesUpdateHandler seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
+    private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer;
+    private final LiquipediaRefDataFetcher liquipediaRefDataFetcher;
+    private final SeriesUpdateHandler seriesUpdateHandler;
     private final AudioTranscriptionDelegator audioTranscriptionDelegator = new AudioTranscriptionDelegator();
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
 
-    public GameScreenshotProcessor()
+    public GameScreenshotProcessor(final ApplicationContext applicationContext)
     {
-        this.liquipediaRefDataFetcher.setLiquipediaUrl(LIQUIPEDIA_PAGE);
+        this.applicationContext = applicationContext;
+        this.subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer(applicationContext);
+        this.liquipediaRefDataFetcher = new LiquipediaRefDataFetcher(applicationContext);
         this.liquipediaRefDataFetcher.updateLiquipediaRefData();
+        this.seriesUpdateHandler = new SeriesUpdateHandler(applicationContext, liquipediaRefDataFetcher);
     }
 
     public void run()
     {
-        while (true)
+        logger.log(Level.INFO, "Starting worker thread");
+        while (applicationContext.isBroadcastLive())
         {
             try
             {
@@ -52,6 +58,7 @@ public class GameScreenshotProcessor
                 break;
             }
         }
+        logger.log(Level.INFO, "Stopping worker thread");
     }
 
     private void pollAndHandleIncomingFiles()

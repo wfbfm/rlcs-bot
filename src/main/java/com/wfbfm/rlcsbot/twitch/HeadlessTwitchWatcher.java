@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.twitch;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,13 +17,15 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class HeadlessTwitchWatcher
 {
+    private final ApplicationContext applicationContext;
     private final Logger logger = Logger.getLogger(HeadlessTwitchWatcher.class.getName());
     private final WebDriver webDriver;
     private final Actions actions;
     private final TakesScreenshot screenshotDriver;
 
-    public HeadlessTwitchWatcher()
+    public HeadlessTwitchWatcher(final ApplicationContext applicationContext)
     {
+        this.applicationContext = applicationContext;
         // Set up the ChromeDriver
         final ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
@@ -33,9 +36,34 @@ public class HeadlessTwitchWatcher
         screenshotDriver = (TakesScreenshot) webDriver;
     }
 
+    public void run()
+    {
+        Runtime.getRuntime().addShutdownHook(new Thread(webDriver::quit));
+
+        logger.log(Level.INFO, "Starting worker thread");
+        getStreamInFullScreen();
+
+        while (applicationContext.isBroadcastLive())
+        {
+            try
+            {
+                captureAndSaveScreenshot("screenshot-" + Instant.now().toEpochMilli() + ".png");
+            }
+            catch (IOException e)
+            {
+                logger.log(Level.SEVERE, "Unable to take screenshot - stopping feed.", e);
+                break;
+            }
+            sleepForMs(SCREENSHOT_INTERVAL_MS);
+        }
+
+        logger.log(Level.INFO, "Stopping worker thread");
+        webDriver.quit();
+    }
+
     private void getStreamInFullScreen()
     {
-        webDriver.get(BROADCAST_URL);
+        webDriver.get(applicationContext.getBroadcastUrl());
         sleepForMs(5000);
         actions.sendKeys(Keys.chord("f")).perform();
 
@@ -63,28 +91,6 @@ public class HeadlessTwitchWatcher
         {
             e.printStackTrace();
         }
-    }
-
-    public void run()
-    {
-        Runtime.getRuntime().addShutdownHook(new Thread(webDriver::quit));
-
-        getStreamInFullScreen();
-
-        while (true)
-        {
-            try
-            {
-                captureAndSaveScreenshot("screenshot-" + Instant.now().toEpochMilli() + ".png");
-            }
-            catch (IOException e)
-            {
-                logger.log(Level.SEVERE, "Unable to take screenshot - stopping feed.", e);
-                break;
-            }
-            sleepForMs(SCREENSHOT_INTERVAL_MS);
-        }
-        webDriver.quit();
     }
 
     private void captureAndSaveScreenshot(final String fileName) throws IOException

@@ -1,6 +1,7 @@
 package com.wfbfm.rlcsbot.audiotranscriber;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.elastic.ElasticSearchPublisher;
 import com.wfbfm.rlcsbot.series.SeriesEvent;
 
@@ -18,15 +19,23 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.INCOMING_POLLING_SLEEP_TIME
 
 public class TranscriptionPoller
 {
+    private final ApplicationContext applicationContext;
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
     private final Logger logger = Logger.getLogger(TranscriptionPoller.class.getName());
 
+    public TranscriptionPoller(final ApplicationContext applicationContext)
+    {
+        this.applicationContext = applicationContext;
+    }
+
     public void run()
     {
-        while (true)
+        logger.log(Level.INFO, "Starting worker thread");
+        while (applicationContext.isBroadcastLive())
         {
             pollAndHandleTranscriptionFiles();
         }
+        logger.log(Level.INFO, "Stopping worker thread");
     }
 
     private void pollAndHandleTranscriptionFiles()
