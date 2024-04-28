@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.series.handler;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
 import com.wfbfm.rlcsbot.series.*;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,7 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 public class SeriesUpdateHandler
 {
     private static final Set<Integer> allowableBestOf = new HashSet<>(Set.of(3, 5, 7));
+    private final ApplicationContext applicationContext;
     private final List<Series> completedSeries = new ArrayList<>();
     private final LiquipediaRefDataFetcher liquipediaRefDataFetcher;
     private final LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
@@ -21,8 +23,9 @@ public class SeriesUpdateHandler
     private Series currentSeries = null;
     private SeriesSnapshot snapshotWithIllogicalScore = null;
 
-    public SeriesUpdateHandler(final LiquipediaRefDataFetcher liquipediaRefDataFetcher)
+    public SeriesUpdateHandler(final ApplicationContext applicationContext, final LiquipediaRefDataFetcher liquipediaRefDataFetcher)
     {
+        this.applicationContext = applicationContext;
         this.liquipediaRefDataFetcher = liquipediaRefDataFetcher;
     }
 
@@ -278,10 +281,10 @@ public class SeriesUpdateHandler
         }
 
         final String blueTeamName = lookupImperfectName(liquipediaRefDataFetcher.getUppercaseTeamNameMap(),
-                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
+                applicationContext.getUppercaseDisplayToLiquipediaName(),
                 blueTeam.getTeamName().toUpperCase());
         final String orangeTeamName = lookupImperfectName(liquipediaRefDataFetcher.getUppercaseTeamNameMap(),
-                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
+                applicationContext.getUppercaseDisplayToLiquipediaName(),
                 orangeTeam.getTeamName().toUpperCase());
 
         if (blueTeamName == null)
@@ -341,13 +344,13 @@ public class SeriesUpdateHandler
     private String resolveTeamFromImperfectPlayerNames(final Team team)
     {
         final String resolvedPlayerName1 = lookupImperfectName(liquipediaRefDataFetcher.getUppercasePlayerNameMap(),
-                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
+                applicationContext.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer1().getName().toUpperCase());
         final String resolvedPlayerName2 = lookupImperfectName(liquipediaRefDataFetcher.getUppercasePlayerNameMap(),
-                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
+                applicationContext.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer2().getName().toUpperCase());
         final String resolvedPlayerName3 = lookupImperfectName(liquipediaRefDataFetcher.getUppercasePlayerNameMap(),
-                liquipediaRefDataFetcher.getUppercaseDisplayToLiquipediaName(),
+                applicationContext.getUppercaseDisplayToLiquipediaName(),
                 team.getPlayer3().getName().toUpperCase());
 
         //  Only return a team name if the resolved players are all part of the same team.  At least 2 players must be resolved.

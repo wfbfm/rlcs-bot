@@ -40,7 +40,7 @@ public class GameScreenshotProcessor
         this.subImageToSeriesSnapshotTransformer = new SubImageToSeriesSnapshotTransformer(applicationContext);
         this.liquipediaRefDataFetcher = new LiquipediaRefDataFetcher(applicationContext);
         this.liquipediaRefDataFetcher.updateLiquipediaRefData();
-        this.seriesUpdateHandler = new SeriesUpdateHandler(liquipediaRefDataFetcher);
+        this.seriesUpdateHandler = new SeriesUpdateHandler(applicationContext, liquipediaRefDataFetcher);
     }
 
     public void run()

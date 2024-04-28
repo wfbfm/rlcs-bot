@@ -40,7 +40,7 @@ public class RlcsBotApplication
 
         if (ADMIN_WEBSOCKET_ENABLED)
         {
-            adminControlWebSocketServer = new AdminControlWebSocketServer(SECRET_ADMIN_PORT);
+            adminControlWebSocketServer = new AdminControlWebSocketServer(SECRET_ADMIN_PORT, this);
             adminControlWebSocketServer.start();
         }
     }
@@ -167,13 +167,18 @@ public class RlcsBotApplication
         }
     }
 
-    public void updateLiquipediaPage()
+    public void updateBroadcastUrl(final String broadcastUrl)
     {
-
+        this.applicationContext.setBroadcastUrl(broadcastUrl);
     }
 
-    public void addDisplayNameMapping()
+    public void updateLiquipediaUrl(final String liquipediaUrl)
     {
+        this.applicationContext.setLiquipediaUrl(liquipediaUrl);
+    }
 
+    public void addDisplayNameMapping(final String displayName, final String liquipediaName)
+    {
+        this.applicationContext.getUppercaseDisplayToLiquipediaName().put(displayName.toUpperCase(), liquipediaName);
     }
 }

@@ -1,7 +1,5 @@
 package com.wfbfm.rlcsbot.liquipedia;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 import com.wfbfm.rlcsbot.app.ApplicationContext;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -9,7 +7,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +19,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.DISPLAY_NAME_MAPPINGS;
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.LOGO_DIRECTORY;
 
 public class LiquipediaRefDataFetcher
@@ -36,31 +36,12 @@ public class LiquipediaRefDataFetcher
     private Map<String, String> playerToTeamNameMap = new HashMap<>();
     private Map<String, String> uppercasePlayerNameMap = new HashMap<>();
     private Map<String, String> uppercaseTeamNameMap = new HashMap<>();
-    private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
     private String liquipediaUrl;
 
     public LiquipediaRefDataFetcher(final ApplicationContext applicationContext)
     {
         this.applicationContext = applicationContext;
         this.liquipediaUrl = applicationContext.getLiquipediaUrl();
-        initialiseDisplayNameCache();
-    }
-
-    private void initialiseDisplayNameCache()
-    {
-        try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(DISPLAY_NAME_MAPPINGS)).build())
-        {
-            String[] row;
-            while ((row = csvReader.readNext()) != null)
-            {
-                this.uppercaseDisplayToLiquipediaName.put(row[0], row[1]);
-            }
-        }
-        catch (Exception e)
-        {
-            logger.log(Level.SEVERE, "Unable to read display name mappings.");
-            throw new RuntimeException(e);
-        }
     }
 
     public Map<String, Map<String, String>> getTeamToPlayerAndCoachMap()
@@ -86,11 +67,6 @@ public class LiquipediaRefDataFetcher
     public Map<String, String> getUppercaseTeamNameMap()
     {
         return uppercaseTeamNameMap;
-    }
-
-    public Map<String, String> getUppercaseDisplayToLiquipediaName()
-    {
-        return uppercaseDisplayToLiquipediaName;
     }
 
     public boolean updateLiquipediaRefData()
