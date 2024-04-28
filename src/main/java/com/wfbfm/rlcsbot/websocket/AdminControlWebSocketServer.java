@@ -41,6 +41,10 @@ public class AdminControlWebSocketServer extends WebSocketServer
     {
         logger.log(Level.INFO, "Parsing command from client: " + message);
         final JsonObject commandJson = parseJson(message);
+        if (commandJson == null)
+        {
+            return;
+        }
         final AdminCommand adminCommand = parseAdminCommand(commandJson);
 
         switch (adminCommand)
@@ -103,7 +107,7 @@ public class AdminControlWebSocketServer extends WebSocketServer
 
     private AdminCommand parseAdminCommand(final JsonObject commandJson)
     {
-        if (commandJson == null || !commandJson.has(COMMAND))
+        if (!commandJson.has(COMMAND))
         {
             return AdminCommand.INVALID;
         }
@@ -125,11 +129,13 @@ public class AdminControlWebSocketServer extends WebSocketServer
         {
             final String displayName = commandJson.get("displayName").getAsString();
             final String liquipediaName = commandJson.get("liquipediaName").getAsString();
+            broadcast(String.format("Added display name mapping to cache: %s - %s", displayName, liquipediaName));
             this.application.addDisplayNameMapping(displayName, liquipediaName);
             return true;
         }
         else
         {
+            broadcast("Required parameters: displayName, liquipediaName");
             return false;
         }
     }
@@ -138,7 +144,9 @@ public class AdminControlWebSocketServer extends WebSocketServer
     {
         if (commandJson.has("liquipediaUrl"))
         {
-            this.application.updateLiquipediaUrl(commandJson.get("liquipediaUrl").getAsString());
+            final String liquipediaUrl = commandJson.get("liquipediaUrl").getAsString();
+            this.application.updateLiquipediaUrl(liquipediaUrl);
+            broadcast(String.format("Updated Liquipedia URL: " + liquipediaUrl));
             return true;
         }
         else
@@ -151,7 +159,9 @@ public class AdminControlWebSocketServer extends WebSocketServer
     {
         if (commandJson.has("broadcastUrl"))
         {
-            this.application.updateBroadcastUrl(commandJson.get("broadcastUrl").getAsString());
+            final String broadcastUrl = commandJson.get("broadcastUrl").getAsString();
+            this.application.updateBroadcastUrl(broadcastUrl);
+            broadcast(String.format("Updated Broadcast URL: " + broadcastUrl));
             return true;
         }
         else
@@ -162,12 +172,15 @@ public class AdminControlWebSocketServer extends WebSocketServer
 
     private void handleStartBroadcast()
     {
+        broadcast("Broadcast starting...");
         this.application.startBroadcast();
+        broadcast("Broadcast started!");
     }
 
     private void handleStopBroadcast()
     {
         this.application.stopBroadcast();
+        broadcast("Broadcast stopped!");
     }
 
     @Override
