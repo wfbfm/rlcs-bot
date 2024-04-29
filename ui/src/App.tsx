@@ -127,7 +127,7 @@ const App: React.FC = () =>
                 })
                 .map((series, index) => (
                   <Box key={index} p={4}>
-                    <SeriesContainer series={series} />
+                    <SeriesContainer series={series} logos={logos} />
                   </Box>
                 ))}
             </Box>
