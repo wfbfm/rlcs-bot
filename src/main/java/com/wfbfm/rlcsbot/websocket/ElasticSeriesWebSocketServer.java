@@ -130,6 +130,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         final SearchResponse<?> response = client
                 .search(s -> s
                         .index(indexName)
+                        .size(10_000)
                         .query(q -> q.queryString(qs -> qs.query(queryString))), objectType);
 
         for (final Hit<?> hit : response.hits().hits())
