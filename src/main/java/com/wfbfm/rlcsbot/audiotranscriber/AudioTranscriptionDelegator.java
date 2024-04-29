@@ -89,13 +89,13 @@ public class AudioTranscriptionDelegator
     private String generateInitialPrompt(final Series series)
     {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(series.getBlueTeam().getTeamName()).append(" ");
-        stringBuilder.append(series.getBlueTeam().getPlayer1().getName()).append(" ");
-        stringBuilder.append(series.getBlueTeam().getPlayer2().getName()).append(" ");
-        stringBuilder.append(series.getBlueTeam().getPlayer3().getName()).append(" ");
-        stringBuilder.append(series.getOrangeTeam().getTeamName()).append(" ");
-        stringBuilder.append(series.getOrangeTeam().getPlayer1().getName()).append(" ");
-        stringBuilder.append(series.getOrangeTeam().getPlayer2().getName()).append(" ");
+        stringBuilder.append(series.getBlueTeam().getTeamName()).append(", ");
+        stringBuilder.append(series.getBlueTeam().getPlayer1().getName()).append(", ");
+        stringBuilder.append(series.getBlueTeam().getPlayer2().getName()).append(", ");
+        stringBuilder.append(series.getBlueTeam().getPlayer3().getName()).append(", ");
+        stringBuilder.append(series.getOrangeTeam().getTeamName()).append(", ");
+        stringBuilder.append(series.getOrangeTeam().getPlayer1().getName()).append(", ");
+        stringBuilder.append(series.getOrangeTeam().getPlayer2().getName()).append(", ");
         stringBuilder.append(series.getOrangeTeam().getPlayer3().getName());
         return stringBuilder.toString();
     }
