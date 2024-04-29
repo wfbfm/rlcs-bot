@@ -129,8 +129,8 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         final String queryString = String.format(EXACT_ELASTIC_SEARCH_STRING, applicationContext.getLiquipediaUrl());
         final SearchResponse<?> response = client
                 .search(s -> s
-                        .index(indexName),
-                        objectType);
+                        .index(indexName)
+                        .query(q -> q.queryString(qs -> qs.query(queryString))), objectType);
 
         for (final Hit<?> hit : response.hits().hits())
         {
