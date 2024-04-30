@@ -3,7 +3,7 @@ import { Badge, Box, Center, Divider, HStack, Image, Icon, Stack, Text, VStack, 
 import Series from './model/series';
 import { MinusIcon, TimeIcon } from '@chakra-ui/icons';
 
-const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, colour: string, filledFirst: boolean) =>
+const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, colour: string, filledFirst: boolean, isMobile: boolean | undefined) =>
 {
     const icons = [];
 
@@ -16,7 +16,7 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
         const iconColour = isFilled ? colour : 'grey';
 
         icons.push(
-            <MinusIcon boxSize={6} key={`${iconName}-${colour}-${i}`} name={iconName} color={iconColour} />
+            <MinusIcon boxSize={isMobile ? 4 : 6} key={`${iconName}-${colour}-${i}`} name={iconName} color={iconColour} />
         );
     }
     return icons;
@@ -58,7 +58,7 @@ const getLogoName = (teamName: string | undefined, isLightMode: boolean): string
     return `${teamName}${modeSuffix}.png`
 };
 
-export const SeriesHeader: React.FC<{ series: Series | null, logos: { [logoName: string]: string } }> = ({ series, logos }) =>
+export const SeriesHeader: React.FC<{ series: Series | null, logos: { [logoName: string]: string }, isMobile: boolean | undefined }> = ({ series, logos, isMobile }) =>
 {
     const backgroundColour = useColorModeValue('gray.100', 'gray.900');
     const { colorMode, toggleColorMode } = useColorMode();
@@ -76,21 +76,21 @@ export const SeriesHeader: React.FC<{ series: Series | null, logos: { [logoName:
                 <Box>
                     <Center bg={backgroundColour} p={2}>
                         <HStack>
-                            {blueLogo ? <Image src={`${blueLogo}`} boxSize={10}></Image> : null}
+                            {blueLogo ? <Image src={`${blueLogo}`} boxSize={isMobile ? 6 : 10}></Image> : null}
                             <VStack spacing={0}>
                                 <Text as='b' fontSize='sm'>{series._source.blueTeam.teamName}</Text>
                                 <HStack>
-                                    {seriesScoreIcons(series._source.seriesWinningGameScore, series._source.seriesScore.blueScore, 'blue.500', false)}
+                                    {seriesScoreIcons(series._source.seriesWinningGameScore, series._source.seriesScore.blueScore, 'blue.500', false, isMobile)}
                                 </HStack>
                             </VStack>
                             {gameScoreDisplay(series)}
                             <VStack spacing={0}>
                                 <Text as='b' fontSize='sm'>{series._source.orangeTeam.teamName}</Text>
                                 <HStack>
-                                    {seriesScoreIcons(series._source.seriesWinningGameScore, series._source.seriesScore.orangeScore, 'orange.400', true)}
+                                    {seriesScoreIcons(series._source.seriesWinningGameScore, series._source.seriesScore.orangeScore, 'orange.400', true, isMobile)}
                                 </HStack>
                             </VStack>
-                            {orangeLogo ? <Image src={`${orangeLogo}`} boxSize={10}></Image> : null}
+                            {orangeLogo ? <Image src={`${orangeLogo}`} boxSize={isMobile ? 6 : 10}></Image> : null}
                         </HStack>
                     </Center>
                 </Box>

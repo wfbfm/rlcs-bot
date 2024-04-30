@@ -12,7 +12,7 @@ const getLogoName = (teamName: string | undefined, isLightMode: boolean): string
 };
 
 
-export const NewSeriesContainer: React.FC<{ seriesEvent: SeriesEvent, series: Series, logos: { [logoName: string]: string } }> = ({ seriesEvent, series, logos }) => {
+export const NewSeriesContainer: React.FC<{ seriesEvent: SeriesEvent, series: Series, logos: { [logoName: string]: string }, isMobile: boolean | undefined }> = ({ seriesEvent, series, logos, isMobile }) => {
     const { colorMode, toggleColorMode } = useColorMode();
     const headerColour = useColorModeValue('gray.200', 'gray.800')
     const commentaryColour = useColorModeValue('gray.100', 'gray.600')
@@ -30,8 +30,12 @@ export const NewSeriesContainer: React.FC<{ seriesEvent: SeriesEvent, series: Se
                 <Box width='100%'>
                     <Center width='100%' bg={headerColour} p={2}>
                         <Flex justifyContent='space-between' alignItems='center' width='100%'>
-                            <Spacer></Spacer>
-                            <Spacer></Spacer>
+                            {!isMobile &&
+                                <>
+                                    <Spacer></Spacer>
+                                    <Spacer></Spacer>
+                                </>
+                            }
                             <VStack alignItems='center'>
                                 <Image src={`${blueLogo}`} boxSize={10}></Image>
                                 <Text as='b' fontSize='sm'>{series._source.blueTeam.teamName}</Text>
@@ -47,8 +51,12 @@ export const NewSeriesContainer: React.FC<{ seriesEvent: SeriesEvent, series: Se
                                 <Image src={`${orangeLogo}`} boxSize={10}></Image>
                                 <Text as='b' fontSize='sm'>{series._source.orangeTeam.teamName}</Text>
                             </VStack>
-                            <Spacer></Spacer>
-                            <Spacer></Spacer>
+                            {!isMobile &&
+                                <>
+                                    <Spacer></Spacer>
+                                    <Spacer></Spacer>
+                                </>
+                            }
                         </Flex>
                     </Center>
                     <Box bg={commentaryColour} p={4}>

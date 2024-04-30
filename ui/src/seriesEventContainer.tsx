@@ -7,18 +7,20 @@ import { MdOutlineSportsScore } from "react-icons/md";
 import { IoFootball } from "react-icons/io5";
 
 
-const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, colour: string, filledFirst: boolean) => {
+const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, colour: string, filledFirst: boolean, isMobile: boolean | undefined) =>
+{
     const icons = [];
 
     const emptyIconCount = seriesWinningGameScore - seriesScore;
 
-    for (let i = 1; i < seriesWinningGameScore + 1; i++) {
+    for (let i = 1; i < seriesWinningGameScore + 1; i++)
+    {
         const isFilled = filledFirst ? i <= seriesScore : i > emptyIconCount;
         const iconName = isFilled ? 'filledIcon' : 'emptyIcon';
         const iconColour = isFilled ? colour : 'grey';
 
         icons.push(
-            <MinusIcon boxSize={6} key={`${iconName}-${colour}-${i}`} name={iconName} color={iconColour} />
+            <MinusIcon boxSize={isMobile ? 4 : 6} key={`${iconName}-${colour}-${i}`} name={iconName} color={iconColour} />
         );
     }
     return icons;
@@ -58,7 +60,10 @@ const getLogoName = (teamName: string | undefined, isLightMode: boolean): string
 };
 
 
-export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: Series, logos: { [logoName: string]: string } }> = ({ seriesEvent, series, logos }) => {
+export const SeriesEventContainer: React.FC<{
+    seriesEvent: SeriesEvent, series: Series, logos: { [logoName: string]: string },
+    isMobile: boolean | undefined
+}> = ({ seriesEvent, series, logos, isMobile }) => {
     const evaluationResult: string = seriesEvent._source.evaluation;
     const { colorMode, toggleColorMode } = useColorMode();
     const headerColour = useColorModeValue('gray.200', 'gray.800')
@@ -73,9 +78,9 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
 
     return (
         <HStack height='100%'>
-            <Center width='10%' height='100%'>
-                {evaluationResult === 'BLUE_GAME' && blueLogo &&
-                    <Flex direction='column'  height='100%' alignItems={'center'} bg={`${blueBannerColour}`} borderWidth='1px' borderRadius='lg' overflow='hidden'>
+            <Center width={isMobile ? '0%' : '10%'} height='100%'>
+                {evaluationResult === 'BLUE_GAME' && blueLogo && !isMobile &&
+                    <Flex direction='column' height='100%' alignItems={'center'} bg={`${blueBannerColour}`} borderWidth='1px' borderRadius='lg' overflow='hidden'>
                         <Spacer height='30%'></Spacer>
                         <Image src={`${blueLogo}`} boxSize={10}></Image>
                         <Badge variant='solid' colorScheme='blue' p={1} marginTop={4}>GAME WIN</Badge>
@@ -83,30 +88,30 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
                     </Flex>
                 }
             </Center>
-            <Center width='90%' borderWidth='1px' borderRadius='lg' overflow='hidden'>
+            <Center width={isMobile ? '100%' : '80%'} borderWidth='1px' borderRadius='lg' overflow='hidden'>
                 <Box width='100%'>
                     <Center width='100%' bg={headerColour} p={2}>
                         <HStack>
                             <Center minW='20px'>
-                                {evaluationResult === 'BLUE_GOAL' && <Icon boxSize={6} as={IoFootball} color={'blue.500'}></Icon>}
-                                {evaluationResult === 'BLUE_GAME' && <Icon boxSize={6} as={MdOutlineSportsScore} color={'blue.500'}></Icon>}
+                                {evaluationResult === 'BLUE_GOAL' && <Icon boxSize={isMobile ? 4 : 6} as={IoFootball} color={'blue.500'}></Icon>}
+                                {evaluationResult === 'BLUE_GAME' && <Icon boxSize={isMobile ? 4 : 6} as={MdOutlineSportsScore} color={'blue.500'}></Icon>}
                             </Center>
                             <VStack spacing={0}>
-                                <Text as='b' fontSize='sm'>{series._source.blueTeam.teamName}</Text>
+                                <Text as='b' fontSize={isMobile ? 'xs' : 'sm'}>{series._source.blueTeam.teamName}</Text>
                                 <HStack>
-                                    {seriesScoreIcons(series._source.seriesWinningGameScore, seriesEvent._source.seriesScore.blueScore, 'blue.500', false)}
+                                    {seriesScoreIcons(series._source.seriesWinningGameScore, seriesEvent._source.seriesScore.blueScore, 'blue.500', false, isMobile)}
                                 </HStack>
                             </VStack>
                             {gameScoreDisplay(seriesEvent)}
                             <VStack spacing={0}>
-                                <Text as='b' fontSize='sm'>{series._source.orangeTeam.teamName}</Text>
+                                <Text as='b' fontSize={isMobile ? 'xs' : 'sm'}>{series._source.orangeTeam.teamName}</Text>
                                 <HStack>
-                                    {seriesScoreIcons(series._source.seriesWinningGameScore, seriesEvent._source.seriesScore.orangeScore, 'orange.400', true)}
+                                    {seriesScoreIcons(series._source.seriesWinningGameScore, seriesEvent._source.seriesScore.orangeScore, 'orange.400', true, isMobile)}
                                 </HStack>
                             </VStack>
                             <Center minW='20px'>
-                                {evaluationResult === 'ORANGE_GOAL' && <Icon boxSize={6} as={IoFootball} color={'orange.400'}></Icon>}
-                                {evaluationResult === 'ORANGE_GAME' && <Icon boxSize={6} as={MdOutlineSportsScore} color={'orange.400'}></Icon>}
+                                {evaluationResult === 'ORANGE_GOAL' && <Icon boxSize={isMobile ? 4 : 6} as={IoFootball} color={'orange.400'}></Icon>}
+                                {evaluationResult === 'ORANGE_GAME' && <Icon boxSize={isMobile ? 4 : 6} as={MdOutlineSportsScore} color={'orange.400'}></Icon>}
                             </Center>
                         </HStack>
                     </Center>
@@ -117,9 +122,9 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
                     </Box>
                 </Box>
             </Center>
-            <Center width='10%' height='100%'>
-                {evaluationResult === 'ORANGE_GAME' && orangeLogo &&
-                    <Flex direction='column'  height='100%' alignItems={'center'} bg={`${orangeBannerColour}`} borderWidth='1px' borderRadius='lg' overflow='hidden'>
+            <Center width={isMobile ? '0%' : '10%'} height='100%'>
+                {evaluationResult === 'ORANGE_GAME' && orangeLogo && !isMobile &&
+                    <Flex direction='column' height='100%' alignItems={'center'} bg={`${orangeBannerColour}`} borderWidth='1px' borderRadius='lg' overflow='hidden'>
                         <Spacer height='30%'></Spacer>
                         <Image src={`${orangeLogo}`} boxSize={10}></Image>
                         <Badge variant='solid' colorScheme='orange' p={1} marginTop={4}>GAME WIN</Badge>
