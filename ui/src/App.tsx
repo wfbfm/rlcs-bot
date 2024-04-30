@@ -12,6 +12,8 @@ import { SeriesContainer } from './seriesContainer';
 import { IoLogoTwitch } from "react-icons/io";
 import SideBar from './sideBar';
 import { SeriesHeader } from './seriesHeader';
+import { NewSeriesContainer } from './newSeriesContainer';
+import { SeriesVictoryContainer } from './seriesVictoryContainer';
 
 const App: React.FC = () =>
 {
@@ -179,7 +181,14 @@ const App: React.FC = () =>
                 })
                 .map((seriesEvent, index) => (
                   <Box key={index} p={4} width='60%' height='100%'>
+                    {seriesEvent._source.evaluation === 'NEW_SERIES' ?
+                    <NewSeriesContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    :
+                    seriesEvent._source.evaluation === 'SERIES_COMPLETE' ?
+                    <SeriesVictoryContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    :
                     <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    }
                   </Box>
                 ))}
             </VStack>

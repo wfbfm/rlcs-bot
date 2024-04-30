@@ -63,7 +63,7 @@ export const SeriesEventContainer: React.FC<{ seriesEvent: SeriesEvent, series: 
     const { colorMode, toggleColorMode } = useColorMode();
     const headerColour = useColorModeValue('gray.200', 'gray.800')
     const commentaryColour = useColorModeValue('gray.100', 'gray.600')
-    const blueBannerColour = useColorModeValue('blue.200', 'blue.500')
+    const blueBannerColour = useColorModeValue('blue.200', 'blue.600')
     const orangeBannerColour = useColorModeValue('orange.300', 'orange.400')
     const isLightMode = colorMode === 'light';
     const blueLogoName = getLogoName(series?._source.blueTeam.teamName, isLightMode);
