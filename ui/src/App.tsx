@@ -3,11 +3,8 @@ import './App.css';
 import Series from './model/series';
 import SeriesEvent from './model/seriesEvent';
 import { SeriesEventContainer } from './seriesEventContainer';
-import { Box, Button, Center, Collapse, Flex, HStack, Heading, Icon, IconButton, Image, Link, Spacer, Text, VStack, useColorModeValue } from '@chakra-ui/react';
+import { Box, Button, Center, Collapse, Flex, HStack, Heading, Icon, IconButton, Image, Link, Spacer, Text, VStack, useBreakpointValue, useColorModeValue } from '@chakra-ui/react';
 import ReactTwitchEmbedVideo from "react-twitch-embed-video"
-import NavBar from './navBar';
-import blueLogo from './Karmine_Corp_lightmode.png';
-import orangeLogo from './Team_Vitality_2023_lightmode.png';
 import { SeriesContainer } from './seriesContainer';
 import { IoLogoTwitch } from "react-icons/io";
 import SideBar from './sideBar';
@@ -21,7 +18,6 @@ const App: React.FC = () =>
   const [seriesEvents, setSeriesEvents] = useState<{ [eventId: string]: SeriesEvent }>({});
   const [series, setSeries] = useState<{ [seriesId: string]: Series }>({});
   const [currentSeries, setCurrentSeries] = useState<Series | null>(null);
-  const [messages, setMessages] = useState<(String)[]>([]);
   const [logos, setLogos] = useState<{ [logoName: string]: string }>({});
   const [showTwitch, setShowTwitch] = React.useState(false);
 
@@ -78,7 +74,6 @@ const App: React.FC = () =>
           return updatedSeries;
         });
       }
-      setMessages((prevMessages) => [...prevMessages, event.data]);
     }
 
     return () =>
@@ -113,9 +108,15 @@ const App: React.FC = () =>
     );
   }
 
+  const isMobile = useBreakpointValue({ base: true, sm: false });
+  const backgroundColour = useColorModeValue('gray.100', 'gray.900');
+  const mainWidth = isMobile ? '100%' : '80%';
+
   return (
     <Flex>
-      <Box bg={useColorModeValue('gray.100', 'gray.900')} position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
+      {!isMobile &&
+      <>
+      <Box bg={backgroundColour} position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
         <SideBar></SideBar>
         <Flex flexDirection={'column'} height='90%'>
           <VStack flex='1'>
@@ -149,18 +150,19 @@ const App: React.FC = () =>
 
         </Flex>
       </Box>
-
       <Spacer></Spacer>
+      </>
+      }
 
-      <Box width='80%' overflow='hidden' p={0}>
-        <Box p={0} position='fixed' width='80%' height='10%' zIndex={999} borderBottom='1px solid gray' bg={useColorModeValue('gray.100', 'gray.900')} overflow='hidden'>
+      <Box width={mainWidth} overflow='hidden' p={0}>
+        <Box p={0} position='fixed' width={mainWidth} height='10%' zIndex={999} borderBottom='1px solid gray' bg={useColorModeValue('gray.100', 'gray.900')} overflow='hidden'>
           <Center p={4}>
-            <SeriesHeader series={currentSeries} logos={logos} />
+            <SeriesHeader series={currentSeries} logos={logos} isMobile={isMobile}/>
           </Center>
         </Box>
 
 
-        <VStack p={4} marginTop='6%' height='100%'>
+        <VStack p={4} marginTop={isMobile ? '20%' : '6%'} height='100%'>
           {collapsableTwitchStream()}
           <Box minW='50%'>
             <VStack height='100%'>
@@ -180,14 +182,14 @@ const App: React.FC = () =>
                   return eventIdB - eventIdA;
                 })
                 .map((seriesEvent, index) => (
-                  <Box key={index} p={4} width='60%' height='100%'>
+                  <Box key={index} p={4} width={isMobile ? '100%' : '60%'} height='100%'>
                     {seriesEvent._source.evaluation === 'NEW_SERIES' ?
-                    <NewSeriesContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    <NewSeriesContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} isMobile={isMobile} />
                     :
                     seriesEvent._source.evaluation === 'SERIES_COMPLETE' ?
                     <SeriesVictoryContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
                     :
-                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} isMobile={isMobile} />
                     }
                   </Box>
                 ))}
