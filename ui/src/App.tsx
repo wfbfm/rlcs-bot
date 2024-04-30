@@ -12,6 +12,8 @@ import { SeriesContainer } from './seriesContainer';
 import { IoLogoTwitch } from "react-icons/io";
 import SideBar from './sideBar';
 import { SeriesHeader } from './seriesHeader';
+import { NewSeriesContainer } from './newSeriesContainer';
+import { SeriesVictoryContainer } from './seriesVictoryContainer';
 
 const App: React.FC = () =>
 {
@@ -158,10 +160,10 @@ const App: React.FC = () =>
         </Box>
 
 
-        <VStack p={4} marginTop='6%'>
+        <VStack p={4} marginTop='6%' height='100%'>
           {collapsableTwitchStream()}
           <Box minW='50%'>
-            <VStack>
+            <VStack height='100%'>
               {Object.values(seriesEvents)
                 .sort((a, b) =>
                 {
@@ -178,8 +180,15 @@ const App: React.FC = () =>
                   return eventIdB - eventIdA;
                 })
                 .map((seriesEvent, index) => (
-                  <Box key={index} p={4} width='60%'>
-                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} />
+                  <Box key={index} p={4} width='60%' height='100%'>
+                    {seriesEvent._source.evaluation === 'NEW_SERIES' ?
+                    <NewSeriesContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    :
+                    seriesEvent._source.evaluation === 'SERIES_COMPLETE' ?
+                    <SeriesVictoryContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    :
+                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                    }
                   </Box>
                 ))}
             </VStack>

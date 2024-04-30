@@ -24,7 +24,7 @@ const seriesScoreIcons = (seriesWinningGameScore: number, seriesScore: number, c
 
 const gameScoreDisplay = (series: Series) =>
 {
-    if (series._source.currentGame.score != null)
+    if (series._source.currentGame != null && series._source.currentGame.score != null)
     {
         return (
             <HStack>
