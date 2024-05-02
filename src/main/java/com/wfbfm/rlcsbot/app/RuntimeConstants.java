@@ -4,8 +4,8 @@ import java.io.File;
 
 public class RuntimeConstants
 {
-    public final static boolean BROADCAST_ENABLED = true;
-    public final static boolean TRANSCRIPTION_ENABLED = true;
+    public final static boolean BROADCAST_ENABLED = false;
+    public final static boolean TRANSCRIPTION_ENABLED = false;
     public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = false;
     public final static boolean SCREENSHOT_PROCESSING_ENABLED = true;
     public final static boolean WEBSOCKET_ENABLED = true;
@@ -19,12 +19,12 @@ public class RuntimeConstants
     public static final int LEVENSHTEIN_MINIMUM_DISTANCE = 2;
     public static final int GAME_TIME_SECONDS = 300;
     public static final int SCREENSHOT_INTERVAL_MS = 10_000;
-    public static final File TEMP_DIRECTORY = new File("/temp/");
-    public static final File INCOMING_DIRECTORY = new File("/temp/incoming/");
-    public static final File PROCESSING_DIRECTORY = new File("/temp/processing/");
-    public static final File COMPLETE_DIRECTORY = new File("/temp/complete/");
-    public static final File AUDIO_DIRECTORY = new File("/temp/audio/");
-    public static final File LOGO_DIRECTORY = new File("/temp/logos/");
+    public static final File TEMP_DIRECTORY = new File("temp/");
+    public static final File INCOMING_DIRECTORY = new File("temp/incoming/");
+    public static final File PROCESSING_DIRECTORY = new File("temp/processing/");
+    public static final File COMPLETE_DIRECTORY = new File("temp/complete/");
+    public static final File AUDIO_DIRECTORY = new File("temp/audio/");
+    public static final File LOGO_DIRECTORY = new File("temp/logos/");
     public static final int INCOMING_POLLING_SLEEP_TIME_MS = 200;
     public static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
     public static final String DISPLAY_NAME_MAPPINGS = "src/main/resources/display-name-mappings.csv";
@@ -33,12 +33,12 @@ public class RuntimeConstants
     public static final File FULL_AUDIO_FILE = new File("/temp/audio/full-audio.wav");
     public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
     public static final int TRANSCRIPTION_FILE_SECONDS = 20;
-    public static final String ELASTICSEARCH_USERNAME = System.getProperty("ELASTICSEARCH_USERNAME");
-    public static final String ELASTICSEARCH_PASSWORD = System.getProperty("ELASTICSEARCH_PASSWORD");
-    public static final String ELASTICSEARCH_HOST = System.getProperty("ELASTICSEARCH_HOST");
+    public static final String ELASTICSEARCH_USERNAME = "no";
+    public static final String ELASTICSEARCH_PASSWORD = "no";
+    public static final String ELASTICSEARCH_HOST = "no";
     public static final String ELASTIC_INDEX_SERIES = "series";
     public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
-    public static final int WEBSOCKET_PORT = Integer.parseInt(System.getProperty("APP_PORT"));
-    public static final int SECRET_ADMIN_PORT = Integer.parseInt(System.getProperty("SECRET_ADMIN_APP_PORT"));
+    public static final int WEBSOCKET_PORT = 1;
+    public static final int SECRET_ADMIN_PORT = 1;
     public static final int DEFAULT_BEST_OF = 5;
 }

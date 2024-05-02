@@ -17,6 +17,8 @@ RUN apt-get install -y python3.11 python3-pip git
 COPY . .
 RUN pip3 install -r requirements.txt
 
+RUN chmod +x /app/import_cert.sh
+
 # TODO: Chrome web driver?
 
 # Streamlink - for audio recordings from Twitch
@@ -32,12 +34,12 @@ FROM maven:3.8.4-openjdk-17 AS maven
 
 # Set the working directory in the Maven build stage
 WORKDIR /app
-RUN mkdir /temp
-RUN mkdir /temp/incoming
-RUN mkdir /temp/complete
-RUN mkdir /temp/audio
-RUN mkdir /temp/processing
-RUN mkdir /temp/logos
+RUN mkdir /app/temp
+RUN mkdir /app/temp/incoming
+RUN mkdir /app/temp/complete
+RUN mkdir /app/temp/audio
+RUN mkdir /app/temp/processing
+RUN mkdir /app/temp/logos
 
 # Copy the Maven project file from the base stage
 COPY --from=base /app .
@@ -52,5 +54,4 @@ FROM base AS final
 COPY --from=maven /app/target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar /app/target/
 
 # Define the command to run your application
-# TODO: replace with actual variables
-CMD ["java", "-jar", "-DELASTICSEARCH_HOST=https://elasticsearch:9200", "-DELASTICSEARCH_USERNAME=elastic", "-DELASTICSEARCH_PASSWORD=password", "-DAPP_PORT=8080", "-DSECRET_ADMIN_APP_PORT=1", "target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar"]
+CMD ["./import_cert.sh", "&&", "java", "-jar", "target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar"]

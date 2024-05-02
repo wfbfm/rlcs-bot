@@ -13,17 +13,23 @@ services:
       - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - APP_PORT=${APP_PORT}
       - SECRET_ADMIN_APP_PORT=${SECRET_ADMIN_APP_PORT}
+    depends_on:
+      elasticsearch:
+        condition: service_healthy  # Wait for Elasticsearch container to be healthy
+    volumes:
+      - certs:/usr/share/elasticsearch/config
+
   ui:
     container_name: rlcs_ui
     build: ./ui
+    environment:
+      - APP_PORT=${APP_PORT}
     ports:
-      - "80:80"
+      - "${APP_PORT}:${APP_PORT}"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     container_name: rlcs_elastic
-#    networks:
-#      - elastic
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Des.cores=1"  # Set JVM options as needed
@@ -31,13 +37,20 @@ services:
     ports:
       - "9200:9200"  # Elasticsearch HTTP
       - "9300:9300"  # Elasticsearch TCP
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+      - certs:/usr/share/elasticsearch/config
     deploy:
       resources:
         limits:
           cpus: 1
           memory: 1G
-    # Add other Elasticsearch configurations as needed
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f https://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-#networks:
-#  elastic:
-#    driver: bridge
+volumes:
+  esdata:
+  certs:
