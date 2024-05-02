@@ -4,8 +4,9 @@ target/
 !**/src/test/**/target/
 /venv/
 /src/test/data/
-/src/main/temp/
-/appconfig
+/temp/
+/appconfig/
+/temp/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

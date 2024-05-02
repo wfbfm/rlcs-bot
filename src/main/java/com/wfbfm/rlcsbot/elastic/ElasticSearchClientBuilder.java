@@ -6,24 +6,25 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.apache.http.Header;
 import org.apache.http.HttpHost;
-import org.apache.http.message.BasicHeader;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.ELASTIC_API_KEY;
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.ELASTIC_SEARCH_SERVER;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public abstract class ElasticSearchClientBuilder
 {
     public static ElasticsearchClient getElasticsearchClient()
     {
         final ElasticsearchClient client;
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD));
         final RestClient restClient = RestClient
-                .builder(HttpHost.create(ELASTIC_SEARCH_SERVER))
-                .setDefaultHeaders(new Header[]{
-                        new BasicHeader("Authorization", "ApiKey " + ELASTIC_API_KEY)
-                })
+                .builder(HttpHost.create(System.getProperty(ELASTICSEARCH_HOST)))
+                .setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
                 .build();
 
         final ObjectMapper objectMapper = new ObjectMapper();
