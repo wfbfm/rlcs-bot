@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set variables
-CERT_FILE="/usr/share/elasticsearch/config/certs/rlcs_es01/rlcs_es01.crt"
+CERT_FILE="/usr/share/elasticsearch/config/certs/es01/es01.crt"
 KEYSTORE="$JAVA_HOME/lib/security/cacerts"
 STOREPASS="changeit"
-ALIAS="rlcs_es01"
+ALIAS="es01"
 
 # Check if certificate exists in keystore
 if keytool -list -keystore "$KEYSTORE" -storepass "$STOREPASS" -alias "$ALIAS" >/dev/null 2>&1; then

@@ -33,6 +33,7 @@ public class RuntimeConstants
     public static final String PYTHON_SCRIPT = "python_scripts" + File.separator + "transcribe_commentary.py";
     public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
     public static final int TRANSCRIPTION_FILE_SECONDS = 20;
+    public static final String ELASTICSEARCH_HOST = System.getenv("ELASTIC_HOST");
     public static final String ELASTICSEARCH_USERNAME = System.getenv("ELASTIC_USERNAME");
     public static final String ELASTICSEARCH_PASSWORD = System.getenv("ELASTIC_PASSWORD");
     public static final String ELASTIC_INDEX_SERIES = "series";
