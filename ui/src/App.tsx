@@ -20,12 +20,14 @@ const App: React.FC = () =>
   const [currentSeries, setCurrentSeries] = useState<Series | null>(null);
   const [logos, setLogos] = useState<{ [logoName: string]: string }>({});
   const [showTwitch, setShowTwitch] = React.useState(false);
-  const appPort = process.env.APP_PORT;
+  // FIXME
+  // const uiPort = process.env.UI_PORT;
+  const uiPort = 80;
 
   useEffect(() =>
   {
   // FIXME: not localhost
-    const ws = new WebSocket('ws://localhost:' + appPort);
+    const ws = new WebSocket('ws://localhost:' + uiPort);
     setSocket(ws);
 
     return () =>

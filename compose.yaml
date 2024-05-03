@@ -14,43 +14,118 @@ services:
       - APP_PORT=${APP_PORT}
       - SECRET_ADMIN_APP_PORT=${SECRET_ADMIN_APP_PORT}
     depends_on:
-      elasticsearch:
+      rlcs_es01:
         condition: service_healthy  # Wait for Elasticsearch container to be healthy
     volumes:
-      - certs:/usr/share/elasticsearch/config
+      - certs:/usr/share/elasticsearch/config/certs
 
   ui:
     container_name: rlcs_ui
     build: ./ui
     environment:
-      - APP_PORT=${APP_PORT}
+      - UI_PORT=${UI_PORT}
     ports:
-      - "${APP_PORT}:${APP_PORT}"
+      - "${UI_PORT}:${UI_PORT}"
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
-    container_name: rlcs_elastic
-    environment:
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Des.cores=1"  # Set JVM options as needed
-      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-    ports:
-      - "9200:9200"  # Elasticsearch HTTP
-      - "9300:9300"  # Elasticsearch TCP
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - esdata:/usr/share/elasticsearch/data
-      - certs:/usr/share/elasticsearch/config
+      - certs:/usr/share/elasticsearch/config/certs
+    user: "0"
+    command: >
+      bash -c '
+        if [ x${ELASTIC_PASSWORD} == x ]; then
+          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${KIBANA_PASSWORD} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+        if [ ! -f config/certs/ca.zip ]; then
+          echo "Creating CA";
+          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+          unzip config/certs/ca.zip -d config/certs;
+        fi;
+        if [ ! -f config/certs/certs.zip ]; then
+          echo "Creating certs";
+          echo -ne \
+          "instances:\n"\
+          "  - name: rlcs_es01\n"\
+          "    dns:\n"\
+          "      - rlcs_es01\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: kibana\n"\
+          "    dns:\n"\
+          "      - kibana\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          > config/certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          unzip config/certs/certs.zip -d config/certs;
+        fi;
+        echo "Setting file permissions"
+        chown -R root:root config/certs;
+        find . -type d -exec chmod 750 \{\} \;;
+        find . -type f -exec chmod 640 \{\} \;;
+        echo "Waiting for Elasticsearch availability";
+        until curl -s --cacert config/certs/ca/ca.crt https://rlcs_es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        echo "Setting kibana_system password";
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://rlcs_es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "All done!";
+      '
+    healthcheck:
+      test: [ "CMD-SHELL", "[ -f config/certs/rlcs_es01/rlcs_es01.crt ]" ]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  rlcs_es01:
+    depends_on:
+      setup:
+        condition: service_healthy
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    labels:
+      co.elastic.logs/module: elasticsearch
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - ${ES_PORT}:9200
+    environment:
+      - node.name=rlcs_es01
+      - cluster.name=${CLUSTER_NAME}
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/rlcs_es01/rlcs_es01.key
+      - xpack.security.http.ssl.certificate=certs/rlcs_es01/rlcs_es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/rlcs_es01/rlcs_es01.key
+      - xpack.security.transport.ssl.certificate=certs/rlcs_es01/rlcs_es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${LICENSE}
     deploy:
       resources:
         limits:
           cpus: 1
           memory: 1G
     healthcheck:
-      test: ["CMD-SHELL", "curl -f https://localhost:9200/_cluster/health || exit 1"]
-      interval: 30s
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert config/certs/rlcs_es01/rlcs_es01.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 120
 
 volumes:
-  esdata:
   certs:
+  esdata01:

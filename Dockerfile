@@ -11,22 +11,26 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 WORKDIR /app
 
 # Python - for audio transcription
-RUN apt-get install -y python3.11 python3-pip git
+# TODO is this needed? we have python in base
+# RUN apt-get install -y python3.11 python3-pip git
 
 # Copy and install Python dependencies
 COPY . .
-RUN pip3 install -r requirements.txt
+
+# Adding this in later, it slows us down
+# RUN pip3 install -r requirements.txt
 
 RUN chmod +x /app/import_cert.sh
 
 # TODO: Chrome web driver?
+# TODO: FFMPEG
 
 # Streamlink - for audio recordings from Twitch
-RUN apt-get install -y streamlink
+# RUN apt-get install -y streamlink
 
 # Tesseract - for OCR on Twitch screenshots
-RUN apt-get install -y tesseract-ocr
-RUN apt-get install -y libtesseract-dev
+# RUN apt-get install -y tesseract-ocr
+# RUN apt-get install -y libtesseract-dev
 
 
 # Maven build stage
@@ -54,4 +58,4 @@ FROM base AS final
 COPY --from=maven /app/target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar /app/target/
 
 # Define the command to run your application
-CMD ["./import_cert.sh", "&&", "java", "-jar", "target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar"]
+CMD ["bash", "-c", "./import_cert.sh && java -jar target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar"]
