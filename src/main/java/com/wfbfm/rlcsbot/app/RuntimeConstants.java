@@ -25,20 +25,19 @@ public class RuntimeConstants
     public static final File COMPLETE_DIRECTORY = new File("temp/complete/");
     public static final File AUDIO_DIRECTORY = new File("temp/audio/");
     public static final File LOGO_DIRECTORY = new File("temp/logos/");
+    public static final File FULL_AUDIO_FILE = new File("temp/audio/full-audio.wav");
     public static final int INCOMING_POLLING_SLEEP_TIME_MS = 200;
     public static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
     public static final String DISPLAY_NAME_MAPPINGS = "src/main/resources/display-name-mappings.csv";
     public static final String PYTHON_VENV_PATH = "venv" + File.separator + "bin" + File.separator + "python";
     public static final String PYTHON_SCRIPT = "python_scripts" + File.separator + "transcribe_commentary.py";
-    public static final File FULL_AUDIO_FILE = new File("/temp/audio/full-audio.wav");
     public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
     public static final int TRANSCRIPTION_FILE_SECONDS = 20;
-    public static final String ELASTICSEARCH_USERNAME = "no";
-    public static final String ELASTICSEARCH_PASSWORD = "no";
-    public static final String ELASTICSEARCH_HOST = "no";
+    public static final String ELASTICSEARCH_USERNAME = System.getenv("ELASTIC_USERNAME");
+    public static final String ELASTICSEARCH_PASSWORD = System.getenv("ELASTIC_PASSWORD");
     public static final String ELASTIC_INDEX_SERIES = "series";
     public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
-    public static final int WEBSOCKET_PORT = 1;
-    public static final int SECRET_ADMIN_PORT = 1;
+    public static final int WEBSOCKET_PORT = Integer.parseInt(System.getenv("APP_PORT"));
+    public static final int SECRET_ADMIN_PORT = Integer.parseInt(System.getenv("SECRET_ADMIN_APP_PORT"));
     public static final int DEFAULT_BEST_OF = 5;
 }

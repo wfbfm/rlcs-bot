@@ -11,5 +11,5 @@ if keytool -list -keystore "$KEYSTORE" -storepass "$STOREPASS" -alias "$ALIAS" >
     echo "Certificate already exists in the keystore. Skipping import."
 else
     # Import certificate to Java KeyStore
-    keytool -importcert -file "$CERT_FILE" -keystore "$KEYSTORE" -storepass "$STOREPASS" -noprompt
+    keytool -importcert -trustcacerts -file "$CERT_FILE" -keystore "$KEYSTORE" -storepass "$STOREPASS" -noprompt -alias "$ALIAS"
 fi
