@@ -1,6 +1,9 @@
 # Use a suitable base image with JDK 17, Python, and other necessary dependencies
 FROM python:3.11 AS base
 
+# Force to use https for apt-get
+RUN echo "deb https://deb.debian.org/debian/ stable main" > /etc/apt/sources.list
+
 # Install JDK 17
 RUN apt-get update && apt-get install -y openjdk-17-jdk
 
