@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.audiotranscriber;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.series.Player;
 import com.wfbfm.rlcsbot.series.Series;
 import com.wfbfm.rlcsbot.series.Team;
@@ -12,7 +13,8 @@ import static org.mockito.Mockito.when;
 
 public class AudioTranscriptionDelegatorTest
 {
-    private final AudioTranscriptionDelegator transcriber = new AudioTranscriptionDelegator();
+    private final ApplicationContext applicationContext = new ApplicationContext("url", "url", false);
+    private final AudioTranscriptionDelegator transcriber = new AudioTranscriptionDelegator(applicationContext);
 
     @Test
     public void testTranscribeAudio() throws InterruptedException
