@@ -51,21 +51,25 @@ public class SubImageToSeriesSnapshotTransformer
         textTesseract.setDatapath(TESSERACT_DATA_PATH);
         textTesseract.setLanguage(TESSERACT_LANGUAGE);
         textTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SPARSE_TEXT);
+        textTesseract.setVariable("debug_file", "temp/tesseract.log");
 
         clockTesseract.setDatapath(TESSERACT_DATA_PATH);
         clockTesseract.setLanguage(TESSERACT_LANGUAGE);
         clockTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SPARSE_TEXT);
         clockTesseract.setVariable("tessedit_char_whitelist", "0123456789:+");
+        clockTesseract.setVariable("debug_file", "temp/tesseract.log");
 
         numberTesseract.setDatapath(TESSERACT_DATA_PATH);
         numberTesseract.setLanguage(TESSERACT_LANGUAGE);
         numberTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SPARSE_TEXT);
         numberTesseract.setVariable("tessedit_char_whitelist", "0123456789");
+        numberTesseract.setVariable("debug_file", "temp/tesseract.log");
 
         bestOfTesseract.setDatapath(TESSERACT_DATA_PATH);
         bestOfTesseract.setLanguage(TESSERACT_LANGUAGE);
         bestOfTesseract.setPageSegMode(ITessAPI.TessPageSegMode.PSM_SPARSE_TEXT);
         bestOfTesseract.setVariable("tessedit_char_whitelist", "357");
+        bestOfTesseract.setVariable("debug_file", "temp/tesseract.log");
     }
 
     public SeriesSnapshot transform(final GameScreenshotSubImageWrapper subImageWrapper)

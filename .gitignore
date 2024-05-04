@@ -6,7 +6,6 @@ target/
 /src/test/data/
 /temp/
 /appconfig/
-/temp/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

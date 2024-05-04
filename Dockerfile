@@ -39,12 +39,6 @@ FROM maven:3.8.4-openjdk-17 AS maven
 
 # Set the working directory in the Maven build stage
 WORKDIR /app
-RUN mkdir /app/temp
-RUN mkdir /app/temp/incoming
-RUN mkdir /app/temp/complete
-RUN mkdir /app/temp/audio
-RUN mkdir /app/temp/processing
-RUN mkdir /app/temp/logos
 
 # Copy the Maven project file from the base stage
 COPY --from=base /app .
@@ -57,6 +51,13 @@ FROM base AS final
 
 # Copy the built artifacts from the Maven build stage
 COPY --from=maven /app/target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar /app/target/
+
+RUN mkdir /app/temp
+RUN mkdir /app/temp/incoming
+RUN mkdir /app/temp/complete
+RUN mkdir /app/temp/audio
+RUN mkdir /app/temp/processing
+RUN mkdir /app/temp/logos
 
 # Define the command to run your application
 CMD ["bash", "-c", "./import_cert.sh && java -jar target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar"]

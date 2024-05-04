@@ -4,18 +4,18 @@ import java.io.File;
 
 public class RuntimeConstants
 {
-    public final static boolean BROADCAST_ENABLED = true;
-    public final static boolean TRANSCRIPTION_ENABLED = true;
-    public final static boolean LIVE_COMMENTARY_RECORDING_ENABLED = true;
-    public final static boolean SCREENSHOT_PROCESSING_ENABLED = true;
-    public final static boolean WEBSOCKET_ENABLED = true;
-    public final static boolean ADMIN_WEBSOCKET_ENABLED = true;
-    public final static boolean ELASTIC_ENABLED = true;
+    public static final boolean BROADCAST_ENABLED = true;
+    public static final boolean TRANSCRIPTION_ENABLED = true;
+    public static final boolean LIVE_COMMENTARY_RECORDING_ENABLED = true;
+    public static final boolean SCREENSHOT_PROCESSING_ENABLED = true;
+    public static final boolean WEBSOCKET_ENABLED = true;
+    public static final boolean ADMIN_WEBSOCKET_ENABLED = true;
+    public static final boolean ELASTIC_ENABLED = true;
     public static final String BROADCAST_URL = "https://www.twitch.tv/videos/2131987392?t=03h05m37s";
     public static final String LIQUIPEDIA_PAGE = "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_2/North_America/Open_Qualifier_4";
-    public static boolean DEBUGGING_ENABLED = false;
-    public static boolean RETAIN_PROCESSING_FILES = false;
-    public static boolean RETAIN_SCREENSHOTS = false;
+    public static final boolean DEBUGGING_ENABLED = false;
+    public static final boolean RETAIN_PROCESSING_FILES = false;
+    public static final boolean RETAIN_SCREENSHOTS = false;
     public static final int LEVENSHTEIN_MINIMUM_DISTANCE = 2;
     public static final int GAME_TIME_SECONDS = 300;
     public static final int SCREENSHOT_INTERVAL_MS = 10_000;

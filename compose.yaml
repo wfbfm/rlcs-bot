@@ -112,11 +112,7 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    deploy:
-      resources:
-        limits:
-          cpus: 1
-          memory: 1G
+    mem_limit: 1GB
     healthcheck:
       test:
         [

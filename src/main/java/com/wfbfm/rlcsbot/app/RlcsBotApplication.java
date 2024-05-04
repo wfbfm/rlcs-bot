@@ -93,7 +93,8 @@ public class RlcsBotApplication
         {
             if (directory.exists())
             {
-                if (directory.equals(AUDIO_DIRECTORY) && !LIVE_COMMENTARY_RECORDING_ENABLED)
+                final boolean isVod = applicationContext.getBroadcastUrl().contains("/videos/");
+                if (directory.equals(AUDIO_DIRECTORY) && isVod)
                 {
                     continue;
                 }
