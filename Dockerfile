@@ -21,6 +21,8 @@ COPY . .
 RUN pip3 install -r requirements.txt
 
 RUN chmod +x /app/import_cert.sh
+RUN tr -d '\r' < /app/import_cert.sh > /app/import_cert_unix.sh
+RUN chmod +x /app/import_cert_unix.sh
 
 # Streamlink - for audio recordings from Twitch
 RUN apt-get install -y streamlink
@@ -63,4 +65,4 @@ RUN mkdir /app/temp/processing
 RUN mkdir /app/temp/logos
 
 # Define the command to run your application
-CMD ["bash", "-c", "./import_cert.sh && java -jar target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar"]
+CMD ["bash", "-c", "./import_cert_unix.sh && java -jar target/rlcs-bot-1.0-SNAPSHOT-jar-with-dependencies.jar"]
