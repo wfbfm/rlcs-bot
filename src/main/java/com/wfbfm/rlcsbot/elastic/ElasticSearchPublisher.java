@@ -4,15 +4,12 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.UpdateResponse;
-import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import com.google.common.annotations.VisibleForTesting;
 import com.wfbfm.rlcsbot.series.Series;
 import com.wfbfm.rlcsbot.series.SeriesEvent;
 import com.wfbfm.rlcsbot.series.SeriesSnapshot;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,32 +23,11 @@ public class ElasticSearchPublisher
 
     public ElasticSearchPublisher()
     {
-        client = getElasticsearchClient();
-
         if (!ELASTIC_ENABLED)
         {
             return;
         }
-        try
-        {
-            createIndices();
-        }
-        catch (IOException e)
-        {
-            logger.log(Level.SEVERE, "Unable to check or create Elastic indices", e);
-        }
-    }
-
-    private void createIndices() throws IOException
-    {
-        final List<String> indices = Arrays.asList(ELASTIC_INDEX_SERIES, ELASTIC_INDEX_SERIES_EVENT);
-        for (final String index : indices)
-        {
-            if (!client.indices().exists(ExistsRequest.of(e -> e.index(index))).value())
-            {
-                client.indices().create(c -> c.index(index));
-            }
-        }
+        client = getElasticsearchClient();
     }
 
     public void uploadNewSeries(final Series series)

@@ -70,7 +70,7 @@ public class AudioTranscriptionDelegator
         }
 
         return new ProcessBuilder(
-                PYTHON_VENV_PATH,
+                PYTHON,
                 PYTHON_SCRIPT,
                 FULL_AUDIO_PATH,
                 escapeSpaces(String.format(TRIMMED_FILE_PATH, seriesEventId)),

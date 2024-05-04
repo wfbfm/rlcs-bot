@@ -1,6 +1,7 @@
 package com.wfbfm.rlcsbot.twitch;
 
 import com.wfbfm.rlcsbot.app.ApplicationContext;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,7 +14,8 @@ import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.INCOMING_DIRECTORY;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.SCREENSHOT_INTERVAL_MS;
 
 public class HeadlessTwitchWatcher
 {
@@ -26,11 +28,12 @@ public class HeadlessTwitchWatcher
     public HeadlessTwitchWatcher(final ApplicationContext applicationContext)
     {
         this.applicationContext = applicationContext;
-        // Set up the ChromeDriver
+        WebDriverManager.chromedriver().setup();
         final ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--window-size=1920,1080");
-        // options.add_argument("--mute-audio")
         webDriver = new ChromeDriver(options);
         actions = new Actions(webDriver);
         screenshotDriver = (TakesScreenshot) webDriver;

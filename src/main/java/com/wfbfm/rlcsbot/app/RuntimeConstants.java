@@ -29,7 +29,7 @@ public class RuntimeConstants
     public static final int INCOMING_POLLING_SLEEP_TIME_MS = 200;
     public static final String BROADCAST_SCHEMA_FILE_PATH = "src/main/resources/broadcast-schema.csv";
     public static final String DISPLAY_NAME_MAPPINGS = "src/main/resources/display-name-mappings.csv";
-    public static final String PYTHON_VENV_PATH = "venv" + File.separator + "bin" + File.separator + "python";
+    public static final String PYTHON = "python";
     public static final String PYTHON_SCRIPT = "python_scripts" + File.separator + "transcribe_commentary.py";
     public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
     public static final int TRANSCRIPTION_FILE_SECONDS = 20;
