@@ -77,6 +77,12 @@ public class AdminControlWebSocketServer extends WebSocketServer
             case STOP_BROADCAST:
                 handleStopBroadcast();
                 break;
+            case ALLOW_MIDSERIES:
+                if (!handleAllowMidSeries(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
             case DELETE_SERIES:
             case DELETE_SERIES_EVENT:
             case UPDATE_SERIES:
@@ -181,6 +187,20 @@ public class AdminControlWebSocketServer extends WebSocketServer
     {
         this.application.stopBroadcast();
         broadcast("Broadcast stopped!");
+    }
+
+    private boolean handleAllowMidSeries(final JsonObject commandJson)
+    {
+        if (commandJson.has("allowMidSeries"))
+        {
+            this.application.updateMidSeries(Boolean.parseBoolean(commandJson.get("allowMidSeries").getAsString()));
+            broadcast("Midseries allowed: " + this.application.getApplicationContext().isMidSeriesAllowed());
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     @Override

@@ -180,7 +180,7 @@ public class Series
         stringBuilder.append(this.seriesMetaData.getDate());
         stringBuilder.append("-");
         stringBuilder.append(Instant.now().toEpochMilli());
-        return stringBuilder.toString();
+        return stringBuilder.toString().replaceAll(" ", "");
     }
 
     public String getSeriesId()

@@ -180,4 +180,14 @@ public class RlcsBotApplication
     {
         this.applicationContext.getUppercaseDisplayToLiquipediaName().put(displayName.toUpperCase(), liquipediaName);
     }
+
+    public void updateMidSeries(final boolean midSeries)
+    {
+        this.applicationContext.setMidSeriesAllowed(midSeries);
+    }
+
+    public ApplicationContext getApplicationContext()
+    {
+        return this.applicationContext;
+    }
 }

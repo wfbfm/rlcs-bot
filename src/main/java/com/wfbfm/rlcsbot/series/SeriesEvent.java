@@ -30,7 +30,7 @@ public class SeriesEvent
     public SeriesEvent(final Series series, final SeriesSnapshotEvaluation evaluation)
     {
         final int updateNumber = series.uptickEventNumber();
-        this.eventId = "Event" + String.valueOf(updateNumber) + "-" + series.getSeriesId();
+        this.eventId = "Event" + updateNumber + "-" + series.getSeriesId();
         this.seriesId = series.getSeriesId();
         this.currentGame = series.getCurrentGame();
         this.seriesScore = series.getSeriesScore();

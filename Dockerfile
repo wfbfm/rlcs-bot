@@ -13,7 +13,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 # Set the working directory in the container
 WORKDIR /app
 
-RUN apt-get install -y git
+RUN apt-get install -y git vim less
 
 # Copy and install Python dependencies
 COPY . .

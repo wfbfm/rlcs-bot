@@ -81,13 +81,8 @@ public class CommentaryRecorder
                 streamUrl,
                 audioQuality,
                 "-o",
-                escapeSpaces(FULL_AUDIO_FILE.getAbsolutePath()),
+                FULL_AUDIO_FILE.getAbsolutePath(),
                 "--twitch-disable-ads"
         );
-    }
-
-    private String escapeSpaces(final String inputString)
-    {
-        return "\"" + inputString + "\"";
     }
 }
