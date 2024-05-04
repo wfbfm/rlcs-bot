@@ -75,18 +75,14 @@ public class CommentaryRecorder
 
     private ProcessBuilder createStreamlinkProcess(final String streamUrl)
     {
+        final String audioQuality = streamUrl.contains("/videos/") ? "audio" : "audio_only";
         return new ProcessBuilder(
                 STREAMLINK_COMMAND,
                 streamUrl,
-                "audio_only",
+                audioQuality,
                 "-o",
-                escapeSpaces(FULL_AUDIO_FILE.getAbsolutePath()),
+                FULL_AUDIO_FILE.getAbsolutePath(),
                 "--twitch-disable-ads"
         );
-    }
-
-    private String escapeSpaces(final String inputString)
-    {
-        return "\"" + inputString + "\"";
     }
 }

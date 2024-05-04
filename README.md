@@ -1,27 +1,75 @@
-# Installation
+# Rocket League Commentary Service
 
-Dockerising this is on my to-do list, so good luck.
+### Local Installation
 
-1. Clone the project.  Carefully review `src/main/java/com/wfbfm/rlcsbot/app/RuntimeConstants.java`
-2. Create a python venv in the project directory and do a `pip install -r requirements.txt`.
-If not running on Windows, update the PYTHON_VENV_PATH in RuntimeConstants.java
-3. Install [ffmpeg](https://ffmpeg.org/) if not already available on your machine
-4. Install [streamlink](https://streamlink.github.io/install.html) if not already available on your machine
-5. Create a folder in project directory `/appconfig/` - this will hold the Elastic API key
-6. Follow the [Elastic Docker instructions](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html) to
-configure a single-node 8.12.2 Elasticsearch container:
-   *  `docker network create elastic`
-   *  `docker pull docker.elastic.co/elasticsearch/elasticsearch:8.12.2`
-   *  `docker run --name es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.12.2`
-   *  Take note of the Elastic password that is printed to the terminal after running the container for the first time
-   *  Copy the generated http_ca.crt to your machine `docker cp es01:/usr/share/elasticsearch/config/certs/http_ca.crt .`
-   *  Add the generated http_ca.crt to your JDK trusted certs - similar to `keytool -importcert -alias elasticSearch -file "http_ca.crt" -keystore "%JAVA_HOME%\lib\security\cacerts"`
-7. Continue following the [Elastic Docker instructions](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
-to stand up a Kibana container:
-   * `docker pull docker.elastic.co/kibana/kibana:8.12.2`
-   * `docker run --name kib01 --net elastic -p 5601:5601 docker.elastic.co/kibana/kibana:8.12.2`
-   * Navigate to the link printed to the terminal - typically `localhost:5601?code=XXX` with a trailing unique code
-   * Log in with user `elastic` and the password generated in 6)
-   * Generate an API key via your [local Kibana config](http://localhost:5601/app/management/security/api_keys) page
-   * Copy your API key to a new file `/appconfig/elastic_api_key.txt`
+First, make any necessary changes to the placeholder passwords/secret ports in `.env`.
 
+```bash
+docker-compose up --build
+```
+
+The docker-compose script will spin up:
+- An ElasticSearch instance - which stores score update/commentary data
+- The React UI - available locally at `http://localhost:80`
+- The backend Java app.  This also serves a secret admin websocket at `ws://localhost:<SECRET_ADMIN_APP_PORT>`
+
+### Admin Commands
+
+The admin websocket listens for a number of commands that control the start/stop of the broadcast.
+Eventually, I'll make a simple control panel and fit this into the UI.  For now:
+
+#### Update Broadcast & Liquipedia URL
+
+You can pass in a Twitch page for a live broadcast, or a VOD.  Make sure you also update the Liquipedia URL with the corresponding page!
+
+Live broadcasts:
+
+```
+{"command": "BROADCAST_URL", "broadcastUrl": "https://www.twitch.tv/rocketleague"}
+```
+```
+{"command": "LIQUIPEDIA_URL", "liquipediaUrl": "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_2/Europe/Open_Qualifier_4"}
+```
+
+VOD:
+
+```
+{"command": "BROADCAST_URL", "broadcastUrl": "https://www.twitch.tv/videos/2131987392?t=03h05m37s"}
+```
+```
+{"command": "LIQUIPEDIA_URL", "liquipediaUrl": "https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2024/Major_2/North_America/Open_Qualifier_4"}
+```
+
+#### Start/Stop Broadcast
+
+```
+{"command": "START_BROADCAST"}
+```
+
+```
+{"command": "STOP_BROADCAST"}
+```
+
+#### Twitch -> Liquipedia Name mapping
+
+Some team names are very long, and are thus shown differently on the broadcast.
+In case the backend config is missing a mapping, you can add one with:
+
+```
+{"command": "DISPLAY_NAME", "displayName": "GRIDSERVE RSV", "liquipediaName":"GRIDSERVE Resolve"}
+```
+
+#### Starting a broadcast mid-stream
+There is validation in the app to only initiate a new series in the opening seconds of the game.
+This prevents accidentally creating a new series during highlight packages in between matches.
+
+If you want to start the feed during a series, you can temporarily relax the validation with:
+
+```
+{"command": "ALLOW_MIDSERIES", "allowMidSeries": "true"}
+```
+
+Don't forget to re-enforce the validation, once the game has been picked up:
+```
+{"command": "ALLOW_MIDSERIES", "allowMidSeries": "false"}
+```

@@ -14,6 +14,7 @@ public class ApplicationContext
     private String broadcastUrl;
     private String liquipediaUrl;
     private boolean isBroadcastLive;
+    private boolean isMidSeriesAllowed;
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
 
     public ApplicationContext(final String broadcastUrl, final String liquipediaUrl, final boolean isBroadcastLive)
@@ -21,6 +22,7 @@ public class ApplicationContext
         this.broadcastUrl = broadcastUrl;
         this.liquipediaUrl = liquipediaUrl;
         this.isBroadcastLive = isBroadcastLive;
+        this.isMidSeriesAllowed = false;
         initialiseDisplayNameCache();
     }
 
@@ -52,6 +54,16 @@ public class ApplicationContext
     public void setBroadcastLive(final boolean broadcastLive)
     {
         isBroadcastLive = broadcastLive;
+    }
+
+    public boolean isMidSeriesAllowed()
+    {
+        return isMidSeriesAllowed;
+    }
+
+    public void setMidSeriesAllowed(final boolean midSeriesAllowed)
+    {
+        isMidSeriesAllowed = midSeriesAllowed;
     }
 
     public Map<String, String> getUppercaseDisplayToLiquipediaName()

@@ -11,5 +11,6 @@ public enum AdminCommand
     BROADCAST_URL,
     START_BROADCAST,
     STOP_BROADCAST,
-    DISPLAY_NAME
+    DISPLAY_NAME,
+    ALLOW_MIDSERIES
 }

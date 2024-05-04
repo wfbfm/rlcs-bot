@@ -109,10 +109,16 @@ public class SeriesUpdateHandler
 
     private boolean isValidNewSeries(final SeriesSnapshot snapshot)
     {
-        // TODO
-        final boolean littleTimeElapsed = snapshot.getCurrentGame().getClock().getElapsedSeconds() < 100;
-        final boolean zeroSeriesScore = snapshot.getSeriesScore().getBlueScore() == 0 && snapshot.getSeriesScore().getOrangeScore() == 0;
-        return littleTimeElapsed && zeroSeriesScore;
+        if (applicationContext.isMidSeriesAllowed())
+        {
+            return true;
+        }
+        else
+        {
+            final boolean littleTimeElapsed = snapshot.getCurrentGame().getClock().getElapsedSeconds() < 100;
+            final boolean zeroSeriesScore = snapshot.getSeriesScore().getBlueScore() == 0 && snapshot.getSeriesScore().getOrangeScore() == 0;
+            return littleTimeElapsed && zeroSeriesScore;
+        }
     }
 
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)

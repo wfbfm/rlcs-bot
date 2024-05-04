@@ -30,8 +30,6 @@ public class RlcsBotApplication
         executorService = Executors.newCachedThreadPool();
         Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
 
-        startBroadcast();
-
         if (WEBSOCKET_ENABLED)
         {
             webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT, applicationContext);
@@ -95,7 +93,8 @@ public class RlcsBotApplication
         {
             if (directory.exists())
             {
-                if (directory.equals(AUDIO_DIRECTORY) && !LIVE_COMMENTARY_RECORDING_ENABLED)
+                final boolean isVod = applicationContext.getBroadcastUrl().contains("/videos/");
+                if (directory.equals(AUDIO_DIRECTORY) && isVod)
                 {
                     continue;
                 }
@@ -180,5 +179,15 @@ public class RlcsBotApplication
     public void addDisplayNameMapping(final String displayName, final String liquipediaName)
     {
         this.applicationContext.getUppercaseDisplayToLiquipediaName().put(displayName.toUpperCase(), liquipediaName);
+    }
+
+    public void updateMidSeries(final boolean midSeries)
+    {
+        this.applicationContext.setMidSeriesAllowed(midSeries);
+    }
+
+    public ApplicationContext getApplicationContext()
+    {
+        return this.applicationContext;
     }
 }

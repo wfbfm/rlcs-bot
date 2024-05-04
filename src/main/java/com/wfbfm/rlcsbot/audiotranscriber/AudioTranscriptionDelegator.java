@@ -70,18 +70,18 @@ public class AudioTranscriptionDelegator
         }
 
         return new ProcessBuilder(
-                PYTHON_VENV_PATH,
+                PYTHON,
                 PYTHON_SCRIPT,
                 FULL_AUDIO_PATH,
-                escapeSpaces(String.format(TRIMMED_FILE_PATH, seriesEventId)),
+                String.format(TRIMMED_FILE_PATH, seriesEventId),
                 String.valueOf(TRANSCRIPTION_FILE_SECONDS),
                 String.valueOf(startSeconds),
-                escapeSpaces(String.format(TRANSCRIPTION_FILENAME, seriesEventId)),
-                escapeSpaces(initialPrompt)
+                String.format(TRANSCRIPTION_FILENAME, seriesEventId),
+                wrapInQuotes(initialPrompt)
         );
     }
 
-    private String escapeSpaces(final String inputString)
+    private String wrapInQuotes(final String inputString)
     {
         return "\"" + inputString + "\"";
     }
