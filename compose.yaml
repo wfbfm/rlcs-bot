@@ -24,6 +24,7 @@ services:
     build: ./ui
     environment:
       - UI_PORT=${UI_PORT}
+      - APP_PORT=${APP_PORT}
     ports:
       - "${UI_PORT}:${UI_PORT}"
 

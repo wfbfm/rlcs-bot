@@ -30,8 +30,6 @@ public class RlcsBotApplication
         executorService = Executors.newCachedThreadPool();
         Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
 
-        startBroadcast();
-
         if (WEBSOCKET_ENABLED)
         {
             webSocketServer = new ElasticSeriesWebSocketServer(WEBSOCKET_PORT, applicationContext);

@@ -7,31 +7,28 @@ RUN apt-get update && apt-get install -y openjdk-17-jdk
 # Set JAVA_HOME environment variable
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
+## FIXME: need Google Chrome
+
 # Set the working directory in the container
 WORKDIR /app
 
-# Python - for audio transcription
-# TODO is this needed? we have python in base
-# RUN apt-get install -y python3.11 python3-pip git
+RUN apt-get install -y git
 
 # Copy and install Python dependencies
 COPY . .
 
 # Adding this in later, it slows us down
-# RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 RUN chmod +x /app/import_cert.sh
 
-# TODO: Chrome web driver?
-# TODO: FFMPEG
-
 # Streamlink - for audio recordings from Twitch
-# RUN apt-get install -y streamlink
+RUN apt-get install -y streamlink
+RUN apt-get install -y ffmpeg
 
 # Tesseract - for OCR on Twitch screenshots
-# RUN apt-get install -y tesseract-ocr
-# RUN apt-get install -y libtesseract-dev
-
+RUN apt-get install -y tesseract-ocr
+RUN apt-get install -y libtesseract-dev
 
 # Maven build stage
 FROM maven:3.8.4-openjdk-17 AS maven

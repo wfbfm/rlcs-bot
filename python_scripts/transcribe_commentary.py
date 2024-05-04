@@ -57,3 +57,4 @@ if __name__ == "__main__":
     transcription_file = os.path.join(input_directory, transcription_filename)
     with open(transcription_file, 'w') as txt_file:
         txt_file.write(transcription)
+    os.remove(trimmed_audio_filename)
