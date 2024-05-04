@@ -7,8 +7,6 @@ RUN apt-get update && apt-get install -y openjdk-17-jdk
 # Set JAVA_HOME environment variable
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-## FIXME: need Google Chrome
-
 # Set the working directory in the container
 WORKDIR /app
 
@@ -17,7 +15,6 @@ RUN apt-get install -y git
 # Copy and install Python dependencies
 COPY . .
 
-# Adding this in later, it slows us down
 RUN pip3 install -r requirements.txt
 
 RUN chmod +x /app/import_cert.sh
@@ -29,6 +26,22 @@ RUN apt-get install -y ffmpeg
 # Tesseract - for OCR on Twitch screenshots
 RUN apt-get install -y tesseract-ocr
 RUN apt-get install -y libtesseract-dev
+
+# Install Chrome WebDriver
+RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
+    mkdir -p /opt/chromedriver-$CHROMEDRIVER_VERSION && \
+    curl -sS -o /tmp/chromedriver_linux64.zip http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip && \
+    unzip -qq /tmp/chromedriver_linux64.zip -d /opt/chromedriver-$CHROMEDRIVER_VERSION && \
+    rm /tmp/chromedriver_linux64.zip && \
+    chmod +x /opt/chromedriver-$CHROMEDRIVER_VERSION/chromedriver && \
+    ln -fs /opt/chromedriver-$CHROMEDRIVER_VERSION/chromedriver /usr/local/bin/chromedriver
+
+# Install Google Chrome
+RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get -yqq update && \
+    apt-get -yqq install google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
 
 # Maven build stage
 FROM maven:3.8.4-openjdk-17 AS maven
