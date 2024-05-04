@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.audiotranscriber;
 
+import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.series.Series;
 
 import java.io.File;
@@ -16,6 +17,12 @@ public class AudioTranscriptionDelegator
     private static final String TRANSCRIPTION_FILENAME = FULL_AUDIO_FILE.getParentFile().getAbsolutePath() + File.separator + "%s.txt";
     private final Logger logger = Logger.getLogger(AudioTranscriptionDelegator.class.getName());
     private final long initialisationTime = Instant.now().getEpochSecond();
+    private final ApplicationContext applicationContext;
+
+    public AudioTranscriptionDelegator(final ApplicationContext applicationContext)
+    {
+        this.applicationContext = applicationContext;
+    }
 
     public void delegateAudioTranscription(final Series series, final String seriesEventId)
     {
@@ -60,13 +67,14 @@ public class AudioTranscriptionDelegator
     private ProcessBuilder createTranscriptionProcess(final String initialPrompt, final String seriesEventId)
     {
         final long startSeconds;
-        if (LIVE_COMMENTARY_RECORDING_ENABLED)
+        if (applicationContext.getBroadcastUrl().contains("/videos/"))
         {
-            startSeconds = 0L;
+            // the commentary isn't live, so we need to approximate when to clip the pre-downloaded audio from
+            startSeconds = Instant.now().getEpochSecond() - initialisationTime;
         }
         else
         {
-            startSeconds = Instant.now().getEpochSecond() - initialisationTime;
+            startSeconds = 0L;
         }
 
         return new ProcessBuilder(

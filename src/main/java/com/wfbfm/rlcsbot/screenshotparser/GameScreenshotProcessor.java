@@ -31,7 +31,7 @@ public class GameScreenshotProcessor
     private final SubImageToSeriesSnapshotTransformer subImageToSeriesSnapshotTransformer;
     private final LiquipediaRefDataFetcher liquipediaRefDataFetcher;
     private final SeriesUpdateHandler seriesUpdateHandler;
-    private final AudioTranscriptionDelegator audioTranscriptionDelegator = new AudioTranscriptionDelegator();
+    private final AudioTranscriptionDelegator audioTranscriptionDelegator;
     private final ElasticSearchPublisher elasticSearchPublisher = new ElasticSearchPublisher();
 
     public GameScreenshotProcessor(final ApplicationContext applicationContext)
@@ -41,6 +41,7 @@ public class GameScreenshotProcessor
         this.liquipediaRefDataFetcher = new LiquipediaRefDataFetcher(applicationContext);
         this.liquipediaRefDataFetcher.updateLiquipediaRefData();
         this.seriesUpdateHandler = new SeriesUpdateHandler(applicationContext, liquipediaRefDataFetcher);
+        this.audioTranscriptionDelegator = new AudioTranscriptionDelegator(applicationContext);
     }
 
     public void run()

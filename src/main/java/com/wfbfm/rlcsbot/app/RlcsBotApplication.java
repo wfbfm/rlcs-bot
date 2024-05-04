@@ -93,11 +93,6 @@ public class RlcsBotApplication
         {
             if (directory.exists())
             {
-                final boolean isVod = applicationContext.getBroadcastUrl().contains("/videos/");
-                if (directory.equals(AUDIO_DIRECTORY) && isVod)
-                {
-                    continue;
-                }
                 directory.delete();
                 directory.mkdirs();
                 System.out.println("Directory cleared: " + directory.getAbsolutePath());
