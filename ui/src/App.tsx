@@ -20,7 +20,9 @@ const App: React.FC = () =>
   const [currentSeries, setCurrentSeries] = useState<Series | null>(null);
   const [logos, setLogos] = useState<{ [logoName: string]: string }>({});
   const [showTwitch, setShowTwitch] = React.useState(false);
-  const appPort = process.env.APP_PORT;
+  const appPort = 8080;
+  // FIXME;
+  // const appPort = process.env.APP_PORT;
 
   useEffect(() =>
   {
