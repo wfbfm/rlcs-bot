@@ -110,6 +110,12 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
 
     private void pollAndBroadcastNewDocuments()
     {
+        if (applicationContext.flushWebSocket())
+        {
+            flush();
+            logger.info("Flushed Elastic broadcaster - 0 series/seriesEvents/logos in internal maps");
+        }
+
         logger.info("Polling for new Elastic documents.");
         try
         {
@@ -138,6 +144,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             final String documentId = hit.id();
             final String documentJson = JsonpUtils.toJsonString(hit, client._jsonpMapper());
             final String cachedDocumentJson = documentMap.get(documentId);
+            // FIXME!  This isn't doing the comparison correctly.  UI models will also need to be overhauled, as the json payload will change
             if (cachedDocumentJson == null || !cachedDocumentJson.equals(documentJson))
             {
                 documentMap.put(documentId, documentJson);
@@ -173,4 +180,11 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         return BASE_64_TEMPLATE + base64String;
     }
 
+    private void flush()
+    {
+        this.allBroadcastSeries.clear();
+        this.allBroadcastSeriesEvents.clear();
+        this.allTeamLogos.clear();
+        this.applicationContext.setFlushWebSocket(false);
+    }
 }
