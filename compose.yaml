@@ -13,6 +13,9 @@ services:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - APP_PORT=${APP_PORT}
       - SECRET_ADMIN_APP_PORT=${SECRET_ADMIN_APP_PORT}
+      - SSL_ENABLED=${SSL_ENABLED}
+      - KEYSTORE_PATH=${KEYSTORE_PATH}
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
     depends_on:
       es01:
         condition: service_healthy  # Wait for Elasticsearch container to be healthy
@@ -25,6 +28,7 @@ services:
     environment:
       - UI_PORT=${UI_PORT}
       - APP_PORT=${APP_PORT}
+      - SSL_ENABLED=${SSL_ENABLED}
     ports:
       - "${UI_PORT}:${UI_PORT}"
 
