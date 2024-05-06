@@ -18,7 +18,7 @@ public class RuntimeConstants
     public static final boolean RETAIN_SCREENSHOTS = false;
     public static final int LEVENSHTEIN_MINIMUM_DISTANCE = 2;
     public static final int GAME_TIME_SECONDS = 300;
-    public static final int SCREENSHOT_INTERVAL_MS = 10_000;
+    public static final int SCREENSHOT_INTERVAL_MS = Integer.parseInt(System.getenv("SAMPLING_RATE"));
     public static final File TEMP_DIRECTORY = new File("temp/");
     public static final File INCOMING_DIRECTORY = new File("temp/incoming/");
     public static final File PROCESSING_DIRECTORY = new File("temp/processing/");

@@ -184,7 +184,7 @@ public class SeriesUpdateHandler
         final Clock currentClock = currentSeries.getCurrentGame().getClock();
         if (currentClock.getElapsedSeconds() > snapshot.getCurrentGame().getClock().getElapsedSeconds())
         {
-            final int approxElapsedSeconds = currentClock.getElapsedSeconds() + (SCREENSHOT_INTERVAL_MS / 1_000);
+            final int approxElapsedSeconds = currentClock.getElapsedSeconds() + (applicationContext.getSamplingRateMs() / 1_000);
             final Clock newClock = new Clock(approxElapsedSeconds, currentClock.isOvertime());
             currentSeries.getCurrentGame().setClock(newClock);
             return;
@@ -246,7 +246,8 @@ public class SeriesUpdateHandler
         final Score gameScore = currentSeries.getCurrentGame().getScore();
         final boolean isTeamInLead = gameScore.getBlueScore() != gameScore.getOrangeScore();
         final Clock clock = currentSeries.getCurrentGame().getClock();
-        final boolean isLittleTimeRemaining = clock.isOvertime() || (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * SCREENSHOT_INTERVAL_MS / 1_000);
+        final boolean isLittleTimeRemaining = clock.isOvertime() ||
+                (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * applicationContext.getSamplingRateMs() / 1_000);
         return isTeamInLead && isLittleTimeRemaining;
     }
 

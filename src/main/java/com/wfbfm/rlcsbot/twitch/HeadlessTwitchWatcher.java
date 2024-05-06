@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.INCOMING_DIRECTORY;
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.SCREENSHOT_INTERVAL_MS;
 
 public class HeadlessTwitchWatcher
 {
@@ -57,7 +56,7 @@ public class HeadlessTwitchWatcher
                 logger.log(Level.SEVERE, "Unable to take screenshot - stopping feed.", e);
                 break;
             }
-            sleepForMs(SCREENSHOT_INTERVAL_MS);
+            sleepForMs(applicationContext.getSamplingRateMs());
         }
 
         logger.log(Level.INFO, "Stopping worker thread");

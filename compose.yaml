@@ -16,6 +16,7 @@ services:
       - SSL_ENABLED=${SSL_ENABLED}
       - KEYSTORE_PATH=${KEYSTORE_PATH}
       - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+      - SAMPLING_RATE=${SAMPLING_RATE}
     depends_on:
       es01:
         condition: service_healthy  # Wait for Elasticsearch container to be healthy
@@ -114,7 +115,7 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    mem_limit: 1GB
+    mem_limit: 512MB
     healthcheck:
       test:
         [

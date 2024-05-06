@@ -83,7 +83,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             {
                 semaphore.release();
             }
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, applicationContext.getSamplingRateMs(), TimeUnit.MILLISECONDS);
     }
 
     @Override
