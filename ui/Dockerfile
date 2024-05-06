@@ -4,8 +4,6 @@ FROM node:21.6.2 as build
 # Set the working directory in the container
 WORKDIR /app
 
-ENV APP_PORT=${APP_PORT}
-
 # Copy package.json and yarn.lock (if exists) to the working directory
 COPY package.json yarn.lock* ./
 
@@ -26,9 +24,6 @@ COPY --from=build /app/build /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE ${UI_PORT}
-
-# Set the APP_PORT environment variable for the nginx container
-ENV APP_PORT=${APP_PORT}
 
 # Command to run nginx
 CMD ["nginx", "-g", "daemon off;"]

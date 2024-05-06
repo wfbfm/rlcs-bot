@@ -11,8 +11,10 @@ import com.wfbfm.rlcsbot.series.SeriesEvent;
 import org.apache.commons.io.FileUtils;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import org.java_websocket.server.WebSocketServer;
 
+import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -51,6 +53,18 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         super(new InetSocketAddress(port));
 
         this.applicationContext = applicationContext;
+        if (SSL_ENABLED)
+        {
+            final SSLContext sslContext = SslContextProvider.getSslContext();
+            if (sslContext == null)
+            {
+                logger.log(Level.SEVERE, "Unable to set up SSL");
+            }
+            else
+            {
+                setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sslContext));
+            }
+        }
         startPollingForNewDocuments();
     }
 
@@ -118,7 +132,10 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             logger.info("Flushed Elastic broadcaster - 0 series/seriesEvents/logos in internal maps");
         }
 
-        logger.info("Polling for new Elastic documents.");
+        if (DEBUGGING_ENABLED)
+        {
+            logger.info("Polling for new Elastic documents.");
+        }
         try
         {
             broadcastLatestDocuments(ELASTIC_INDEX_SERIES, allBroadcastSeries, Series.class);

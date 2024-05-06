@@ -6,11 +6,15 @@ import com.google.gson.JsonParser;
 import com.wfbfm.rlcsbot.app.RlcsBotApplication;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import org.java_websocket.server.WebSocketServer;
 
+import javax.net.ssl.SSLContext;
 import java.net.InetSocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.SSL_ENABLED;
 
 public class AdminControlWebSocketServer extends WebSocketServer
 {
@@ -22,6 +26,18 @@ public class AdminControlWebSocketServer extends WebSocketServer
     {
         super(new InetSocketAddress(port));
         this.application = application;
+        if (SSL_ENABLED)
+        {
+            final SSLContext sslContext = SslContextProvider.getSslContext();
+            if (sslContext == null)
+            {
+                logger.log(Level.SEVERE, "Unable to set up SSL");
+            }
+            else
+            {
+                setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sslContext));
+            }
+        }
     }
 
     @Override

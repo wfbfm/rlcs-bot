@@ -40,5 +40,8 @@ public class RuntimeConstants
     public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
     public static final int WEBSOCKET_PORT = Integer.parseInt(System.getenv("APP_PORT"));
     public static final int SECRET_ADMIN_PORT = Integer.parseInt(System.getenv("SECRET_ADMIN_APP_PORT"));
+    public static final String KEYSTORE_PASSWORD = System.getenv("KEYSTORE_PASSWORD");
+    public static final String KEYSTORE_PATH = System.getenv("KEYSTORE_PATH");
+    public static final boolean SSL_ENABLED = Boolean.parseBoolean(System.getenv("SSL_ENABLED"));
     public static final int DEFAULT_BEST_OF = 5;
 }
