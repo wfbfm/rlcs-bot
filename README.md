@@ -1,5 +1,17 @@
 # Rocket League Commentary Service
 
+### Automated, real-time RLCS text feed
+
+Inspired by live text coverage of traditional sports, RL Commentary Service parses live score information and audio transcripts of the official
+[Rocket League Twitch Broadcast](https://www.twitch.tv/rocketleague):
+
+![rlcs-bot](https://github.com/wfbfm/rlcs-bot/assets/49768006/acf37487-bcb2-4a48-ba2a-36eaecc215b0)
+
+### Questions? Join us on Discord:
+
+[![RL Commentary Service Discord](https://discordapp.com/api/guilds/1048640527920271381/embed.png?style=banner2)](https://discord.gg/Y8sBAmrzrq)
+
+
 ### Local Installation
 
 First, make any necessary changes to the placeholder passwords/secret ports in `.env`.
