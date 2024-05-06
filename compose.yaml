@@ -22,6 +22,7 @@ services:
         condition: service_healthy  # Wait for Elasticsearch container to be healthy
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
+    mem_limit: 512MB
 
   ui:
     container_name: rlcs_ui
@@ -30,6 +31,7 @@ services:
       - UI_PORT=${UI_PORT}
     ports:
       - "${UI_PORT}:${UI_PORT}"
+    mem_limit: 256MB
 
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
@@ -115,7 +117,7 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    mem_limit: 512MB
+    mem_limit: 1GB
     healthcheck:
       test:
         [
