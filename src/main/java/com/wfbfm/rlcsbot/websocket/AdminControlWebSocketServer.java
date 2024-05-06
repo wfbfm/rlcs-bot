@@ -102,6 +102,12 @@ public class AdminControlWebSocketServer extends WebSocketServer
             case FLUSH_WEBSOCKET:
                 handleFlushWebSocket();
                 break;
+            case SAMPLING_RATE:
+                if (!handleSamplingRate(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
             case DELETE_SERIES:
             case DELETE_SERIES_EVENT:
             case UPDATE_SERIES:
@@ -212,6 +218,21 @@ public class AdminControlWebSocketServer extends WebSocketServer
     {
         this.application.getApplicationContext().setFlushWebSocket(true);
         broadcast("Flushing websocket...");
+    }
+
+    private boolean handleSamplingRate(final JsonObject commandJson)
+    {
+        if (commandJson.has("samplingRate"))
+        {
+            final int samplingRate = commandJson.get("samplingRate").getAsInt();
+            this.application.getApplicationContext().setSamplingRateMs(samplingRate);
+            broadcast(String.format("Updated sampling rate URL: " + samplingRate));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private boolean handleAllowMidSeries(final JsonObject commandJson)

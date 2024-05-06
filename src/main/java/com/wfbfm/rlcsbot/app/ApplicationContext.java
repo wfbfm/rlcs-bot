@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.DISPLAY_NAME_MAPPINGS;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.SCREENSHOT_INTERVAL_MS;
 
 public class ApplicationContext
 {
@@ -16,6 +17,7 @@ public class ApplicationContext
     private boolean isBroadcastLive;
     private boolean isMidSeriesAllowed;
     private boolean flushWebSocket;
+    private int samplingRateMs;
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
 
     public ApplicationContext(final String broadcastUrl, final String liquipediaUrl, final boolean isBroadcastLive)
@@ -24,6 +26,7 @@ public class ApplicationContext
         this.liquipediaUrl = liquipediaUrl;
         this.isBroadcastLive = isBroadcastLive;
         this.isMidSeriesAllowed = false;
+        this.samplingRateMs = SCREENSHOT_INTERVAL_MS;
         initialiseDisplayNameCache();
     }
 
@@ -80,6 +83,16 @@ public class ApplicationContext
     public void setFlushWebSocket(final boolean flushWebSocket)
     {
         this.flushWebSocket = flushWebSocket;
+    }
+
+    public int getSamplingRateMs()
+    {
+        return samplingRateMs;
+    }
+
+    public void setSamplingRateMs(final int samplingRateMs)
+    {
+        this.samplingRateMs = samplingRateMs;
     }
 
     private void initialiseDisplayNameCache()
