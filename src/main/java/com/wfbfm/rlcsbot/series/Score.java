@@ -89,4 +89,21 @@ public class Score
         assignTeamInLead();
         return teamInLead;
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Score other = (Score) obj;
+        return blueScore == other.blueScore &&
+                orangeScore == other.orangeScore &&
+                teamInLead == other.teamInLead;
+    }
 }

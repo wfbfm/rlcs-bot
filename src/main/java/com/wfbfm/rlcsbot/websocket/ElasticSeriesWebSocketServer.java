@@ -34,12 +34,14 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
     private static final String IMAGE_JSON_TEMPLATE = "{\"payloadType\": \"image\", \"imageName\": \"%s\", \"base64Image\": \"%s\"}";
     private static final String BASE_64_TEMPLATE = "data:image/png;base64,";
     private static final String EXACT_ELASTIC_SEARCH_STRING = "\"%s\"";
+    private static final int MAX_RECORDS_FROM_SEARCH = 10_000;
     private final Base64.Encoder base64Encoder = Base64.getEncoder();
     private final Logger logger = Logger.getLogger(ElasticSeriesWebSocketServer.class.getName());
     private final ApplicationContext applicationContext;
     private final ElasticsearchClient client = ElasticSearchClientBuilder.getElasticsearchClient();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Semaphore semaphore = new Semaphore(1);
+    private final Map<String, Object> documentObjectCache = new HashMap<>();
     private final Map<String, String> allBroadcastSeries = new HashMap<>();
     private final Map<String, String> allBroadcastSeriesEvents = new HashMap<>();
     private final Map<String, String> allTeamLogos = new HashMap<>();
@@ -110,6 +112,12 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
 
     private void pollAndBroadcastNewDocuments()
     {
+        if (applicationContext.flushWebSocket())
+        {
+            flush();
+            logger.info("Flushed Elastic broadcaster - 0 series/seriesEvents/logos in internal maps");
+        }
+
         logger.info("Polling for new Elastic documents.");
         try
         {
@@ -130,18 +138,21 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         final SearchResponse<?> response = client
                 .search(s -> s
                         .index(indexName)
-                        .size(10_000)
+                        .size(MAX_RECORDS_FROM_SEARCH)
                         .query(q -> q.queryString(qs -> qs.query(queryString))), objectType);
 
         for (final Hit<?> hit : response.hits().hits())
         {
             final String documentId = hit.id();
             final String documentJson = JsonpUtils.toJsonString(hit, client._jsonpMapper());
-            final String cachedDocumentJson = documentMap.get(documentId);
-            if (cachedDocumentJson == null || !cachedDocumentJson.equals(documentJson))
+            final Object documentObject = hit.source();
+            final Object cachedHit = documentObjectCache.get(documentId);
+            if (cachedHit == null || !cachedHit.equals(documentObject))
             {
                 documentMap.put(documentId, documentJson);
+                documentObjectCache.put(documentId, documentObject);
                 logger.info("Found new document - broadcasting to all clients: " + documentId);
+                logger.info(documentJson);
                 broadcast(String.format(BROADCAST_JSON_TEMPLATE, documentJson));
             }
         }
@@ -173,4 +184,11 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         return BASE_64_TEMPLATE + base64String;
     }
 
+    private void flush()
+    {
+        this.allBroadcastSeries.clear();
+        this.allBroadcastSeriesEvents.clear();
+        this.allTeamLogos.clear();
+        this.applicationContext.setFlushWebSocket(false);
+    }
 }

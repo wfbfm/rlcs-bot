@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Series
@@ -203,5 +204,29 @@ public class Series
         stringBuilder.append("bestOf=" + bestOf + " currentGameNumber=" + currentGameNumber + " isComplete=" + isComplete +
                 " numberOfCompletedGames=" + completedGames.size());
         return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Series other = (Series) obj;
+        return bestOf == other.bestOf &&
+                currentGameNumber == other.currentGameNumber &&
+                isComplete == other.isComplete &&
+                Objects.equals(seriesId, other.seriesId) &&
+                Objects.equals(seriesMetaData, other.seriesMetaData) &&
+                Objects.equals(completedGames, other.completedGames) &&
+                Objects.equals(currentGame, other.currentGame) &&
+                Objects.equals(seriesScore, other.seriesScore) &&
+                Objects.equals(blueTeam, other.blueTeam) &&
+                Objects.equals(orangeTeam, other.orangeTeam);
     }
 }

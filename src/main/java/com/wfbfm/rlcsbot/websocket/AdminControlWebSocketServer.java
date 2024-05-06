@@ -83,6 +83,9 @@ public class AdminControlWebSocketServer extends WebSocketServer
                     logger.log(Level.WARNING, "Received command with missing params");
                 }
                 break;
+            case FLUSH_WEBSOCKET:
+                handleFlushWebSocket();
+                break;
             case DELETE_SERIES:
             case DELETE_SERIES_EVENT:
             case UPDATE_SERIES:
@@ -187,6 +190,12 @@ public class AdminControlWebSocketServer extends WebSocketServer
     {
         this.application.stopBroadcast();
         broadcast("Broadcast stopped!");
+    }
+
+    private void handleFlushWebSocket()
+    {
+        this.application.getApplicationContext().setFlushWebSocket(true);
+        broadcast("Flushing websocket...");
     }
 
     private boolean handleAllowMidSeries(final JsonObject commandJson)

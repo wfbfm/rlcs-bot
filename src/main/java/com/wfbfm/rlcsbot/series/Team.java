@@ -1,5 +1,7 @@
 package com.wfbfm.rlcsbot.series;
 
+import java.util.Objects;
+
 public class Team
 {
     private Player player1;
@@ -87,5 +89,25 @@ public class Team
     public String getPlayerNames()
     {
         return this.playerNames;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Team other = (Team) obj;
+        return Objects.equals(player1, other.player1) &&
+                Objects.equals(player2, other.player2) &&
+                Objects.equals(player3, other.player3) &&
+                teamColour == other.teamColour &&
+                Objects.equals(teamName, other.teamName) &&
+                Objects.equals(playerNames, other.playerNames);
     }
 }

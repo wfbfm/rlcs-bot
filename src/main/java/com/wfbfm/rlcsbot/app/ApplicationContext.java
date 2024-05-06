@@ -15,6 +15,7 @@ public class ApplicationContext
     private String liquipediaUrl;
     private boolean isBroadcastLive;
     private boolean isMidSeriesAllowed;
+    private boolean flushWebSocket;
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
 
     public ApplicationContext(final String broadcastUrl, final String liquipediaUrl, final boolean isBroadcastLive)
@@ -69,6 +70,16 @@ public class ApplicationContext
     public Map<String, String> getUppercaseDisplayToLiquipediaName()
     {
         return uppercaseDisplayToLiquipediaName;
+    }
+
+    public boolean flushWebSocket()
+    {
+        return flushWebSocket;
+    }
+
+    public void setFlushWebSocket(final boolean flushWebSocket)
+    {
+        this.flushWebSocket = flushWebSocket;
     }
 
     private void initialiseDisplayNameCache()
