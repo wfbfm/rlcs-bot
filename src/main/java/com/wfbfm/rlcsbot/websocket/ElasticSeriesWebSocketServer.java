@@ -132,7 +132,10 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             logger.info("Flushed Elastic broadcaster - 0 series/seriesEvents/logos in internal maps");
         }
 
-        logger.info("Polling for new Elastic documents.");
+        if (DEBUGGING_ENABLED)
+        {
+            logger.info("Polling for new Elastic documents.");
+        }
         try
         {
             broadcastLatestDocuments(ELASTIC_INDEX_SERIES, allBroadcastSeries, Series.class);

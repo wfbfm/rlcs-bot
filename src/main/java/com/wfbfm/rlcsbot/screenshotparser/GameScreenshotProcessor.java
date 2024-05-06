@@ -69,11 +69,13 @@ public class GameScreenshotProcessor
             final File[] incomingFiles = INCOMING_DIRECTORY.listFiles();
             if (incomingFiles != null && incomingFiles.length > 0)
             {
-                logger.log(Level.INFO, String.format("Found %d files in incoming directory - beginning processing.", incomingFiles.length));
+                if (DEBUGGING_ENABLED)
+                {
+                    logger.log(Level.INFO, String.format("Found %d files in incoming directory - beginning processing.", incomingFiles.length));
+                }
                 Arrays.sort(incomingFiles, Comparator.comparingLong(File::lastModified));
                 for (final File incomingFile : incomingFiles)
                 {
-                    logger.log(Level.INFO, "Beginning processing: " + incomingFile.getName());
                     handleIncomingFile(incomingFile);
                 }
             }
@@ -90,8 +92,11 @@ public class GameScreenshotProcessor
         final SeriesSnapshot seriesSnapshot = this.subImageToSeriesSnapshotTransformer.transform(subImageWrapper);
         final SeriesSnapshotEvaluation evaluation = seriesUpdateHandler.evaluateSeries(seriesSnapshot);
 
-        logger.log(Level.INFO, "Evaluation Result: " + evaluation.name());
-        logger.log(Level.INFO, "Current Series Status: " + seriesUpdateHandler.getCurrentSeriesAsString());
+        if (DEBUGGING_ENABLED)
+        {
+            logger.log(Level.INFO, "Evaluation Result: " + evaluation.name());
+            logger.log(Level.INFO, "Current Series Status: " + seriesUpdateHandler.getCurrentSeriesAsString());
+        }
 
         final SeriesEvent seriesEvent;
         switch (evaluation)
