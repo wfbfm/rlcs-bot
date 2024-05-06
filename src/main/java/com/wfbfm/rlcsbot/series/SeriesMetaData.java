@@ -1,6 +1,7 @@
 package com.wfbfm.rlcsbot.series;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class SeriesMetaData
 {
@@ -51,5 +52,22 @@ public class SeriesMetaData
     public void setLiquipediaPage(final String liquipediaPage)
     {
         this.liquipediaPage = liquipediaPage;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final SeriesMetaData other = (SeriesMetaData) obj;
+        return Objects.equals(date, other.date) &&
+                Objects.equals(seriesDescription, other.seriesDescription) &&
+                Objects.equals(liquipediaPage, other.liquipediaPage);
     }
 }

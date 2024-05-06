@@ -2,6 +2,8 @@ package com.wfbfm.rlcsbot.series;
 
 import com.wfbfm.rlcsbot.series.handler.SeriesSnapshotEvaluation;
 
+import java.util.Objects;
+
 public class SeriesEvent
 {
     private final String eventId;
@@ -88,5 +90,28 @@ public class SeriesEvent
     public String getLiquipediaPage()
     {
         return liquipediaPage;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final SeriesEvent other = (SeriesEvent) obj;
+        return bestOf == other.bestOf &&
+                currentGameNumber == other.currentGameNumber &&
+                Objects.equals(eventId, other.eventId) &&
+                Objects.equals(seriesId, other.seriesId) &&
+                Objects.equals(currentGame, other.currentGame) &&
+                Objects.equals(seriesScore, other.seriesScore) &&
+                evaluation == other.evaluation &&
+                Objects.equals(liquipediaPage, other.liquipediaPage) &&
+                Objects.equals(commentary, other.commentary);
     }
 }

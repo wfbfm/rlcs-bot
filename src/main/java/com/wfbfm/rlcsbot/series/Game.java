@@ -1,5 +1,7 @@
 package com.wfbfm.rlcsbot.series;
 
+import java.util.Objects;
+
 public class Game
 {
     private Score score;
@@ -54,5 +56,22 @@ public class Game
     public String toString()
     {
         return "Game Score: " + score.getBlueScore() + " - " + score.getOrangeScore() + " (Time: " + clock.getDisplayedTime() + ")";
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Game other = (Game) obj;
+        return Objects.equals(score, other.score) &&
+                Objects.equals(clock, other.clock) &&
+                winner == other.winner;
     }
 }

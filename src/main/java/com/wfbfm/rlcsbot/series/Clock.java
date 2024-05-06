@@ -1,5 +1,7 @@
 package com.wfbfm.rlcsbot.series;
 
+import java.util.Objects;
+
 import static com.wfbfm.rlcsbot.app.RuntimeConstants.GAME_TIME_SECONDS;
 
 public class Clock
@@ -83,5 +85,22 @@ public class Clock
                 return String.valueOf(minutes) + ":" + String.format("%02d", seconds);
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Clock other = (Clock) obj;
+        return elapsedSeconds == other.elapsedSeconds &&
+                isOvertime == other.isOvertime &&
+                Objects.equals(displayedTime, other.displayedTime);
     }
 }
