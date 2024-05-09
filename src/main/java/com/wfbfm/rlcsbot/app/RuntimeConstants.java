@@ -31,7 +31,7 @@ public class RuntimeConstants
     public static final String DISPLAY_NAME_MAPPINGS = "src/main/resources/display-name-mappings.csv";
     public static final String PYTHON = "python";
     public static final String PYTHON_SCRIPT = "python_scripts" + File.separator + "transcribe_commentary.py";
-    public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
+    public static final int TRANSCRIPTION_WAIT_TIME_MS = Integer.parseInt(System.getenv("TRANSCRIPTION_WAIT"));
     public static final int TRANSCRIPTION_FILE_SECONDS = 20;
     public static final String ELASTICSEARCH_HOST = System.getenv("ELASTIC_HOST");
     public static final String ELASTICSEARCH_USERNAME = System.getenv("ELASTIC_USERNAME");

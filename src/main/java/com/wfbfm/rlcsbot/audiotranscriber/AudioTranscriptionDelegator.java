@@ -32,7 +32,7 @@ public class AudioTranscriptionDelegator
             return;
         }
         final String initialPrompt = generateInitialPrompt(series);
-        logger.log(Level.INFO, String.format("In %d ms, attempting audio transcription %s", TRANSCRIPTION_WAIT_TIME_MS, seriesEventId));
+        logger.log(Level.INFO, String.format("In %d ms, attempting audio transcription %s", applicationContext.getTranscriptionWaitMs(), seriesEventId));
 
         final Thread transcriptionScriptThread = createTranscriptionThread(initialPrompt, seriesEventId);
         transcriptionScriptThread.start();
@@ -44,7 +44,7 @@ public class AudioTranscriptionDelegator
         {
             try
             {
-                Thread.sleep(TRANSCRIPTION_WAIT_TIME_MS);
+                Thread.sleep(applicationContext.getTranscriptionWaitMs());
             }
             catch (InterruptedException e)
             {

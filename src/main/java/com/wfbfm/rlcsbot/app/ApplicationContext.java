@@ -7,8 +7,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.DISPLAY_NAME_MAPPINGS;
-import static com.wfbfm.rlcsbot.app.RuntimeConstants.SCREENSHOT_INTERVAL_MS;
+import static com.wfbfm.rlcsbot.app.RuntimeConstants.*;
 
 public class ApplicationContext
 {
@@ -18,6 +17,7 @@ public class ApplicationContext
     private boolean isMidSeriesAllowed;
     private boolean flushWebSocket;
     private int samplingRateMs;
+    private int transcriptionWaitMs;
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
 
     public ApplicationContext(final String broadcastUrl, final String liquipediaUrl, final boolean isBroadcastLive)
@@ -27,6 +27,7 @@ public class ApplicationContext
         this.isBroadcastLive = isBroadcastLive;
         this.isMidSeriesAllowed = false;
         this.samplingRateMs = SCREENSHOT_INTERVAL_MS;
+        this.transcriptionWaitMs = TRANSCRIPTION_WAIT_TIME_MS;
         initialiseDisplayNameCache();
     }
 
@@ -93,6 +94,16 @@ public class ApplicationContext
     public void setSamplingRateMs(final int samplingRateMs)
     {
         this.samplingRateMs = samplingRateMs;
+    }
+
+    public int getTranscriptionWaitMs()
+    {
+        return transcriptionWaitMs;
+    }
+
+    public void setTranscriptionWaitMs(final int transcriptionWaitMs)
+    {
+        this.transcriptionWaitMs = transcriptionWaitMs;
     }
 
     private void initialiseDisplayNameCache()

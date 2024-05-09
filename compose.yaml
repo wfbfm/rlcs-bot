@@ -17,6 +17,7 @@ services:
       - KEYSTORE_PATH=${KEYSTORE_PATH}
       - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
       - SAMPLING_RATE=${SAMPLING_RATE}
+      - TRANSCRIPTION_WAIT=${TRANSCRIPTION_WAIT}
     depends_on:
       es01:
         condition: service_healthy  # Wait for Elasticsearch container to be healthy

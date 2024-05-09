@@ -108,6 +108,12 @@ public class AdminControlWebSocketServer extends WebSocketServer
                     logger.log(Level.WARNING, "Received command with missing params");
                 }
                 break;
+            case TRANSCRIPTION_WAIT:
+                if (!handleTranscriptionWait(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
             case DELETE_SERIES:
             case DELETE_SERIES_EVENT:
             case UPDATE_SERIES:
@@ -226,7 +232,22 @@ public class AdminControlWebSocketServer extends WebSocketServer
         {
             final int samplingRate = commandJson.get("samplingRate").getAsInt();
             this.application.getApplicationContext().setSamplingRateMs(samplingRate);
-            broadcast(String.format("Updated sampling rate URL: " + samplingRate));
+            broadcast(String.format("Updated sampling rate: " + samplingRate));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean handleTranscriptionWait(final JsonObject commandJson)
+    {
+        if (commandJson.has("transcriptionWait"))
+        {
+            final int transcriptionWait = commandJson.get("transcriptionWait").getAsInt();
+            this.application.getApplicationContext().setTranscriptionWaitMs(transcriptionWait);
+            broadcast(String.format("Updated transcription wait: " + transcriptionWait));
             return true;
         }
         else
