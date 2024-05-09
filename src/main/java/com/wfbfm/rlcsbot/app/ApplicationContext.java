@@ -2,6 +2,7 @@ package com.wfbfm.rlcsbot.app;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.wfbfm.rlcsbot.series.TeamColour;
 
 import java.io.FileReader;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class ApplicationContext
     private int samplingRateMs;
     private int transcriptionWaitMs;
     private int bestOf;
+    private TeamColour gameWinnerOverride = TeamColour.NONE;
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
 
     public ApplicationContext(final String broadcastUrl, final String liquipediaUrl, final boolean isBroadcastLive)
@@ -115,6 +117,16 @@ public class ApplicationContext
     public void setBestOf(final int bestOf)
     {
         this.bestOf = bestOf;
+    }
+
+    public TeamColour getGameWinnerOverride()
+    {
+        return gameWinnerOverride;
+    }
+
+    public void setGameWinnerOverride(final TeamColour gameWinnerOverride)
+    {
+        this.gameWinnerOverride = gameWinnerOverride;
     }
 
     private void initialiseDisplayNameCache()

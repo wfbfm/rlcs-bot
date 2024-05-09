@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.series.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
 import com.wfbfm.rlcsbot.series.*;
@@ -31,8 +32,11 @@ public class SeriesUpdateHandler
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
     {
-        // TODO - recovery mechanism in case we get the names wrong on the first assignment?
-        // TODO - ditto gameNumber
+        if (applicationContext.getGameWinnerOverride() != TeamColour.NONE)
+        {
+            return handleSeriesWinnerOverride();
+        }
+
         if (!enrichAllNamesFromTeams(snapshot))
         {
             if (!enrichAllNamesFromPlayers(snapshot))
@@ -42,6 +46,17 @@ public class SeriesUpdateHandler
             }
         }
         return handleGameScreenshot(snapshot);
+    }
+
+    private SeriesSnapshotEvaluation handleSeriesWinnerOverride()
+    {
+        logger.log(Level.WARNING, "Applying game winner override: " + currentSeries.toString());
+        final Score currentGameScore = currentSeries.getCurrentGame().getScore();
+        final int newGameScore = currentGameScore.getTeamScore(applicationContext.getGameWinnerOverride()) + 1;
+        currentGameScore.setTeamScore(newGameScore, applicationContext.getGameWinnerOverride());
+
+        applicationContext.setGameWinnerOverride(TeamColour.NONE);
+        return handleCompletedGame();
     }
 
     private SeriesSnapshotEvaluation handleNonGameScreenshot()
@@ -92,6 +107,20 @@ public class SeriesUpdateHandler
             {
                 // TODO - what will cause this / do we need to handle?
                 return SeriesSnapshotEvaluation.INVALID_NEW_SERIES;
+            }
+        }
+        else
+        {
+            if (!snapshot.getBlueTeam().getTeamName().equals(currentSeries.getBlueTeam().getTeamName()) ||
+                    !snapshot.getOrangeTeam().getTeamName().equals(currentSeries.getOrangeTeam().getTeamName()))
+            {
+                if (isValidNewSeries(snapshot) && isSeriesMatchPoint())
+                {
+                    logger.log(Level.SEVERE, "Abandoning current series: " + currentSeries.toString());
+                    currentSeries = new Series(snapshot);
+                    logger.log(Level.INFO, "Replacing with new series: " + currentSeries.toString());
+                    return SeriesSnapshotEvaluation.NEW_SERIES;
+                }
             }
         }
         enrichBestOf(snapshot);
@@ -249,6 +278,33 @@ public class SeriesUpdateHandler
         final boolean isLittleTimeRemaining = clock.isOvertime() ||
                 (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * applicationContext.getSamplingRateMs() / 1_000);
         return isTeamInLead && isLittleTimeRemaining;
+    }
+
+    private boolean isSeriesMatchPoint()
+    {
+        final Score seriesScore = currentSeries.getSeriesScore();
+        final int matchPoint = currentSeries.getSeriesWinningGameScore() - 1;
+        return seriesScore.getBlueScore() >= matchPoint || seriesScore.getOrangeScore() >= matchPoint;
+    }
+
+    private boolean isSeriesCompletable() // not viable.
+    {
+        // attempt to automatically close out a series if we miss the winning goal.
+        if (currentSeries == null || currentSeries.getCurrentGame() == null)
+        {
+            return false;
+        }
+        final boolean isGameScoreLevel = currentSeries.getCurrentGame().getScore().getTeamInLead() == TeamColour.NONE;
+        final Clock clock = currentSeries.getCurrentGame().getClock();
+        final boolean isLittleTimeRemaining = clock.isOvertime() ||
+                (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * applicationContext.getSamplingRateMs() / 1_000);
+        // in the case where scores are level, i.e. 7th game of Bo7 - you can't automatically complete the series
+        // those cases will require a lookup against Liquipedia or manual input
+        if (isGameScoreLevel && isLittleTimeRemaining && isSeriesMatchPoint())
+        {
+            return currentSeries.getSeriesScore().getTeamInLead() != TeamColour.NONE;
+        }
+        return false;
     }
 
     private void enrichBestOf(final SeriesSnapshot snapshot)
@@ -463,6 +519,12 @@ public class SeriesUpdateHandler
     public Series getCurrentSeries()
     {
         return currentSeries;
+    }
+
+    @VisibleForTesting
+    public void setCurrentSeries(final Series series)
+    {
+        this.currentSeries = series;
     }
 
     public SeriesSnapshot getSnapshotWithIllogicalScore()

@@ -16,5 +16,6 @@ public enum AdminCommand
     FLUSH_WEBSOCKET,
     SAMPLING_RATE,
     TRANSCRIPTION_WAIT,
-    BEST_OF
+    BEST_OF,
+    GAME_WINNER
 }

@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.wfbfm.rlcsbot.app.RlcsBotApplication;
+import com.wfbfm.rlcsbot.series.TeamColour;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
@@ -116,6 +117,12 @@ public class AdminControlWebSocketServer extends WebSocketServer
                 break;
             case BEST_OF:
                 if (!handleBestOf(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
+            case GAME_WINNER:
+                if (!handleGameWinner(commandJson))
                 {
                     logger.log(Level.WARNING, "Received command with missing params");
                 }
@@ -269,6 +276,28 @@ public class AdminControlWebSocketServer extends WebSocketServer
             final int bestOf = commandJson.get("bestOf").getAsInt();
             this.application.getApplicationContext().setBestOf(bestOf);
             broadcast(String.format("Updated bestOf: " + bestOf));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean handleGameWinner(final JsonObject commandJson)
+    {
+        if (commandJson.has("team"))
+        {
+            try
+            {
+                final TeamColour winner = TeamColour.valueOf(commandJson.get("team").getAsString());
+                broadcast(String.format("Applying game winner override: " + winner.name()));
+                this.application.getApplicationContext().setGameWinnerOverride(winner);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
             return true;
         }
         else
