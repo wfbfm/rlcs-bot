@@ -114,6 +114,12 @@ public class AdminControlWebSocketServer extends WebSocketServer
                     logger.log(Level.WARNING, "Received command with missing params");
                 }
                 break;
+            case BEST_OF:
+                if (!handleBestOf(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
             case DELETE_SERIES:
             case DELETE_SERIES_EVENT:
             case UPDATE_SERIES:
@@ -248,6 +254,21 @@ public class AdminControlWebSocketServer extends WebSocketServer
             final int transcriptionWait = commandJson.get("transcriptionWait").getAsInt();
             this.application.getApplicationContext().setTranscriptionWaitMs(transcriptionWait);
             broadcast(String.format("Updated transcription wait: " + transcriptionWait));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean handleBestOf(final JsonObject commandJson)
+    {
+        if (commandJson.has("bestOf"))
+        {
+            final int bestOf = commandJson.get("bestOf").getAsInt();
+            this.application.getApplicationContext().setBestOf(bestOf);
+            broadcast(String.format("Updated bestOf: " + bestOf));
             return true;
         }
         else

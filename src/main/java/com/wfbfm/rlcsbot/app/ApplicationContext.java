@@ -18,6 +18,7 @@ public class ApplicationContext
     private boolean flushWebSocket;
     private int samplingRateMs;
     private int transcriptionWaitMs;
+    private int bestOf;
     private Map<String, String> uppercaseDisplayToLiquipediaName = new HashMap<>();
 
     public ApplicationContext(final String broadcastUrl, final String liquipediaUrl, final boolean isBroadcastLive)
@@ -104,6 +105,16 @@ public class ApplicationContext
     public void setTranscriptionWaitMs(final int transcriptionWaitMs)
     {
         this.transcriptionWaitMs = transcriptionWaitMs;
+    }
+
+    public int getBestOf()
+    {
+        return bestOf;
+    }
+
+    public void setBestOf(final int bestOf)
+    {
+        this.bestOf = bestOf;
     }
 
     private void initialiseDisplayNameCache()

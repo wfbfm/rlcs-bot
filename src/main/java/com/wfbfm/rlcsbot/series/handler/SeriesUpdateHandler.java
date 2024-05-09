@@ -254,7 +254,12 @@ public class SeriesUpdateHandler
     private void enrichBestOf(final SeriesSnapshot snapshot)
     {
         // image recognition isn't the best, sometimes we need to correct what we parse
-        if (!allowableBestOf.contains(currentSeries.getBestOf()) && allowableBestOf.contains(snapshot.getBestOf()))
+        // override from config
+        if (applicationContext.getBestOf() > 0)
+        {
+            currentSeries.setBestOf(applicationContext.getBestOf());
+        }
+        else if (!allowableBestOf.contains(currentSeries.getBestOf()) && allowableBestOf.contains(snapshot.getBestOf()))
         {
             currentSeries.setBestOf(snapshot.getBestOf());
         }
