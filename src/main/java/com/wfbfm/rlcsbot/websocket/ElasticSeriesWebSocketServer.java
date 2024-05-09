@@ -210,6 +210,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         this.allBroadcastSeries.clear();
         this.allBroadcastSeriesEvents.clear();
         this.allTeamLogos.clear();
+        this.documentObjectCache.clear();
         this.applicationContext.setFlushWebSocket(false);
     }
 }
