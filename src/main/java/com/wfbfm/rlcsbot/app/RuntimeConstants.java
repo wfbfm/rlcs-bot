@@ -38,6 +38,7 @@ public class RuntimeConstants
     public static final String ELASTICSEARCH_PASSWORD = System.getenv("ELASTIC_PASSWORD");
     public static final String ELASTIC_INDEX_SERIES = "series";
     public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
+    public static final int ELASTIC_REFRESH_MS = 1000;
     public static final int WEBSOCKET_PORT = Integer.parseInt(System.getenv("APP_PORT"));
     public static final int SECRET_ADMIN_PORT = Integer.parseInt(System.getenv("SECRET_ADMIN_APP_PORT"));
     public static final String KEYSTORE_PASSWORD = System.getenv("KEYSTORE_PASSWORD");

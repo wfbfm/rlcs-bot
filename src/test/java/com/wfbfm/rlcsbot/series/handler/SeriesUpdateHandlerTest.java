@@ -231,36 +231,6 @@ public class SeriesUpdateHandlerTest
     }
 
     @Test
-    public void testRecoverFromBadGameScoreState()
-    {
-        final SeriesSnapshot startSnapshot = mockSeriesSnapshot(0, 0, 0, 0, 7, "5:00");
-        assertEquals(SeriesSnapshotEvaluation.NEW_SERIES, seriesUpdateHandler.evaluateSeries(startSnapshot));
-        Series currentSeries = seriesUpdateHandler.getCurrentSeries();
-        assertSeriesValues(startSnapshot, currentSeries);
-
-        final SeriesSnapshot severalBlueGoalsSnapshot = mockSeriesSnapshot(7, 0, 0, 0, 7, "4:40");
-        assertEquals(SeriesSnapshotEvaluation.SCORE_UNCHANGED, seriesUpdateHandler.evaluateSeries(severalBlueGoalsSnapshot));
-        assertNotNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
-        assertSeriesValues(startSnapshot, currentSeries);
-
-        final SeriesSnapshot backToNormalSnapshot = mockSeriesSnapshot(1, 0, 0, 0, 7, "4:30");
-        assertEquals(SeriesSnapshotEvaluation.BLUE_GOAL, seriesUpdateHandler.evaluateSeries(backToNormalSnapshot));
-        assertNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
-        assertSeriesValues(backToNormalSnapshot, currentSeries);
-
-        final SeriesSnapshot severalOrangeGoalsSnapshot = mockSeriesSnapshot(1, 2, 0, 0, 7, "4:20");
-        assertEquals(SeriesSnapshotEvaluation.SCORE_UNCHANGED, seriesUpdateHandler.evaluateSeries(severalOrangeGoalsSnapshot));
-        assertNotNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
-        final SeriesSnapshot backToNormalSnapshotNewTime = mockSeriesSnapshot(1, 0, 0, 0, 7, "4:20");
-        assertSeriesValues(backToNormalSnapshotNewTime, currentSeries);
-
-        final SeriesSnapshot severalOrangeGoalsSnapshotAgain = mockSeriesSnapshot(1, 2, 0, 0, 7, "4:10");
-        assertEquals(SeriesSnapshotEvaluation.CORRECTION, seriesUpdateHandler.evaluateSeries(severalOrangeGoalsSnapshotAgain));
-        assertNull(seriesUpdateHandler.getSnapshotWithIllogicalScore());
-        assertSeriesValues(severalOrangeGoalsSnapshotAgain, currentSeries);
-    }
-
-    @Test
     public void testFallbackCreateNewSeriesWhenCurrentSeriesWasNotClosedOut()
     {
         final SeriesSnapshot matchPointSnapshot = mockSeriesSnapshot(0, 0, 3, 2, 7, "+1:00");

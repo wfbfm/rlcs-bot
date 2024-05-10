@@ -251,16 +251,23 @@ public class SeriesUpdateHandler
             return false;
         }
 
-        if (snapshot.getCurrentGame().getScore().getBlueScore() - existingGameScore.getBlueScore() > 1)
+        final Score snapshotGameScore = snapshot.getCurrentGame().getScore();
+        if (snapshotGameScore.getBlueScore() - existingGameScore.getBlueScore() > 1)
         {
-            logger.log(Level.WARNING, ">1 Game Score diff (Blue)");
-            return false;
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot blueGameScore: " + existingGameScore.getBlueScore() +
+                    " vs. " + snapshotGameScore.getBlueScore());
+            // TODO: it's not safe to issue corrections on game score, the image parsing is too unreliable.
+            // Temporarily restrict this to series scores
+            // return false;
         }
 
-        if (snapshot.getCurrentGame().getScore().getOrangeScore() - existingGameScore.getOrangeScore() > 1)
+        if (snapshotGameScore.getOrangeScore() - existingGameScore.getOrangeScore() > 1)
         {
-            logger.log(Level.WARNING, ">1 Game Score diff (Orange)");
-            return false;
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot orangeGameScore: " + existingGameScore.getOrangeScore() +
+                    " vs. " + snapshotGameScore.getOrangeScore());
+            // TODO: it's not safe to issue corrections on game score, the image parsing is too unreliable.
+            // Temporarily restrict this to series scores
+            // return false;
         }
 
         return true;

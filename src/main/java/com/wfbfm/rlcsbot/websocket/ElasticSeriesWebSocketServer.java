@@ -84,7 +84,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             {
                 semaphore.release();
             }
-        }, 0, applicationContext.getSamplingRateMs(), TimeUnit.MILLISECONDS);
+        }, 0, ELASTIC_REFRESH_MS, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -160,7 +160,10 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
                         .query(q -> q.queryString(qs -> qs.query(queryString))), objectType);
 
         final List<? extends Hit<?>> hits = response.hits().hits();
-        logger.log(Level.INFO, String.format("Found %d %s records - for query: %s", hits.size(), indexName, queryString));
+        if (DEBUGGING_ENABLED)
+        {
+            logger.log(Level.INFO, String.format("Found %d %s records - for query: %s", hits.size(), indexName, queryString));
+        }
 
         for (final Hit<?> hit : hits)
         {
