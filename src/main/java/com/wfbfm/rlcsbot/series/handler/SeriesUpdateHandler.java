@@ -96,6 +96,7 @@ public class SeriesUpdateHandler
 
     private SeriesSnapshotEvaluation handleGameScreenshot(final SeriesSnapshot snapshot)
     {
+        enrichBestOf(snapshot);
         if (currentSeries == null)
         {
             if (isValidNewSeries(snapshot))
@@ -105,7 +106,6 @@ public class SeriesUpdateHandler
             }
             else
             {
-                // TODO - what will cause this / do we need to handle?
                 return SeriesSnapshotEvaluation.INVALID_NEW_SERIES;
             }
         }
@@ -123,7 +123,6 @@ public class SeriesUpdateHandler
                 }
             }
         }
-        enrichBestOf(snapshot);
         if (isHighlight(snapshot))
         {
             snapshotWithIllogicalScore = null;
@@ -146,8 +145,38 @@ public class SeriesUpdateHandler
         {
             final boolean littleTimeElapsed = snapshot.getCurrentGame().getClock().getElapsedSeconds() < 100;
             final boolean zeroSeriesScore = snapshot.getSeriesScore().getBlueScore() == 0 && snapshot.getSeriesScore().getOrangeScore() == 0;
-            return littleTimeElapsed && zeroSeriesScore;
+            return littleTimeElapsed && zeroSeriesScore && !isSeriesAlreadyComplete(snapshot);
         }
+    }
+
+    private boolean isSeriesAlreadyComplete(final SeriesSnapshot snapshot)
+    {
+        final String blueTeam = snapshot.getBlueTeam().getTeamName();
+        final String orangeTeam = snapshot.getOrangeTeam().getTeamName();
+        final String liquipediaPage = snapshot.getSeriesMetaData().getLiquipediaPage();
+        final int bestOf = snapshot.getBestOf();
+
+        final boolean[] alreadyExists = {false};
+        completedSeries.forEach(series ->
+        {
+            if (!series.getBlueTeam().getTeamName().equals(blueTeam))
+            {
+                return;
+            }
+            if (!series.getOrangeTeam().getTeamName().equals(orangeTeam))
+            {
+                return;
+            }
+            if (!series.getSeriesMetaData().getLiquipediaPage().equals(liquipediaPage))
+            {
+                return;
+            }
+            if (series.getBestOf() == bestOf)
+            {
+                alreadyExists[0] = true;
+            }
+        });
+        return alreadyExists[0];
     }
 
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)
@@ -256,18 +285,16 @@ public class SeriesUpdateHandler
         {
             logger.log(Level.WARNING, "Conflict between cached vs. snapshot blueGameScore: " + existingGameScore.getBlueScore() +
                     " vs. " + snapshotGameScore.getBlueScore());
-            // TODO: it's not safe to issue corrections on game score, the image parsing is too unreliable.
-            // Temporarily restrict this to series scores
-            // return false;
+            // TODO: is it safe to issue corrections to game score?
+            return false;
         }
 
         if (snapshotGameScore.getOrangeScore() - existingGameScore.getOrangeScore() > 1)
         {
             logger.log(Level.WARNING, "Conflict between cached vs. snapshot orangeGameScore: " + existingGameScore.getOrangeScore() +
                     " vs. " + snapshotGameScore.getOrangeScore());
-            // TODO: it's not safe to issue corrections on game score, the image parsing is too unreliable.
-            // Temporarily restrict this to series scores
-            // return false;
+            // TODO: is it safe to issue corrections to game score?
+            return false;
         }
 
         return true;
