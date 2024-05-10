@@ -93,6 +93,30 @@ public class GameScreenshotSubImageWrapper
                 };
     }
 
+    public boolean anySubImageIsNull()
+    {
+        return blueGameScore == null ||
+                orangeGameScore == null ||
+                blueSeriesTick1 == null ||
+                blueSeriesTick2 == null ||
+                blueSeriesTick3 == null ||
+                blueSeriesTick4 == null ||
+                orangeSeriesTick1 == null ||
+                orangeSeriesTick2 == null ||
+                orangeSeriesTick3 == null ||
+                orangeSeriesTick4 == null ||
+                blueTeam == null ||
+                orangeTeam == null ||
+                bluePlayer1 == null ||
+                bluePlayer2 == null ||
+                bluePlayer3 == null ||
+                orangePlayer1 == null ||
+                orangePlayer2 == null ||
+                orangePlayer3 == null ||
+                clock == null ||
+                description == null;
+    }
+
     public String getFileName()
     {
         return fileName;
