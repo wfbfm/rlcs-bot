@@ -96,7 +96,6 @@ public class SeriesUpdateHandler
 
     private SeriesSnapshotEvaluation handleGameScreenshot(final SeriesSnapshot snapshot)
     {
-        enrichBestOf(snapshot);
         if (currentSeries == null)
         {
             if (isValidNewSeries(snapshot))
@@ -111,6 +110,7 @@ public class SeriesUpdateHandler
         }
         else
         {
+            enrichBestOf(snapshot);
             if (!snapshot.getBlueTeam().getTeamName().equals(currentSeries.getBlueTeam().getTeamName()) ||
                     !snapshot.getOrangeTeam().getTeamName().equals(currentSeries.getOrangeTeam().getTeamName()))
             {

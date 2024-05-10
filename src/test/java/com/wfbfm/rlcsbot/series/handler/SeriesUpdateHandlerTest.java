@@ -262,6 +262,27 @@ public class SeriesUpdateHandlerTest
     }
 
     @Test
+    public void testCannotCreateNewIdenticalSeries()
+    {
+        final SeriesSnapshot matchPointSnapshot = mockSeriesSnapshot(0, 0, 3, 2, 7, "+1:00");
+        final Series existingMatchPointSeries = new Series(matchPointSnapshot);
+        seriesUpdateHandler.setCurrentSeries(existingMatchPointSeries);
+
+        final SeriesSnapshot highlightSnapshot = mockSeriesSnapshot(1, 2, 1, 0, 7, "4:10");
+        assertEquals(SeriesSnapshotEvaluation.HIGHLIGHT, seriesUpdateHandler.evaluateSeries(highlightSnapshot));
+        assertSeriesValues(matchPointSnapshot, seriesUpdateHandler.getCurrentSeries());
+
+
+        applicationContext.setGameWinnerOverride(TeamColour.BLUE);
+        final SeriesSnapshot secondHighlightSnapshot = mockSeriesSnapshot(1, 2, 1, 0, 7, "4:10");
+        assertEquals(SeriesSnapshotEvaluation.SERIES_COMPLETE, seriesUpdateHandler.evaluateSeries(secondHighlightSnapshot));
+        assertNull(seriesUpdateHandler.getCurrentSeries());
+
+        final SeriesSnapshot invalidNewSeriesSnapshot = mockSeriesSnapshot(0, 0, 3, 2, 7, "+1:00");
+        assertEquals(SeriesSnapshotEvaluation.INVALID_NEW_SERIES, seriesUpdateHandler.evaluateSeries(invalidNewSeriesSnapshot));
+    }
+
+    @Test
     public void testOverrideGameScoreCompletesGame()
     {
         final SeriesSnapshot firstGameSnapshot = mockSeriesSnapshot(0, 0, 1, 2, 7, "+1:00");
