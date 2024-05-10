@@ -37,6 +37,14 @@ public class SeriesUpdateHandler
             return handleSeriesWinnerOverride();
         }
 
+        if (applicationContext.abandonSeries())
+        {
+            // TODO; this should probably delete in elastic, as well
+            this.currentSeries = null;
+            applicationContext.setAbandonSeries(false);
+            return SeriesSnapshotEvaluation.SERIES_NOT_STARTED_YET;
+        }
+
         if (!enrichAllNamesFromTeams(snapshot))
         {
             if (!enrichAllNamesFromPlayers(snapshot))

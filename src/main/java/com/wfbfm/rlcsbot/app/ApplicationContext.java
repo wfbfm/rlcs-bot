@@ -17,6 +17,7 @@ public class ApplicationContext
     private boolean isBroadcastLive;
     private boolean isMidSeriesAllowed;
     private boolean flushWebSocket;
+    private boolean abandonSeries;
     private int samplingRateMs;
     private int transcriptionWaitMs;
     private int bestOf;
@@ -87,6 +88,16 @@ public class ApplicationContext
     public void setFlushWebSocket(final boolean flushWebSocket)
     {
         this.flushWebSocket = flushWebSocket;
+    }
+
+    public boolean abandonSeries()
+    {
+        return abandonSeries;
+    }
+
+    public void setAbandonSeries(final boolean abandonSeries)
+    {
+        this.abandonSeries = abandonSeries;
     }
 
     public int getSamplingRateMs()

@@ -17,5 +17,6 @@ public enum AdminCommand
     SAMPLING_RATE,
     TRANSCRIPTION_WAIT,
     BEST_OF,
-    GAME_WINNER
+    GAME_WINNER,
+    ABANDON_SERIES
 }
