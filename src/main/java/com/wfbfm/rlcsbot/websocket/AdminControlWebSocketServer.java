@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.wfbfm.rlcsbot.app.RlcsBotApplication;
+import com.wfbfm.rlcsbot.series.TeamColour;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
@@ -107,6 +108,27 @@ public class AdminControlWebSocketServer extends WebSocketServer
                 {
                     logger.log(Level.WARNING, "Received command with missing params");
                 }
+                break;
+            case TRANSCRIPTION_WAIT:
+                if (!handleTranscriptionWait(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
+            case BEST_OF:
+                if (!handleBestOf(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
+            case GAME_WINNER:
+                if (!handleGameWinner(commandJson))
+                {
+                    logger.log(Level.WARNING, "Received command with missing params");
+                }
+                break;
+            case ABANDON_SERIES:
+                handleAbandonSeries();
                 break;
             case DELETE_SERIES:
             case DELETE_SERIES_EVENT:
@@ -220,13 +242,71 @@ public class AdminControlWebSocketServer extends WebSocketServer
         broadcast("Flushing websocket...");
     }
 
+    private void handleAbandonSeries()
+    {
+        broadcast("Abandoning series...");
+        this.application.getApplicationContext().setAbandonSeries(true);
+    }
+
     private boolean handleSamplingRate(final JsonObject commandJson)
     {
         if (commandJson.has("samplingRate"))
         {
             final int samplingRate = commandJson.get("samplingRate").getAsInt();
             this.application.getApplicationContext().setSamplingRateMs(samplingRate);
-            broadcast(String.format("Updated sampling rate URL: " + samplingRate));
+            broadcast(String.format("Updated sampling rate: " + samplingRate));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean handleTranscriptionWait(final JsonObject commandJson)
+    {
+        if (commandJson.has("transcriptionWait"))
+        {
+            final int transcriptionWait = commandJson.get("transcriptionWait").getAsInt();
+            this.application.getApplicationContext().setTranscriptionWaitMs(transcriptionWait);
+            broadcast(String.format("Updated transcription wait: " + transcriptionWait));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean handleBestOf(final JsonObject commandJson)
+    {
+        if (commandJson.has("bestOf"))
+        {
+            final int bestOf = commandJson.get("bestOf").getAsInt();
+            this.application.getApplicationContext().setBestOf(bestOf);
+            broadcast(String.format("Updated bestOf: " + bestOf));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean handleGameWinner(final JsonObject commandJson)
+    {
+        if (commandJson.has("team"))
+        {
+            try
+            {
+                final TeamColour winner = TeamColour.valueOf(commandJson.get("team").getAsString());
+                broadcast(String.format("Applying game winner override: " + winner.name()));
+                this.application.getApplicationContext().setGameWinnerOverride(winner);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
             return true;
         }
         else

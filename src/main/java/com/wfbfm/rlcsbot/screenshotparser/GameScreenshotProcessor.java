@@ -89,14 +89,18 @@ public class GameScreenshotProcessor
     private void handleIncomingFile(final File incomingFile)
     {
         final GameScreenshotSubImageWrapper subImageWrapper = this.screenshotToSubImageTransformer.transformScreenshotToSubImages(incomingFile);
+        if (subImageWrapper.anySubImageIsNull())
+        {
+            logger.log(Level.WARNING, "Encountered null subImages - skipping evaluation");
+            incomingFile.delete();
+            return;
+        }
+
         final SeriesSnapshot seriesSnapshot = this.subImageToSeriesSnapshotTransformer.transform(subImageWrapper);
         final SeriesSnapshotEvaluation evaluation = seriesUpdateHandler.evaluateSeries(seriesSnapshot);
 
-        if (DEBUGGING_ENABLED)
-        {
-            logger.log(Level.INFO, "Evaluation Result: " + evaluation.name());
-            logger.log(Level.INFO, "Current Series Status: " + seriesUpdateHandler.getCurrentSeriesAsString());
-        }
+        logger.log(Level.INFO, "Evaluation Result: " + evaluation.name());
+        logger.log(Level.INFO, "Current Series Status: " + seriesUpdateHandler.getCurrentSeriesAsString());
 
         final SeriesEvent seriesEvent;
         switch (evaluation)

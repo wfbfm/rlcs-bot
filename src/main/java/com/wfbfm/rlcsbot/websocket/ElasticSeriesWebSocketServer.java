@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -83,7 +84,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             {
                 semaphore.release();
             }
-        }, 0, applicationContext.getSamplingRateMs(), TimeUnit.MILLISECONDS);
+        }, 0, ELASTIC_REFRESH_MS, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -129,12 +130,12 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         if (applicationContext.flushWebSocket())
         {
             flush();
-            logger.info("Flushed Elastic broadcaster - 0 series/seriesEvents/logos in internal maps");
+            logger.log(Level.INFO, "Flushed Elastic broadcaster - 0 series/seriesEvents/logos in internal maps");
         }
 
         if (DEBUGGING_ENABLED)
         {
-            logger.info("Polling for new Elastic documents.");
+            logger.log(Level.INFO, "Polling for new Elastic documents.");
         }
         try
         {
@@ -158,7 +159,13 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
                         .size(MAX_RECORDS_FROM_SEARCH)
                         .query(q -> q.queryString(qs -> qs.query(queryString))), objectType);
 
-        for (final Hit<?> hit : response.hits().hits())
+        final List<? extends Hit<?>> hits = response.hits().hits();
+        if (DEBUGGING_ENABLED)
+        {
+            logger.log(Level.INFO, String.format("Found %d %s records - for query: %s", hits.size(), indexName, queryString));
+        }
+
+        for (final Hit<?> hit : hits)
         {
             final String documentId = hit.id();
             final String documentJson = JsonpUtils.toJsonString(hit, client._jsonpMapper());
@@ -168,8 +175,8 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
             {
                 documentMap.put(documentId, documentJson);
                 documentObjectCache.put(documentId, documentObject);
-                logger.info("Found new document - broadcasting to all clients: " + documentId);
-                logger.info(documentJson);
+                logger.log(Level.INFO, "Found new document - broadcasting to all clients: " + documentId);
+                logger.log(Level.INFO, documentJson);
                 broadcast(String.format(BROADCAST_JSON_TEMPLATE, documentJson));
             }
         }
@@ -186,7 +193,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
                 if (!allTeamLogos.containsKey(fileName))
                 {
                     final String encodedImage = encodeImageToBase64(logoFile);
-                    logger.info("Found new logo - broadcasting to all clients: " + fileName);
+                    logger.log(Level.INFO, "Found new logo - broadcasting to all clients: " + fileName);
                     allTeamLogos.put(logoFile.getName(), encodedImage);
                     broadcast(String.format(IMAGE_JSON_TEMPLATE, fileName, encodedImage));
                 }
@@ -206,6 +213,7 @@ public class ElasticSeriesWebSocketServer extends WebSocketServer
         this.allBroadcastSeries.clear();
         this.allBroadcastSeriesEvents.clear();
         this.allTeamLogos.clear();
+        this.documentObjectCache.clear();
         this.applicationContext.setFlushWebSocket(false);
     }
 }

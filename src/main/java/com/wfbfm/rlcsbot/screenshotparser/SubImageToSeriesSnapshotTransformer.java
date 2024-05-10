@@ -109,8 +109,9 @@ public class SubImageToSeriesSnapshotTransformer
 
     private void parseSeriesMetadata()
     {
-        final String description = parseImage(textTesseract, SubImageType.DESCRIPTION);
-        final SeriesMetaData seriesMetaData = new SeriesMetaData(LocalDate.now(), description, applicationContext.getLiquipediaUrl());
+        // No need for description.
+        // final String description = parseImage(textTesseract, SubImageType.DESCRIPTION);
+        final SeriesMetaData seriesMetaData = new SeriesMetaData(LocalDate.now(), "", applicationContext.getLiquipediaUrl());
         this.seriesSnapshotBuilder.withSeriesMetaData(seriesMetaData);
     }
 

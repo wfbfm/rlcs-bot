@@ -1,5 +1,6 @@
 package com.wfbfm.rlcsbot.series.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.wfbfm.rlcsbot.app.ApplicationContext;
 import com.wfbfm.rlcsbot.liquipedia.LiquipediaRefDataFetcher;
 import com.wfbfm.rlcsbot.series.*;
@@ -31,8 +32,19 @@ public class SeriesUpdateHandler
 
     public SeriesSnapshotEvaluation evaluateSeries(final SeriesSnapshot snapshot)
     {
-        // TODO - recovery mechanism in case we get the names wrong on the first assignment?
-        // TODO - ditto gameNumber
+        if (applicationContext.getGameWinnerOverride() != TeamColour.NONE)
+        {
+            return handleSeriesWinnerOverride();
+        }
+
+        if (applicationContext.abandonSeries())
+        {
+            // TODO; this should probably delete in elastic, as well
+            this.currentSeries = null;
+            applicationContext.setAbandonSeries(false);
+            return SeriesSnapshotEvaluation.SERIES_NOT_STARTED_YET;
+        }
+
         if (!enrichAllNamesFromTeams(snapshot))
         {
             if (!enrichAllNamesFromPlayers(snapshot))
@@ -42,6 +54,17 @@ public class SeriesUpdateHandler
             }
         }
         return handleGameScreenshot(snapshot);
+    }
+
+    private SeriesSnapshotEvaluation handleSeriesWinnerOverride()
+    {
+        logger.log(Level.WARNING, "Applying game winner override: " + currentSeries.toString());
+        final Score currentGameScore = currentSeries.getCurrentGame().getScore();
+        final int newGameScore = currentGameScore.getTeamScore(applicationContext.getGameWinnerOverride()) + 1;
+        currentGameScore.setTeamScore(newGameScore, applicationContext.getGameWinnerOverride());
+
+        applicationContext.setGameWinnerOverride(TeamColour.NONE);
+        return handleCompletedGame();
     }
 
     private SeriesSnapshotEvaluation handleNonGameScreenshot()
@@ -90,11 +113,24 @@ public class SeriesUpdateHandler
             }
             else
             {
-                // TODO - what will cause this / do we need to handle?
                 return SeriesSnapshotEvaluation.INVALID_NEW_SERIES;
             }
         }
-        enrichBestOf(snapshot);
+        else
+        {
+            enrichBestOf(snapshot);
+            if (!snapshot.getBlueTeam().getTeamName().equals(currentSeries.getBlueTeam().getTeamName()) ||
+                    !snapshot.getOrangeTeam().getTeamName().equals(currentSeries.getOrangeTeam().getTeamName()))
+            {
+                if (isValidNewSeries(snapshot) && isSeriesMatchPoint())
+                {
+                    logger.log(Level.SEVERE, "Abandoning current series: " + currentSeries.toString());
+                    currentSeries = new Series(snapshot);
+                    logger.log(Level.INFO, "Replacing with new series: " + currentSeries.toString());
+                    return SeriesSnapshotEvaluation.NEW_SERIES;
+                }
+            }
+        }
         if (isHighlight(snapshot))
         {
             snapshotWithIllogicalScore = null;
@@ -117,8 +153,38 @@ public class SeriesUpdateHandler
         {
             final boolean littleTimeElapsed = snapshot.getCurrentGame().getClock().getElapsedSeconds() < 100;
             final boolean zeroSeriesScore = snapshot.getSeriesScore().getBlueScore() == 0 && snapshot.getSeriesScore().getOrangeScore() == 0;
-            return littleTimeElapsed && zeroSeriesScore;
+            return littleTimeElapsed && zeroSeriesScore && !isSeriesAlreadyComplete(snapshot);
         }
+    }
+
+    private boolean isSeriesAlreadyComplete(final SeriesSnapshot snapshot)
+    {
+        final String blueTeam = snapshot.getBlueTeam().getTeamName();
+        final String orangeTeam = snapshot.getOrangeTeam().getTeamName();
+        final String liquipediaPage = snapshot.getSeriesMetaData().getLiquipediaPage();
+        final int bestOf = snapshot.getBestOf();
+
+        final boolean[] alreadyExists = {false};
+        completedSeries.forEach(series ->
+        {
+            if (!series.getBlueTeam().getTeamName().equals(blueTeam))
+            {
+                return;
+            }
+            if (!series.getOrangeTeam().getTeamName().equals(orangeTeam))
+            {
+                return;
+            }
+            if (!series.getSeriesMetaData().getLiquipediaPage().equals(liquipediaPage))
+            {
+                return;
+            }
+            if (series.getBestOf() == bestOf)
+            {
+                alreadyExists[0] = true;
+            }
+        });
+        return alreadyExists[0];
     }
 
     private SeriesSnapshotEvaluation handleGameUpdate(final SeriesSnapshot snapshot)
@@ -222,15 +288,20 @@ public class SeriesUpdateHandler
             return false;
         }
 
-        if (snapshot.getCurrentGame().getScore().getBlueScore() - existingGameScore.getBlueScore() > 1)
+        final Score snapshotGameScore = snapshot.getCurrentGame().getScore();
+        if (snapshotGameScore.getBlueScore() - existingGameScore.getBlueScore() > 1)
         {
-            logger.log(Level.WARNING, ">1 Game Score diff (Blue)");
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot blueGameScore: " + existingGameScore.getBlueScore() +
+                    " vs. " + snapshotGameScore.getBlueScore());
+            // TODO: is it safe to issue corrections to game score?
             return false;
         }
 
-        if (snapshot.getCurrentGame().getScore().getOrangeScore() - existingGameScore.getOrangeScore() > 1)
+        if (snapshotGameScore.getOrangeScore() - existingGameScore.getOrangeScore() > 1)
         {
-            logger.log(Level.WARNING, ">1 Game Score diff (Orange)");
+            logger.log(Level.WARNING, "Conflict between cached vs. snapshot orangeGameScore: " + existingGameScore.getOrangeScore() +
+                    " vs. " + snapshotGameScore.getOrangeScore());
+            // TODO: is it safe to issue corrections to game score?
             return false;
         }
 
@@ -251,10 +322,45 @@ public class SeriesUpdateHandler
         return isTeamInLead && isLittleTimeRemaining;
     }
 
+    private boolean isSeriesMatchPoint()
+    {
+        final Score seriesScore = currentSeries.getSeriesScore();
+        final int matchPoint = currentSeries.getSeriesWinningGameScore() - 1;
+        final Clock clock = currentSeries.getCurrentGame().getClock();
+        final boolean isLittleTimeRemaining = clock.isOvertime() ||
+                (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * applicationContext.getSamplingRateMs() / 1_000);
+        return isLittleTimeRemaining && (seriesScore.getBlueScore() >= matchPoint || seriesScore.getOrangeScore() >= matchPoint);
+    }
+
+    private boolean isSeriesCompletable() // not viable.
+    {
+        // attempt to automatically close out a series if we miss the winning goal.
+        if (currentSeries == null || currentSeries.getCurrentGame() == null)
+        {
+            return false;
+        }
+        final boolean isGameScoreLevel = currentSeries.getCurrentGame().getScore().getTeamInLead() == TeamColour.NONE;
+        final Clock clock = currentSeries.getCurrentGame().getClock();
+        final boolean isLittleTimeRemaining = clock.isOvertime() ||
+                (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * applicationContext.getSamplingRateMs() / 1_000);
+        // in the case where scores are level, i.e. 7th game of Bo7 - you can't automatically complete the series
+        // those cases will require a lookup against Liquipedia or manual input
+        if (isGameScoreLevel && isLittleTimeRemaining && isSeriesMatchPoint())
+        {
+            return currentSeries.getSeriesScore().getTeamInLead() != TeamColour.NONE;
+        }
+        return false;
+    }
+
     private void enrichBestOf(final SeriesSnapshot snapshot)
     {
         // image recognition isn't the best, sometimes we need to correct what we parse
-        if (!allowableBestOf.contains(currentSeries.getBestOf()) && allowableBestOf.contains(snapshot.getBestOf()))
+        // override from config
+        if (applicationContext.getBestOf() > 0)
+        {
+            currentSeries.setBestOf(applicationContext.getBestOf());
+        }
+        else if (!allowableBestOf.contains(currentSeries.getBestOf()) && allowableBestOf.contains(snapshot.getBestOf()))
         {
             currentSeries.setBestOf(snapshot.getBestOf());
         }
@@ -458,6 +564,12 @@ public class SeriesUpdateHandler
     public Series getCurrentSeries()
     {
         return currentSeries;
+    }
+
+    @VisibleForTesting
+    public void setCurrentSeries(final Series series)
+    {
+        this.currentSeries = series;
     }
 
     public SeriesSnapshot getSnapshotWithIllogicalScore()
