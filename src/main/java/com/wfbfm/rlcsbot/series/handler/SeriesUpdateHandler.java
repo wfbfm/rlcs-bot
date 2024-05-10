@@ -326,7 +326,10 @@ public class SeriesUpdateHandler
     {
         final Score seriesScore = currentSeries.getSeriesScore();
         final int matchPoint = currentSeries.getSeriesWinningGameScore() - 1;
-        return seriesScore.getBlueScore() >= matchPoint || seriesScore.getOrangeScore() >= matchPoint;
+        final Clock clock = currentSeries.getCurrentGame().getClock();
+        final boolean isLittleTimeRemaining = clock.isOvertime() ||
+                (GAME_TIME_SECONDS - clock.getElapsedSeconds()) < (2 * applicationContext.getSamplingRateMs() / 1_000);
+        return isLittleTimeRemaining && (seriesScore.getBlueScore() >= matchPoint || seriesScore.getOrangeScore() >= matchPoint);
     }
 
     private boolean isSeriesCompletable() // not viable.
