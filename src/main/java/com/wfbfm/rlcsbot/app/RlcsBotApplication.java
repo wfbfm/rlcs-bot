@@ -89,12 +89,46 @@ public class RlcsBotApplication
 
     private void initialiseTempDirectories()
     {
-        for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY, LOGO_DIRECTORY))
+        for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY,
+                AUDIO_DIRECTORY, LOGO_DIRECTORY))
         {
-            directory.delete();
-            directory.mkdirs();
+            if (!deleteDirectory(directory))
+            {
+                System.err.println("Failed to delete directory: " + directory.getAbsolutePath());
+            }
+            if (!directory.mkdirs())
+            {
+                System.err.println("Failed to create directory: " + directory.getAbsolutePath());
+            }
             System.out.println("Directory cleared: " + directory.getAbsolutePath());
         }
+    }
+
+    private boolean deleteDirectory(File directory)
+    {
+        if (!directory.exists())
+        {
+            return true;
+        }
+        final File[] files = directory.listFiles();
+        if (files != null)
+        {
+            for (File file : files)
+            {
+                if (file.isDirectory())
+                {
+                    deleteDirectory(file);
+                }
+                else
+                {
+                    if (!file.delete())
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return directory.delete();
     }
 
     public void stopBroadcast()
