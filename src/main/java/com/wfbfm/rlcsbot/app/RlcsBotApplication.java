@@ -91,17 +91,9 @@ public class RlcsBotApplication
     {
         for (final File directory : Arrays.asList(TEMP_DIRECTORY, INCOMING_DIRECTORY, PROCESSING_DIRECTORY, COMPLETE_DIRECTORY, AUDIO_DIRECTORY, LOGO_DIRECTORY))
         {
-            if (directory.exists())
-            {
-                directory.delete();
-                directory.mkdirs();
-                System.out.println("Directory cleared: " + directory.getAbsolutePath());
-            }
-            else
-            {
-                directory.mkdirs();
-                System.out.println("Directory created: " + directory.getAbsolutePath());
-            }
+            directory.delete();
+            directory.mkdirs();
+            System.out.println("Directory cleared: " + directory.getAbsolutePath());
         }
     }
 
