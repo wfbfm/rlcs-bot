@@ -506,6 +506,18 @@ public class SeriesUpdateHandler
         String bestMatch = null;
         int minDistance = Integer.MAX_VALUE;
 
+        if (inputName.length() <= LEVENSHTEIN_MINIMUM_DISTANCE)
+        {
+            if (liquipediaNameMap.containsKey(inputName))
+            {
+                return liquipediaNameMap.get(inputName);
+            }
+            else
+            {
+                return displayNameOverrideMap.get(inputName);
+            }
+        }
+
         for (Map.Entry<String, String> entry : liquipediaNameMap.entrySet())
         {
             String name = entry.getKey();

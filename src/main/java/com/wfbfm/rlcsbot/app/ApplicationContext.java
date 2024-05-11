@@ -147,6 +147,7 @@ public class ApplicationContext
             String[] row;
             while ((row = csvReader.readNext()) != null)
             {
+                System.out.println(String.format("Adding displayName mapping: %s - %s", row[0], row[1]));
                 this.uppercaseDisplayToLiquipediaName.put(row[0], row[1]);
             }
         }

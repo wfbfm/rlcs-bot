@@ -24,6 +24,7 @@ import static com.wfbfm.rlcsbot.app.RuntimeConstants.LOGO_DIRECTORY;
 public class LiquipediaRefDataFetcher
 {
     private static final String LIQUIPEDIA_BASE_URL = "https://liquipedia.net";
+    private static final int MAX_TEAMS = 16;
     private static final String CLASS = "class";
     private static final String TEAMCARD_COLUMN = "teamcard-column";
     private static final String CENTER = "center";
@@ -102,7 +103,7 @@ public class LiquipediaRefDataFetcher
         final Elements teamCardInners = teamCard.getElementsByAttributeValue(CLASS, TEAMCARD_INNER);
 
 
-        for (int i = 0; i < teamCardInners.size(); i++)
+        for (int i = 0; i < MAX_TEAMS; i++)
         {
             Element teamCardInner = teamCardInners.get(i);
             // parse teamCardInner for player names
