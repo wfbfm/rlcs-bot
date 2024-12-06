@@ -12,8 +12,7 @@ import { SeriesHeader } from './seriesHeader';
 import { NewSeriesContainer } from './newSeriesContainer';
 import { SeriesVictoryContainer } from './seriesVictoryContainer';
 
-const App: React.FC = () =>
-{
+const App: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [seriesEvents, setSeriesEvents] = useState<{ [eventId: string]: SeriesEvent }>({});
   const [series, setSeries] = useState<{ [seriesId: string]: Series }>({});
@@ -24,34 +23,27 @@ const App: React.FC = () =>
   const appPort = process.env.REACT_APP_PORT;
   const sslEnabled = process.env.REACT_APP_SSL_ENABLED === 'true';
 
-  useEffect(() =>
-  {
+  useEffect(() => {
     // FIXME: not localhost
     const wsType = sslEnabled ? 'wss' : 'ws';
     const ws = new WebSocket(wsType + '://' + process.env.REACT_APP_DOMAIN + ':' + appPort);
     setSocket(ws);
 
-    return () =>
-    {
+    return () => {
       ws.close();
     };
   }, []);
 
-  useEffect(() =>
-  {
-    if (!socket)
-    {
+  useEffect(() => {
+    if (!socket) {
       return;
     }
 
-    socket.onmessage = (event) =>
-    {
+    socket.onmessage = (event) => {
       const socketData = JSON.parse(event.data);
 
-      if (socketData.payloadType === 'image')
-      {
-        setLogos((prevLogos) =>
-        {
+      if (socketData.payloadType === 'image') {
+        setLogos((prevLogos) => {
           const updatedLogos = { ...prevLogos };
           updatedLogos[socketData.imageName] = socketData.base64Image;
           return updatedLogos;
@@ -61,41 +53,40 @@ const App: React.FC = () =>
 
       const rlcsData = socketData.payload;
 
-      if (rlcsData._index === 'seriesevent')
-      {
-        setSeriesEvents((prevSeriesEvents) =>
-        {
+      if (rlcsData._index === 'seriesevent') {
+        setSeriesEvents((prevSeriesEvents) => {
           const updatedSeriesEvents = { ...prevSeriesEvents };
           updatedSeriesEvents[rlcsData._source.eventId] = rlcsData;
           return updatedSeriesEvents;
         });
-      } else if (rlcsData._index === 'series')
-      {
-        setSeries((prevSeries) =>
-        {
+      } else if (rlcsData._index === 'series') {
+        setSeries((prevSeries) => {
           const updatedSeries = { ...prevSeries };
           updatedSeries[rlcsData._source.seriesId] = rlcsData;
-          setCurrentSeries(rlcsData);
+          if (
+            currentSeries === null ||
+            getLastNumberFromSeriesId(rlcsData._source.seriesId) >=
+            getLastNumberFromSeriesId(currentSeries._source.seriesId)
+          ) {
+            setCurrentSeries(rlcsData);
+          }
           return updatedSeries;
         });
       }
     }
 
-    return () =>
-    {
+    return () => {
       socket.onmessage = null;
     };
   }, [socket]);
 
-  function getLastNumberFromSeriesId(seriesId: string): number
-  {
+  function getLastNumberFromSeriesId(seriesId: string): number {
     const parts = seriesId.split('-');
     const lastPart = parts[parts.length - 1];
     return parseInt(lastPart, 10);
   }
 
-  function collapsableTwitchStream()
-  {
+  function collapsableTwitchStream() {
     const handleTwitchButton = () => setShowTwitch(!showTwitch);
 
     return (
@@ -120,49 +111,48 @@ const App: React.FC = () =>
   return (
     <Flex>
       {!isMobile &&
-      <>
-      <Box bg={backgroundColour} position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
-        <SideBar></SideBar>
-        <Flex flexDirection={'column'} height='90%'>
-          <VStack flex='1'>
-            <Box>
-              {Object.values(series)
-                .sort((a, b) =>
-                {
-                  const seriesIdA = getLastNumberFromSeriesId(a._source.seriesId);
-                  const seriesIdB = getLastNumberFromSeriesId(b._source.seriesId);
-                  return seriesIdB - seriesIdA;
-                })
-                .map((series, index) => (
-                  <Box key={index} p={4}>
-                    <SeriesContainer series={series} logos={logos} />
-                  </Box>
-                ))}
-            </Box>
-          </VStack>
+        <>
+          <Box bg={backgroundColour} position='fixed' width='20%' height='100%' zIndex={999} boxShadow={'md'}>
+            <SideBar></SideBar>
+            <Flex flexDirection={'column'} height='90%'>
+              <VStack flex='1'>
+                <Box>
+                  {Object.values(series)
+                    .sort((a, b) => {
+                      const seriesIdA = getLastNumberFromSeriesId(a._source.seriesId);
+                      const seriesIdB = getLastNumberFromSeriesId(b._source.seriesId);
+                      return seriesIdB - seriesIdA;
+                    })
+                    .map((series, index) => (
+                      <Box key={index} p={4}>
+                        <SeriesContainer series={series} logos={logos} />
+                      </Box>
+                    ))}
+                </Box>
+              </VStack>
 
-          <Box p={4}>
-            <Text fontSize='xs'>
-              RL Commentary Service is a fan-made hobby project and is not a reliable source.
-              <br></br>
-              <br></br>
-              Scores are determined by real-time parsing of the <b><Link color={'blue.500'} href='https://www.twitch.tv/rocketleague'>official Twitch broadcast</Link></b> - similarly,
-              the text feed is populated from a raw AI transcription of live audio commentary.
-              <br></br>
-              All reference data is sourced from <b><Link color={'blue.500'} href='https://liquipedia.net/rocketleague/Main_Page'>Liquipedia</Link></b>.
-            </Text>
+              <Box p={4}>
+                <Text fontSize='xs'>
+                  RL Commentary Service is a fan-made hobby project and is not a reliable source.
+                  <br></br>
+                  <br></br>
+                  Scores are determined by real-time parsing of the <b><Link color={'blue.500'} href='https://www.twitch.tv/rocketleague'>official Twitch broadcast</Link></b> - similarly,
+                  the text feed is populated from a raw AI transcription of live audio commentary.
+                  <br></br>
+                  All reference data is sourced from <b><Link color={'blue.500'} href='https://liquipedia.net/rocketleague/Main_Page'>Liquipedia</Link></b>.
+                </Text>
+              </Box>
+
+            </Flex>
           </Box>
-
-        </Flex>
-      </Box>
-      <Spacer></Spacer>
-      </>
+          <Spacer></Spacer>
+        </>
       }
 
       <Box width={mainWidth} overflow='hidden' p={0}>
         <Box p={0} position='fixed' width={mainWidth} height='10%' zIndex={999} borderBottom='1px solid gray' bg={useColorModeValue('gray.100', 'gray.900')} overflow='hidden'>
           <Center p={4}>
-            <SeriesHeader series={currentSeries} logos={logos} isMobile={isMobile}/>
+            <SeriesHeader series={currentSeries} logos={logos} isMobile={isMobile} />
           </Center>
         </Box>
 
@@ -172,14 +162,12 @@ const App: React.FC = () =>
           <Box minW='50%'>
             <VStack height='100%'>
               {Object.values(seriesEvents)
-                .sort((a, b) =>
-                {
+                .sort((a, b) => {
                   const regex = /Event(\d+)-/;
                   const seriesIdA = getLastNumberFromSeriesId(a._source.seriesId);
                   const seriesIdB = getLastNumberFromSeriesId(b._source.seriesId);
                   // Compare series IDs first
-                  if (seriesIdA !== seriesIdB)
-                  {
+                  if (seriesIdA !== seriesIdB) {
                     return seriesIdB - seriesIdA; // Sort by decreasing series ID
                   }
                   const eventIdA = parseInt((a._source.eventId.match(regex) || [])[1], 10);
@@ -189,12 +177,12 @@ const App: React.FC = () =>
                 .map((seriesEvent, index) => (
                   <Box key={index} p={4} width={isMobile ? '100%' : '60%'} height='100%'>
                     {seriesEvent._source.evaluation === 'NEW_SERIES' ?
-                    <NewSeriesContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} isMobile={isMobile} />
-                    :
-                    seriesEvent._source.evaluation === 'SERIES_COMPLETE' ?
-                    <SeriesVictoryContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
-                    :
-                    <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} isMobile={isMobile} />
+                      <NewSeriesContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} isMobile={isMobile} />
+                      :
+                      seriesEvent._source.evaluation === 'SERIES_COMPLETE' ?
+                        <SeriesVictoryContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} />
+                        :
+                        <SeriesEventContainer seriesEvent={seriesEvent} series={series[seriesEvent._source.seriesId]} logos={logos} isMobile={isMobile} />
                     }
                   </Box>
                 ))}

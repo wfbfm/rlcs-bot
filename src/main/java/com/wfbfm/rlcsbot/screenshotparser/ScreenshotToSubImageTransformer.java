@@ -89,12 +89,19 @@ public class ScreenshotToSubImageTransformer
     private void processSubImage(File incomingFile, BufferedImage originalImage, SubImageStrategy subImageStrategy) throws IOException
     {
         final BufferedImage subImage = GameScreenshotProcessorUtils.createSubImageFromStrategy(originalImage, subImageStrategy);
-        this.subImageWrapperBuilder.withSubImage(subImageStrategy.getSubImageType(), subImage);
-        if (RETAIN_PROCESSING_FILES)
+        if (subImage != null)
         {
-            final String outputPath = PROCESSING_DIRECTORY + File.separator +
-                    incomingFile.getName().replace(".png", "") + "-" + subImageStrategy.getSubImageType().name() + ".png";
-            GameScreenshotProcessorUtils.saveImage(subImage, outputPath);
+            this.subImageWrapperBuilder.withSubImage(subImageStrategy.getSubImageType(), subImage);
+            if (RETAIN_PROCESSING_FILES)
+            {
+                final String outputPath = PROCESSING_DIRECTORY + File.separator +
+                        incomingFile.getName().replace(".png", "") + "-" + subImageStrategy.getSubImageType().name() + ".png";
+                GameScreenshotProcessorUtils.saveImage(subImage, outputPath);
+            }
+        }
+        else
+        {
+            logger.log(Level.WARNING, "Unable to create subImage: " + incomingFile.getName());
         }
     }
 }

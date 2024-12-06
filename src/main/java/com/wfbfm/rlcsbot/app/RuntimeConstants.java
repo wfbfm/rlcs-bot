@@ -31,13 +31,14 @@ public class RuntimeConstants
     public static final String DISPLAY_NAME_MAPPINGS = "src/main/resources/display-name-mappings.csv";
     public static final String PYTHON = "python";
     public static final String PYTHON_SCRIPT = "python_scripts" + File.separator + "transcribe_commentary.py";
-    public static final int TRANSCRIPTION_WAIT_TIME_MS = 10_000;
+    public static final int TRANSCRIPTION_WAIT_TIME_MS = Integer.parseInt(System.getenv("TRANSCRIPTION_WAIT"));
     public static final int TRANSCRIPTION_FILE_SECONDS = 20;
     public static final String ELASTICSEARCH_HOST = System.getenv("ELASTIC_HOST");
     public static final String ELASTICSEARCH_USERNAME = System.getenv("ELASTIC_USERNAME");
     public static final String ELASTICSEARCH_PASSWORD = System.getenv("ELASTIC_PASSWORD");
     public static final String ELASTIC_INDEX_SERIES = "series";
     public static final String ELASTIC_INDEX_SERIES_EVENT = "seriesevent";
+    public static final int ELASTIC_REFRESH_MS = 1000;
     public static final int WEBSOCKET_PORT = Integer.parseInt(System.getenv("APP_PORT"));
     public static final int SECRET_ADMIN_PORT = Integer.parseInt(System.getenv("SECRET_ADMIN_APP_PORT"));
     public static final String KEYSTORE_PASSWORD = System.getenv("KEYSTORE_PASSWORD");

@@ -16,6 +16,10 @@ public class GameScreenshotProcessorUtils
 {
     public static BufferedImage createSubImageFromStrategy(final BufferedImage originalImage, final SubImageStrategy strategy)
     {
+        if (originalImage == null)
+        {
+            return null;
+        }
         BufferedImage subImage = cropImage(originalImage, strategy.getCropStartX(), strategy.getCropStartY(),
                 strategy.getCropEndX(), strategy.getCropEndY());
 
